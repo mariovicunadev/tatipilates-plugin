@@ -1,0 +1,27 @@
+# Release generados
+release/*.zip
+
+# Carpeta release desactualizada (nunca debe existir)
+release/tatipilates/
+
+# Archivos de Mac
+.DS_Store
+**/.DS_Store
+
+# Datos sensibles y locales
+CONTEXTO.md
+
+# Scripts de desarrollo local
+dev/
+
+# Archivos de prueba generados
+mipilates.zip
+
+# Guías y documentación con posibles credenciales
+guia-rapida-tatiana.*
+
+# Checklists de pruebas (uso local)
+checklist-pruebas-tati-pilates.*
+
+# Logs
+*.log
