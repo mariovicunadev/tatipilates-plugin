@@ -12,6 +12,7 @@ if (!defined('ABSPATH')) {
 $mensaje = isset($_GET['tp_mensaje']) ? sanitize_text_field(wp_unslash($_GET['tp_mensaje'])) : '';
 $error   = isset($_GET['tp_error']) ? sanitize_text_field(wp_unslash($_GET['tp_error'])) : '';
 $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::configuracion() : array();
+$updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : array();
 ?>
 
 <div class="wrap tp-admin tp-configuracion-page">
@@ -148,6 +149,60 @@ $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::
                 <p><?php echo esc_html__('Credenciales demo:', 'tatipilates'); ?></p>
                 <p><code>*.demo@tatipilates.test</code><br><code>Pilates2026!</code></p>
                 <p><code>admin.pilates.demo@tatipilates.test</code><br><code>AdminPilates2026!</code></p>
+            </div>
+        </div>
+
+        <div class="tp-window tp-admin-side">
+            <div class="tp-window-bar">
+                <span></span>
+                <span></span>
+                <strong><?php echo esc_html__('Actualizaciones privadas', 'tatipilates'); ?></strong>
+            </div>
+
+            <div class="tp-window-body">
+                <?php if ($updater_config) : ?>
+                    <p><?php echo esc_html__('Permite que WordPress detecte versiones publicadas en GitHub segun el canal configurado para este sitio.', 'tatipilates'); ?></p>
+
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="tp-updater-form">
+                        <?php wp_nonce_field('tp_guardar_updater_config'); ?>
+                        <input type="hidden" name="action" value="tp_guardar_updater_config">
+
+                        <label class="tp-field tp-field-checkbox">
+                            <input type="checkbox" name="enabled" value="1" <?php checked((int) $updater_config['enabled'], 1); ?>>
+                            <span><?php echo esc_html__('Activar updater privado', 'tatipilates'); ?></span>
+                            <small><?php echo esc_html__('Si esta desactivado, WordPress no mostrara updates privados.', 'tatipilates'); ?></small>
+                        </label>
+
+                        <label class="tp-field">
+                            <span><?php echo esc_html__('Canal de updates', 'tatipilates'); ?></span>
+                            <select name="channel">
+                                <option value="stable" <?php selected($updater_config['channel'], 'stable'); ?>><?php echo esc_html__('Stable / live', 'tatipilates'); ?></option>
+                                <option value="staging" <?php selected($updater_config['channel'], 'staging'); ?>><?php echo esc_html__('Staging / pruebas', 'tatipilates'); ?></option>
+                            </select>
+                            <small><?php echo esc_html__('Usa staging en el sitio de pruebas y stable en el sitio live.', 'tatipilates'); ?></small>
+                        </label>
+
+                        <label class="tp-field">
+                            <span><?php echo esc_html__('GitHub token privado', 'tatipilates'); ?></span>
+                            <input type="password" name="token" value="" autocomplete="new-password" placeholder="<?php echo esc_attr(!empty($updater_config['token']) ? __('Token guardado. Dejalo vacio para conservarlo.', 'tatipilates') : __('Pega un token fine-grained de GitHub.', 'tatipilates')); ?>">
+                            <small><?php echo esc_html__('Permiso minimo recomendado: Contents read-only solo para este repositorio.', 'tatipilates'); ?></small>
+                        </label>
+
+                        <?php if (!empty($updater_config['token'])) : ?>
+                            <label class="tp-field tp-field-checkbox">
+                                <input type="checkbox" name="clear_token" value="1">
+                                <span><?php echo esc_html__('Borrar token guardado', 'tatipilates'); ?></span>
+                                <small><?php echo esc_html__('Usalo si queres desconectar este sitio de GitHub.', 'tatipilates'); ?></small>
+                            </label>
+                        <?php endif; ?>
+
+                        <div class="tp-form-actions">
+                            <?php submit_button(__('Guardar updater', 'tatipilates'), 'primary', 'submit', false); ?>
+                        </div>
+                    </form>
+                <?php else : ?>
+                    <p><?php echo esc_html__('El modulo de actualizaciones privadas no esta disponible.', 'tatipilates'); ?></p>
+                <?php endif; ?>
             </div>
         </div>
     </div>

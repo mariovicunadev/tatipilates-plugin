@@ -41,6 +41,7 @@ class TP_Admin {
         add_action('admin_post_tp_admin_notificacion_vista', array($this, 'marcar_notificacion_vista'));
         add_action('admin_post_tp_admin_notificacion_eliminar', array($this, 'eliminar_notificacion'));
         add_action('admin_post_tp_guardar_notificaciones_config', array($this, 'guardar_notificaciones_config'));
+        add_action('admin_post_tp_guardar_updater_config', array($this, 'guardar_updater_config'));
         add_action('admin_post_tp_seed_test_data', array($this, 'generar_datos_prueba'));
     }
 
@@ -626,6 +627,28 @@ class TP_Admin {
         } else {
             TP_Notificaciones::guardar_configuracion($_POST);
             $args['tp_mensaje'] = rawurlencode('Configuracion de notificaciones guardada.');
+        }
+
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Saves private updater settings.
+     *
+     * @return void
+     */
+    public function guardar_updater_config() {
+        $this->require_admin();
+        check_admin_referer('tp_guardar_updater_config');
+
+        $args = array('page' => 'tatipilates-configuracion');
+
+        if (!class_exists('TP_Updater')) {
+            $args['tp_error'] = rawurlencode('El modulo de actualizaciones privadas no esta disponible.');
+        } else {
+            TP_Updater::guardar_configuracion($_POST);
+            $args['tp_mensaje'] = rawurlencode('Configuracion de actualizaciones guardada.');
         }
 
         wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));

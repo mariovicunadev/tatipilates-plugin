@@ -8,6 +8,15 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - `MINOR`: funcionalidades nuevas.
 - `PATCH`: fixes y mejoras pequenas.
 
+## [1.1.0] - 2026-06-05
+
+### Added
+
+- Agrega updater privado por canales `staging` y `stable` usando GitHub Releases y `updates.json`.
+- Agrega configuracion del canal y token de GitHub desde wp-admin.
+- Agrega workflows de GitHub para publicar release candidate a staging y promover versiones estables a live.
+- Documenta el flujo de releases por canales y el bootstrap inicial del updater.
+
 ## [1.0.1] - 2026-06-05
 
 ### Fixed

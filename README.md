@@ -29,6 +29,9 @@ includes/
 admin/
 public/
 assets/
+docs/
+.github/workflows/
+updates.json
 pre-release-check.sh
 ```
 
@@ -164,7 +167,7 @@ git push origin v1.0.1
 
 ## Deploy a staging y live
 
-El flujo esperado es:
+El flujo manual tradicional es:
 
 ```text
 LocalWP -> pre-release ZIP -> staging -> pruebas -> live
@@ -173,6 +176,57 @@ LocalWP -> pre-release ZIP -> staging -> pruebas -> live
 Para staging, subir el ZIP generado por `pre-release-check.sh` desde wp-admin o por el mecanismo de deploy disponible.
 
 Para live, usar el mismo ZIP que ya paso staging. Si se necesita corregir algo despues de staging, generar un nuevo ZIP, volver a probar y recien despues publicar.
+
+## Updater privado
+
+Desde `1.1.0`, el plugin incluye un updater privado por canales:
+
+- `staging`: para el sitio de pruebas.
+- `stable`: para el sitio live.
+
+La primera version que contiene el updater debe instalarse manualmente con ZIP normal. Despues de ese bootstrap, WordPress puede detectar actualizaciones privadas desde:
+
+```text
+Plugins > Tati Pilates > Actualizar ahora
+```
+
+Configuracion en cada sitio:
+
+```text
+Tati Pilates > Configuracion > Actualizaciones privadas
+```
+
+En staging:
+
+```text
+Canal: staging
+```
+
+En live:
+
+```text
+Canal: stable
+```
+
+El token de GitHub se guarda solo en WordPress. No se sube al repo.
+
+Flujo nuevo recomendado:
+
+```text
+Local changes
+-> commit/push main
+-> GitHub Action: Publish staging release 1.1.1-rc.1
+-> staging actualiza desde WordPress
+-> pruebas
+-> GitHub Action: Promote stable release 1.1.1
+-> live actualiza desde WordPress
+```
+
+Documentacion completa:
+
+```text
+docs/updater-workflow.md
+```
 
 ## Seguridad
 
@@ -187,6 +241,7 @@ El plugin usa:
 - Logging interno controlado por `WP_DEBUG`.
 - Rate limiting en login del portal.
 - Mensajes genericos en reset de contrasena para evitar user enumeration.
+- Updater privado sin tokens hardcodeados en el codigo.
 
 ## Repositorio
 
@@ -208,7 +263,7 @@ Plugin privado de WordPress: Tati Pilates.
 Repo GitHub privado: https://github.com/wefefino/tatipilates-plugin
 Branch principal: main.
 
-Lee README.md y CHANGELOG.md antes de tocar codigo.
+Lee README.md, CHANGELOG.md y docs/updater-workflow.md antes de tocar codigo.
 Si existe CONTEXTO.md en local, leelo tambien, pero no lo subas al repo.
 
 Workflow:
@@ -216,6 +271,7 @@ Workflow:
 - Registra cambios relevantes en CHANGELOG.md.
 - Mantene fuera del repo credenciales, release/, dev/, CONTEXTO.md y ZIPs.
 - Antes de cerrar una tanda para staging, correr ./pre-release-check.sh --yes.
+- Para publicar updates, usar los canales staging/stable documentados en docs/updater-workflow.md.
 
 Objetivo de este chat:
 [describir aqui el cambio o bug]

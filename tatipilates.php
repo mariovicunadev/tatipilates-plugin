@@ -3,10 +3,11 @@
  * Plugin Name: Tati Pilates
  * Plugin URI:  https://tatipilates.com
  * Description: Sistema de gestion de clases, reservas y recuperaciones para Tati Pilates.
- * Version:     1.0.1
+ * Version:     1.1.0
  * Author:      Tati Pilates
  * Text Domain: tatipilates
  * Domain Path: /languages
+ * Update URI:  https://github.com/wefefino/tatipilates-plugin
  *
  * @package TatiPilates
  */
@@ -15,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('TP_VERSION', '1.0.1');
+define('TP_VERSION', '1.1.0');
 define('TP_PLUGIN_FILE', __FILE__);
 define('TP_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TP_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -60,6 +61,10 @@ add_action(
 
         if (is_admin() && class_exists('TP_Admin')) {
             new TP_Admin();
+        }
+
+        if (is_admin() && class_exists('TP_Updater')) {
+            new TP_Updater();
         }
 
         if (class_exists('TP_Portal')) {

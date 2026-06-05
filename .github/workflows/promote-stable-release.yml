@@ -1,0 +1,101 @@
+name: Promote stable release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Stable version, for example 1.0.2"
+        required: true
+      notes:
+        description: "Short release notes shown in WordPress"
+        required: false
+        default: "Version aprobada para live."
+
+permissions:
+  contents: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate version
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Stable versions must look like 1.0.2"
+            exit 1
+          fi
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update plugin version and manifest
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          TAG="v$VERSION"
+          ASSET="tatipilates-$VERSION.zip"
+          NOTES="${{ github.event.inputs.notes }}"
+
+          perl -0pi -e "s/(\\* Version:\\s*)[^\\n]+/\${1}$VERSION/; s/define\\('TP_VERSION', '[^']+'\\);/define('TP_VERSION', '$VERSION');/" tatipilates.php
+
+          node <<'NODE'
+          const fs = require('fs');
+          const version = process.env.VERSION;
+          const tag = `v${version}`;
+          const asset = `tatipilates-${version}.zip`;
+          const notes = process.env.NOTES || 'Version aprobada para live.';
+          const manifest = JSON.parse(fs.readFileSync('updates.json', 'utf8'));
+          manifest.channels.stable = {
+            version,
+            tag,
+            asset,
+            requires: '6.0',
+            tested: '6.5',
+            requires_php: '8.0',
+            notes
+          };
+          fs.writeFileSync('updates.json', JSON.stringify(manifest, null, 2) + '\n');
+          NODE
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+          NOTES: ${{ github.event.inputs.notes }}
+
+      - name: Commit release metadata
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          git add tatipilates.php updates.json
+          git commit -m "chore: promote v$VERSION to stable"
+          git tag "v$VERSION"
+          git push origin HEAD:main
+          git push origin "v$VERSION"
+
+      - name: Build plugin ZIP
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          ASSET="tatipilates-$VERSION.zip"
+          TMP_DIR="$(mktemp -d)"
+          mkdir -p "$TMP_DIR/tatipilates"
+          cp -R tatipilates.php uninstall.php includes admin public assets "$TMP_DIR/tatipilates/"
+          find "$TMP_DIR/tatipilates" -name '.DS_Store' -delete
+          find "$TMP_DIR/tatipilates" -name '.*' -depth -exec rm -rf {} +
+          (cd "$TMP_DIR" && zip -qr "$GITHUB_WORKSPACE/$ASSET" tatipilates)
+          rm -rf "$TMP_DIR"
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          ASSET="tatipilates-$VERSION.zip"
+          NOTES="${{ github.event.inputs.notes }}"
+          gh release create "v$VERSION" "$ASSET" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Tati Pilates v$VERSION" \
+            --notes "$NOTES"
