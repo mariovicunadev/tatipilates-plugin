@@ -83,7 +83,7 @@ El script verifica:
 Si todo pasa, genera un ZIP en:
 
 ```text
-release/tatipilates-YYYYMMDD-HHMM.zip
+release/tatipilates-VERSION-YYYYMMDD-HHMM.zip
 ```
 
 El ZIP incluye:
@@ -108,13 +108,15 @@ git status
 git diff
 ```
 
-4. Correr pre-release:
+4. Registrar el cambio en `CHANGELOG.md`, normalmente en la version `Unreleased`.
+5. Si el cambio se va a mandar a staging, actualizar la version en `tatipilates.php`.
+6. Correr pre-release:
 
 ```zsh
 ./pre-release-check.sh --yes
 ```
 
-5. Si los checks pasan, commitear:
+7. Si los checks pasan, commitear:
 
 ```zsh
 git add .
@@ -130,8 +132,8 @@ fix: prevent duplicate recovery booking
 chore: update release checks
 ```
 
-6. Subir el ZIP generado a staging.
-7. Probar staging, especialmente:
+8. Subir el ZIP generado a staging.
+9. Probar staging, especialmente:
 
 - Login y reset de contrasena en `/mi-pilates`.
 - Dashboard de alumna.
@@ -141,8 +143,15 @@ chore: update release checks
 - PWA/offline.
 - Admin Pilates con permisos limitados.
 
-8. Si staging esta correcto, subir el mismo ZIP a live.
-9. Despues del deploy live, guardar cualquier fix nuevo en Git con otro commit.
+10. Si staging esta correcto, subir el mismo ZIP a live.
+11. Despues del deploy live, crear un tag de version:
+
+```zsh
+git tag v1.0.1
+git push origin v1.0.1
+```
+
+12. Si aparece un bug en staging o live, corregirlo en local, generar un nuevo ZIP y volver a probar. No editar directo en staging/live sin replicar el cambio en Git.
 
 ## Reglas importantes
 
@@ -185,4 +194,29 @@ Repositorio privado:
 
 ```text
 https://github.com/wefefino/tatipilates-plugin
+```
+
+## Prompt base para nuevos chats
+
+Usar este prompt al abrir una nueva conversacion de Codex para cambios futuros:
+
+```text
+Estamos trabajando en el repo local:
+/Users/vicunav/Documents/Codex/Mi Pilates Admin
+
+Plugin privado de WordPress: Tati Pilates.
+Repo GitHub privado: https://github.com/wefefino/tatipilates-plugin
+Branch principal: main.
+
+Lee README.md y CHANGELOG.md antes de tocar codigo.
+Si existe CONTEXTO.md en local, leelo tambien, pero no lo subas al repo.
+
+Workflow:
+- No hagas commit ni push hasta que yo lo pida.
+- Registra cambios relevantes en CHANGELOG.md.
+- Mantene fuera del repo credenciales, release/, dev/, CONTEXTO.md y ZIPs.
+- Antes de cerrar una tanda para staging, correr ./pre-release-check.sh --yes.
+
+Objetivo de este chat:
+[describir aqui el cambio o bug]
 ```

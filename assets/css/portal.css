@@ -210,7 +210,7 @@ body.tp-mi-pilates-authenticated #masthead {
     box-shadow: var(--tp-shadow);
 }
 
-.tp-notification-dropdown a,
+.tp-notification-dropdown-item,
 .tp-notification-dropdown p {
     display: grid;
     gap: 3px;
@@ -225,9 +225,52 @@ body.tp-mi-pilates-authenticated #masthead {
     text-decoration: none !important;
 }
 
-.tp-notification-dropdown a.is-unread {
+.tp-notification-dropdown-item {
+    grid-template-columns: minmax(0, 1fr) 28px;
+    gap: 8px;
+    align-items: start;
+}
+
+.tp-notification-dropdown-item a {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+    color: var(--tp-ink) !important;
+    text-align: left;
+    text-decoration: none !important;
+}
+
+.tp-notification-dropdown-item.is-unread {
     border-color: #b9d2b8;
     background: var(--tp-sage-soft);
+}
+
+.tp-notification-dismiss {
+    display: inline-flex;
+    width: 28px;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    padding: 0;
+    background: transparent;
+    color: var(--tp-muted);
+    cursor: pointer;
+}
+
+.tp-notification-dismiss:hover,
+.tp-notification-dismiss:focus {
+    border-color: var(--tp-line);
+    background: #fff;
+    color: var(--tp-danger);
+}
+
+.tp-notification-dismiss .dashicons {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+    line-height: 18px;
 }
 
 .tp-notification-dropdown strong {
@@ -1453,8 +1496,10 @@ body.tp-mi-pilates-authenticated #masthead {
     }
 
     .tp-portal-topbar {
+        position: relative;
         align-items: stretch;
         flex-direction: column;
+        overflow: visible;
     }
 
     .tp-portal-menu {
@@ -1475,8 +1520,12 @@ body.tp-mi-pilates-authenticated #masthead {
         scroll-snap-align: start;
     }
 
+    .tp-booking-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
     .tp-booking-day > header,
-    .tp-booking-slot,
     .tp-mini-reservation,
     .tp-portal-achievement,
     .tp-portal-notifications article,
@@ -1490,12 +1539,37 @@ body.tp-mi-pilates-authenticated #masthead {
         flex-direction: column;
     }
 
+    .tp-booking-slot {
+        grid-template-columns: 1fr;
+        align-content: start;
+        gap: 8px;
+        min-height: 124px;
+        padding: 8px;
+    }
+
+    .tp-booking-slot strong {
+        font-size: 16px;
+    }
+
+    .tp-booking-slot .tp-button {
+        width: 100%;
+        min-height: 28px;
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
     .tp-slot-reserved-actions {
         justify-content: flex-start;
     }
 
     .tp-slot-booking-actions {
-        justify-content: flex-start;
+        display: grid;
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .tp-slot-booking-actions form {
+        width: 100%;
     }
 
     .tp-public-agenda-slot-head {
@@ -1512,9 +1586,16 @@ body.tp-mi-pilates-authenticated #masthead {
         justify-self: start;
     }
 
+    .tp-notification-menu {
+        position: static;
+    }
+
     .tp-notification-dropdown {
-        right: auto;
-        left: 0;
+        top: calc(100% + 8px);
+        right: 10px;
+        left: 10px;
+        width: auto;
+        max-width: none;
     }
 
     .tp-portal-notification-actions {

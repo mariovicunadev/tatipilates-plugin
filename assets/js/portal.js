@@ -133,21 +133,28 @@
             showInstallButton();
         }
 
-        document.querySelectorAll('[data-tp-notification-read]').forEach(function (notification) {
-            var markAsRead = function () {
-                var notificationId = notification.getAttribute('data-tp-notification-read');
-                var nonce = notification.getAttribute('data-tp-notification-nonce');
+        document.querySelectorAll('[data-tp-notification-dismiss]').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
 
-                if (!notificationId || !nonce || notification.dataset.tpNotificationMarked === '1') {
+                var notificationId = button.getAttribute('data-tp-notification-dismiss');
+                var nonce = button.getAttribute('data-tp-notification-nonce');
+                var item = button.closest('[data-tp-notification-item]');
+
+                if (!notificationId || !nonce || button.dataset.tpNotificationMarked === '1') {
                     return;
                 }
 
-                notification.dataset.tpNotificationMarked = '1';
-                notification.classList.remove('is-unread');
-                notification.classList.add('is-read');
-                decrementNotificationBadge();
+                button.dataset.tpNotificationMarked = '1';
+                button.disabled = true;
 
                 if (!window.TPPortalPWA || !window.TPPortalPWA.adminPostUrl || !window.fetch) {
+                    if (item) {
+                        item.remove();
+                        decrementNotificationBadge();
+                        ensureNotificationEmptyState();
+                    }
                     return;
                 }
 
@@ -160,12 +167,21 @@
                     method: 'POST',
                     body: data,
                     credentials: 'same-origin'
-                }).catch(function () {});
-            };
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('notification-not-marked');
+                    }
 
-            notification.addEventListener('mouseenter', markAsRead);
-            notification.addEventListener('focus', markAsRead);
-            notification.addEventListener('touchstart', markAsRead, { passive: true });
+                    if (item) {
+                        item.remove();
+                        decrementNotificationBadge();
+                        ensureNotificationEmptyState();
+                    }
+                }).catch(function () {
+                    button.dataset.tpNotificationMarked = '0';
+                    button.disabled = false;
+                });
+            });
         });
     });
 
@@ -184,6 +200,26 @@
         }
 
         badge.textContent = String(count - 1);
+    }
+
+    function ensureNotificationEmptyState() {
+        var dropdown = document.querySelector('.tp-notification-dropdown');
+
+        if (!dropdown || dropdown.querySelector('[data-tp-notification-item]') || dropdown.querySelector('.tp-notification-empty')) {
+            return;
+        }
+
+        var viewAll = dropdown.querySelector('.tp-notification-view-all');
+        var empty = document.createElement('p');
+        empty.className = 'tp-notification-empty';
+        empty.textContent = 'Sin notificaciones.';
+
+        if (viewAll) {
+            dropdown.insertBefore(empty, viewAll);
+            return;
+        }
+
+        dropdown.appendChild(empty);
     }
 
     if (!('serviceWorker' in navigator) || !window.TPPortalPWA) {

@@ -238,7 +238,7 @@ case "${zip_answer:l}" in
 
     mkdir -p release
     timestamp="$(date +%Y%m%d-%H%M)"
-    zip_path="$ROOT_DIR/release/tatipilates-$timestamp.zip"
+    zip_path="$ROOT_DIR/release/tatipilates-$version-$timestamp.zip"
     tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/tatipilates-release.XXXXXX")"
 
     mkdir -p "$tmp_dir/tatipilates"

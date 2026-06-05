@@ -34,13 +34,18 @@ if (!defined('ABSPATH')) {
                 <div class="tp-notification-dropdown">
                     <?php if ($notificaciones_recientes) : ?>
                         <?php foreach ($notificaciones_recientes as $notificacion_dropdown) : ?>
-                            <a class="<?php echo esc_attr((int) $notificacion_dropdown->visto_alumna ? 'is-read' : 'is-unread'); ?>" href="<?php echo esc_url($notificaciones_url); ?>" data-tp-notification-read="<?php echo esc_attr((int) $notificacion_dropdown->id); ?>" data-tp-notification-nonce="<?php echo esc_attr(wp_create_nonce('tp_portal_notificacion_vista_' . (int) $notificacion_dropdown->id)); ?>">
-                                <strong><?php echo esc_html($notificacion_dropdown->titulo); ?></strong>
-                                <span><?php echo esc_html(wp_trim_words($notificacion_dropdown->mensaje, 12)); ?></span>
-                            </a>
+                            <div class="tp-notification-dropdown-item is-unread" data-tp-notification-item="<?php echo esc_attr((int) $notificacion_dropdown->id); ?>">
+                                <a href="<?php echo esc_url($notificaciones_url); ?>">
+                                    <strong><?php echo esc_html($notificacion_dropdown->titulo); ?></strong>
+                                    <span><?php echo esc_html(wp_trim_words($notificacion_dropdown->mensaje, 12)); ?></span>
+                                </a>
+                                <button type="button" class="tp-notification-dismiss" aria-label="<?php echo esc_attr__('Marcar como vista', 'tatipilates'); ?>" title="<?php echo esc_attr__('Marcar como vista', 'tatipilates'); ?>" data-tp-notification-dismiss="<?php echo esc_attr((int) $notificacion_dropdown->id); ?>" data-tp-notification-nonce="<?php echo esc_attr(wp_create_nonce('tp_portal_notificacion_vista_' . (int) $notificacion_dropdown->id)); ?>">
+                                    <span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
+                                </button>
+                            </div>
                         <?php endforeach; ?>
                     <?php else : ?>
-                        <p><?php echo esc_html__('Sin notificaciones.', 'tatipilates'); ?></p>
+                        <p class="tp-notification-empty"><?php echo esc_html__('Sin notificaciones.', 'tatipilates'); ?></p>
                     <?php endif; ?>
                     <a class="tp-notification-view-all" href="<?php echo esc_url($notificaciones_url); ?>"><?php echo esc_html__('Ver todas', 'tatipilates'); ?></a>
                 </div>
@@ -414,13 +419,13 @@ if (!defined('ABSPATH')) {
                 </div>
             </div>
 
-            <div class="tp-section-title">
-                <h2><?php echo esc_html__('Mis logros', 'tatipilates'); ?></h2>
-            </div>
+            <?php if (!empty($logros)) : ?>
+                <div class="tp-section-title">
+                    <h2><?php echo esc_html__('Mis logros', 'tatipilates'); ?></h2>
+                </div>
 
-            <div class="tp-window">
-                <div class="tp-window-body">
-                    <?php if (!empty($logros)) : ?>
+                <div class="tp-window">
+                    <div class="tp-window-body">
                         <div class="tp-portal-achievements">
                             <?php foreach ($logros as $logro) : ?>
                                 <?php $logro_completado = 'logrado' === $logro->estado; ?>
@@ -435,19 +440,17 @@ if (!defined('ABSPATH')) {
                                 </article>
                             <?php endforeach; ?>
                         </div>
-                    <?php else : ?>
-                        <p class="tp-empty-state"><?php echo esc_html__('Aun no tienes logros registrados.', 'tatipilates'); ?></p>
-                    <?php endif; ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <div class="tp-section-title">
-                <h2><?php echo esc_html__('Reportar ausencia', 'tatipilates'); ?></h2>
-            </div>
+            <?php if ($reservas_reportables) : ?>
+                <div class="tp-section-title">
+                    <h2><?php echo esc_html__('Reportar ausencia', 'tatipilates'); ?></h2>
+                </div>
 
-	            <div class="tp-window">
-	                <div class="tp-window-body">
-	                    <?php if ($reservas_reportables) : ?>
+                <div class="tp-window">
+                    <div class="tp-window-body">
                         <form class="tp-absence-form" method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
                             <?php wp_nonce_field('tp_portal_reportar_ausencia'); ?>
                             <input type="hidden" name="action" value="tp_portal_reportar_ausencia">
@@ -471,11 +474,9 @@ if (!defined('ABSPATH')) {
                             <button class="tp-button tp-button-primary" type="submit"><?php echo esc_html__('Confirmar ausencia', 'tatipilates'); ?></button>
                             <p><?php echo esc_html__('Se creara una recuperacion valida por 3 meses.', 'tatipilates'); ?></p>
                         </form>
-                    <?php else : ?>
-                        <p class="tp-empty-state"><?php echo esc_html__('No tienes clases futuras para reportar esta semana.', 'tatipilates'); ?></p>
-                    <?php endif; ?>
+                    </div>
                 </div>
-            </div>
+            <?php endif; ?>
         </aside>
     </div>
 </div>

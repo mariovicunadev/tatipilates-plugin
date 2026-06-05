@@ -448,9 +448,10 @@ class TP_Portal {
         $logout_url                        = wp_logout_url(TP_Roles::portal_url());
         $logo_url                          = content_url('uploads/2026/04/1775228635121-2048x1587.png');
         $notificaciones                    = class_exists('TP_Notificaciones') ? TP_Notificaciones::listar_alumna((int) $estudiante->id, array('limit' => 50)) : array();
-        $notificaciones_recientes          = class_exists('TP_Notificaciones') ? TP_Notificaciones::listar_alumna((int) $estudiante->id, array('limit' => 5)) : array();
+        $notificaciones_recientes          = class_exists('TP_Notificaciones') ? TP_Notificaciones::listar_alumna((int) $estudiante->id, array('limit' => 5, 'pendientes' => true)) : array();
         $notificaciones_no_vistas          = class_exists('TP_Notificaciones') ? TP_Notificaciones::contar_no_vistas('alumna', (int) $estudiante->id) : 0;
         $semana['label_rango']             = self::formatear_rango_corto($semana['inicio'], $semana['fin']);
+        $ocultar_dias_pasados_reservas     = 'reservas' === $vista && !$modo_historial && $semana['inicio'] <= $hoy && $semana['fin'] >= $hoy;
 
         foreach ($mis_reservas as $reserva) {
             if ('normal' === $reserva->tipo && 'falto' === $reserva->estado) {
@@ -478,6 +479,12 @@ class TP_Portal {
 
         foreach ($agenda as $indice_dia => $dia) {
             $horarios_visibles = array();
+
+            if ($ocultar_dias_pasados_reservas && $dia['fecha'] < $hoy) {
+                $agenda[$indice_dia]['horarios_visibles'] = array();
+                $agenda[$indice_dia]['mostrar']           = false;
+                continue;
+            }
 
             foreach ($dia['horarios'] as $slot) {
                 if ($modo_historial && empty($slot['reserva'])) {
