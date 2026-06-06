@@ -12,13 +12,13 @@
       "notes": "Release candidate de mantenimiento para probar documentacion y flujo de updater."
     },
     "stable": {
-      "version": "1.1.1",
-      "tag": "v1.1.1",
-      "asset": "tatipilates-1.1.1.zip",
+      "version": "1.1.2",
+      "tag": "v1.1.2",
+      "asset": "tatipilates-1.1.2.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Version aprobada desde staging para live."
+      "notes": "Version estable de mantenimiento con documentacion operativa."
     }
   }
 }
