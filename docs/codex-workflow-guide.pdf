@@ -1,0 +1,875 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier >>
+endobj
+4 0 obj
+<< /Length 2928 >>
+stream
+BT
+/F2 18 Tf
+54 760 Td (Guia de trabajo con Codex - Tati Pilates) Tj
+-54 -24 Td
+/F1 10 Tf
+54 736 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 722 Td (Esta guia resume como abrir nuevos chats, como pedir cambios y que documentacion) Tj
+-54 -14 Td
+/F1 10 Tf
+54 708 Td (conviene mantener para que el proyecto escale sin perder orden.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 694 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 680 Td (Estado actual de documentacion) Tj
+-54 -20 Td
+/F1 10 Tf
+54 660 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 646 Td (El proyecto ya tiene:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 632 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 618 Td (- `README.md`: vision general, estructura, pre-release, updater privado y prompt base.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 604 Td (- `CHANGELOG.md`: historial de versiones y cambios relevantes.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 590 Td (- `docs/updater-workflow.md`: flujo de releases por canales `staging` y `stable`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 576 Td (- `CONTEXTO.md`: memoria local sensible, ignorada por Git.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 562 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 548 Td (Esto ya cubre el flujo principal, pero para escalar conviene sumar documentacion) Tj
+-54 -14 Td
+/F1 10 Tf
+54 534 Td (especializada.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 520 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 506 Td (Archivos .md recomendados) Tj
+-54 -20 Td
+/F1 10 Tf
+54 486 Td () Tj
+-54 -14 Td
+/F2 12 Tf
+54 472 Td (Prioridad alta) Tj
+-54 -17 Td
+/F1 10 Tf
+54 455 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 441 Td (1. `docs/testing-checklist.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 427 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 413 Td (Checklist de pruebas antes de publicar una version. Deberia cubrir:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 399 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 385 Td (- Login y reset de contrasena.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 371 Td (- Portal mobile.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 357 Td (- Reservas, cancelaciones y recuperaciones.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 343 Td (- Agenda semanal.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 329 Td (- Pagos y asistencia.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 315 Td (- Notificaciones.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 301 Td (- Updater privado.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 287 Td (- Roles: admin, Admin Pilates y alumna.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 273 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 259 Td (2. `docs/release-runbook.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 245 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 231 Td (Guia paso a paso para publicar:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 217 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 203 Td (- Como cerrar una tanda local.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 189 Td (- Como crear release candidate.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 175 Td (- Como actualizar staging.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 161 Td (- Como promover a stable.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 147 Td (- Que hacer si staging falla.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 133 Td (- Que hacer si live no detecta update.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 119 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 105 Td (3. `docs/security-checklist.md`) Tj
+-54 -14 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 2447 >>
+stream
+BT
+/F1 10 Tf
+54 760 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 746 Td (Checklist recurrente de seguridad:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 732 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 718 Td (- Nonces.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 704 Td (- Capabilities.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 690 Td (- Ownership checks.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 676 Td (- Sanitizacion y escaping.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 662 Td (- SQL prepare.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 648 Td (- Manejo de tokens.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 634 Td (- No subir credenciales.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 620 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 606 Td (4. `docs/data-model.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 592 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 578 Td (Resumen de tablas y relaciones:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 564 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 550 Td (- `tp_horarios`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 536 Td (- `tp_alumnas`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 522 Td (- `tp_reservas`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 508 Td (- `tp_recuperaciones`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 494 Td (- `tp_pagos`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 480 Td (- `tp_milestones`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 466 Td (- `tp_notificaciones`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 452 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 438 Td (Tambien deberia documentar indices, reglas de borrado y decisiones transaccionales.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 424 Td () Tj
+-54 -14 Td
+/F2 12 Tf
+54 410 Td (Prioridad media) Tj
+-54 -17 Td
+/F1 10 Tf
+54 393 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 379 Td (5. `docs/architecture.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 365 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 351 Td (Mapa de clases y responsabilidades:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 337 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 323 Td (- `TP_Admin`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 309 Td (- `TP_Portal`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 295 Td (- `TP_Reservas`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 281 Td (- `TP_Alumnas`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 267 Td (- `TP_Notificaciones`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 253 Td (- `TP_Updater`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 239 Td (- `TP_Helpers`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 225 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 211 Td (Sirve para que nuevos chats o futuros colaboradores entiendan donde tocar.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 197 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 183 Td (6. `docs/local-development.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 169 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 155 Td (Instrucciones de LocalWP:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 141 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 127 Td (- Symlink del plugin.) Tj
+-54 -14 Td
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Length 2705 >>
+stream
+BT
+/F1 10 Tf
+54 760 Td (- PHP de LocalWP.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 746 Td (- Como correr `php -l`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 732 Td (- Como generar datos demo.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 718 Td (- Como resetear entorno local.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 704 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 690 Td (7. `docs/troubleshooting.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 676 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 662 Td (Problemas frecuentes:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 648 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 634 Td (- No llega email.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 620 Td (- No aparece update.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 606 Td (- GitHub token invalido.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 592 Td (- Staging no detecta release candidate.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 578 Td (- Live no detecta stable.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 564 Td (- Cache de WordPress updates.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 550 Td (- PWA/cache mostrando CSS viejo.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 536 Td () Tj
+-54 -14 Td
+/F2 12 Tf
+54 522 Td (Prioridad baja) Tj
+-54 -17 Td
+/F1 10 Tf
+54 505 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 491 Td (8. `docs/product-decisions.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 477 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 463 Td (Decisiones funcionales importantes:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 449 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 435 Td (- Alumna inactiva cancela reservas futuras.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 421 Td (- Horario inactivo cancela reservas futuras.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 407 Td (- Eliminar alumna requiere no tener historial.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 393 Td (- `cupo_plan_semana\(\)` es fuente central.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 379 Td (- Canal `staging` usa versiones `rc`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 365 Td (- Canal `stable` usa versiones finales.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 351 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 337 Td (9. `docs/roadmap.md`) Tj
+-54 -14 Td
+/F1 10 Tf
+54 323 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 309 Td (Lista viva de mejoras futuras.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 295 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 281 Td (Prompt base para nuevos chats) Tj
+-54 -20 Td
+/F1 10 Tf
+54 261 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 247 Td (Usar este prompt al abrir una nueva conversacion:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 233 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 219 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 205 Td (Estamos trabajando en el repo local:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 192 Td (/Users/vicunav/Documents/Codex/Mi Pilates Admin) Tj
+-54 -13 Td
+/F3 9 Tf
+54 179 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 166 Td (Plugin privado de WordPress: Tati Pilates.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 153 Td (Repo GitHub privado: https://github.com/wefefino/tatipilates-plugin) Tj
+-54 -13 Td
+/F3 9 Tf
+54 140 Td (Branch principal: main.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 127 Td () Tj
+-54 -13 Td
+ET
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 8 0 R >>
+endobj
+10 0 obj
+<< /Length 2818 >>
+stream
+BT
+/F3 9 Tf
+54 760 Td (Lee README.md, CHANGELOG.md y docs/updater-workflow.md antes de tocar codigo.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 747 Td (Si existe CONTEXTO.md en local, leelo tambien, pero no lo subas al repo.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 734 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 721 Td (Workflow:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 708 Td (- No hagas commit ni push hasta que yo lo pida.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 695 Td (- Registra cambios relevantes en CHANGELOG.md.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 682 Td (- Mantene fuera del repo credenciales, release/, dev/, CONTEXTO.md y ZIPs.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 669 Td (- Antes de cerrar una tanda para staging, correr ./pre-release-check.sh --yes.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 656 Td (- Para publicar updates, usar los canales staging/stable documentados en) Tj
+-54 -13 Td
+/F3 9 Tf
+54 643 Td (  docs/updater-workflow.md.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 630 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 617 Td (Objetivo de este chat:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 604 Td ([describir aqui el cambio o bug]) Tj
+-54 -13 Td
+/F1 10 Tf
+54 591 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 577 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 563 Td (Como pedir un cambio) Tj
+-54 -20 Td
+/F1 10 Tf
+54 543 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 529 Td (Formato recomendado:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 515 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 501 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 487 Td (Quiero cambiar:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 474 Td ([descripcion corta]) Tj
+-54 -13 Td
+/F3 9 Tf
+54 461 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 448 Td (Comportamiento actual:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 435 Td ([que pasa ahora]) Tj
+-54 -13 Td
+/F3 9 Tf
+54 422 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 409 Td (Comportamiento esperado:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 396 Td ([que deberia pasar]) Tj
+-54 -13 Td
+/F3 9 Tf
+54 383 Td () Tj
+-54 -13 Td
+/F3 9 Tf
+54 370 Td (Restricciones:) Tj
+-54 -13 Td
+/F3 9 Tf
+54 357 Td (- No hagas commit todavia.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 344 Td (- Registralo en CHANGELOG.md.) Tj
+-54 -13 Td
+/F3 9 Tf
+54 331 Td (- Mantene el cambio acotado.) Tj
+-54 -13 Td
+/F1 10 Tf
+54 318 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 304 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 290 Td (Workflow para cada tarea) Tj
+-54 -20 Td
+/F1 10 Tf
+54 270 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 256 Td (1. Abrir chat nuevo si la tarea es grande o distinta a la tanda actual.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 242 Td (2. Pegar el prompt base.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 228 Td (3. Describir el cambio o bug.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 214 Td (4. Pedir que no se haga commit hasta revisar.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 200 Td (5. Probar en local o staging.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 186 Td (6. Cuando este listo, pedir:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 172 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 158 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 144 Td (Listo para staging. Corre pre-release, commit, push y publica release candidate.) Tj
+-54 -13 Td
+ET
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 10 0 R >>
+endobj
+12 0 obj
+<< /Length 2516 >>
+stream
+BT
+/F1 10 Tf
+54 760 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 746 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 732 Td (7. Codex deberia:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 718 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 704 Td (- correr validaciones;) Tj
+-54 -14 Td
+/F1 10 Tf
+54 690 Td (- actualizar `CHANGELOG.md`;) Tj
+-54 -14 Td
+/F1 10 Tf
+54 676 Td (- generar ZIP si corresponde;) Tj
+-54 -14 Td
+/F1 10 Tf
+54 662 Td (- hacer commit y push;) Tj
+-54 -14 Td
+/F1 10 Tf
+54 648 Td (- publicar `1.x.x-rc.1` al canal `staging`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 634 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 620 Td (8. Probar staging.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 606 Td (9. Si todo esta bien, pedir:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 592 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 578 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 564 Td (Promover 1.x.x a stable.) Tj
+-54 -13 Td
+/F1 10 Tf
+54 551 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 537 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 523 Td (10. Live detectara la version final desde WordPress.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 509 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 495 Td (Versionado recomendado) Tj
+-54 -20 Td
+/F1 10 Tf
+54 475 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 461 Td (- Fix pequeno: subir patch. Ejemplo: `1.1.1` a `1.1.2`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 447 Td (- Feature nueva: subir minor. Ejemplo: `1.1.1` a `1.2.0`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 433 Td (- Cambio incompatible o migracion grande: subir major. Ejemplo: `1.1.1` a `2.0.0`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 419 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 405 Td (Para staging usar siempre:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 391 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 377 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 363 Td (1.2.0-rc.1) Tj
+-54 -13 Td
+/F3 9 Tf
+54 350 Td (1.2.0-rc.2) Tj
+-54 -13 Td
+/F1 10 Tf
+54 337 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 323 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 309 Td (Para live usar:) Tj
+-54 -14 Td
+/F1 10 Tf
+54 295 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 281 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 267 Td (1.2.0) Tj
+-54 -13 Td
+/F1 10 Tf
+54 254 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 240 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 226 Td (Reglas de oro) Tj
+-54 -20 Td
+/F1 10 Tf
+54 206 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 192 Td (- No pegar tokens en chats.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 178 Td (- No subir `CONTEXTO.md`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 164 Td (- No subir ZIPs de `release/`.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 150 Td (- No tocar staging/live manualmente sin replicarlo en Git.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 136 Td (- No promover a `stable` sin probar staging.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 122 Td (- No hacer commit hasta que la tanda este revisada.) Tj
+-54 -14 Td
+ET
+endstream
+endobj
+13 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 12 0 R >>
+endobj
+14 0 obj
+<< /Length 1517 >>
+stream
+BT
+/F1 10 Tf
+54 760 Td (- Mantener `CHANGELOG.md` al dia.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 746 Td (- Usar GitHub Actions para publicar y promover releases.) Tj
+-54 -14 Td
+/F1 10 Tf
+54 732 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 718 Td (Comandos utiles) Tj
+-54 -20 Td
+/F1 10 Tf
+54 698 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 684 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 670 Td (git status) Tj
+-54 -13 Td
+/F3 9 Tf
+54 657 Td (git diff) Tj
+-54 -13 Td
+/F3 9 Tf
+54 644 Td (./pre-release-check.sh --yes) Tj
+-54 -13 Td
+/F3 9 Tf
+54 631 Td (git log --oneline -5) Tj
+-54 -13 Td
+/F3 9 Tf
+54 618 Td (gh workflow list --repo wefefino/tatipilates-plugin) Tj
+-54 -13 Td
+/F3 9 Tf
+54 605 Td (gh run list --repo wefefino/tatipilates-plugin --limit 5) Tj
+-54 -13 Td
+/F1 10 Tf
+54 592 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 578 Td () Tj
+-54 -14 Td
+/F2 14 Tf
+54 564 Td (Flujo resumido) Tj
+-54 -20 Td
+/F1 10 Tf
+54 544 Td () Tj
+-54 -14 Td
+/F1 10 Tf
+54 530 Td () Tj
+-54 -14 Td
+/F3 9 Tf
+54 516 Td (Nuevo chat) Tj
+-54 -13 Td
+/F3 9 Tf
+54 503 Td (-> prompt base) Tj
+-54 -13 Td
+/F3 9 Tf
+54 490 Td (-> cambios locales) Tj
+-54 -13 Td
+/F3 9 Tf
+54 477 Td (-> revisar) Tj
+-54 -13 Td
+/F3 9 Tf
+54 464 Td (-> pre-release) Tj
+-54 -13 Td
+/F3 9 Tf
+54 451 Td (-> commit/push) Tj
+-54 -13 Td
+/F3 9 Tf
+54 438 Td (-> Publish staging release: 1.x.x-rc.1) Tj
+-54 -13 Td
+/F3 9 Tf
+54 425 Td (-> probar staging) Tj
+-54 -13 Td
+/F3 9 Tf
+54 412 Td (-> Promote stable release: 1.x.x) Tj
+-54 -13 Td
+/F3 9 Tf
+54 399 Td (-> actualizar live desde WordPress) Tj
+-54 -13 Td
+/F1 10 Tf
+54 386 Td () Tj
+-54 -14 Td
+ET
+endstream
+endobj
+15 0 obj
+<< /Type /Page /Parent 16 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R /F3 3 0 R >> >> /Contents 14 0 R >>
+endobj
+16 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R] /Count 6 >>
+endobj
+17 0 obj
+<< /Type /Catalog /Pages 16 0 R >>
+endobj
+xref
+0 18
+0000000000 65535 f 
+0000000009 00000 n 
+0000000079 00000 n 
+0000000154 00000 n 
+0000000222 00000 n 
+0000003202 00000 n 
+0000003349 00000 n 
+0000005848 00000 n 
+0000005995 00000 n 
+0000008752 00000 n 
+0000008899 00000 n 
+0000011770 00000 n 
+0000011919 00000 n 
+0000014488 00000 n 
+0000014637 00000 n 
+0000016207 00000 n 
+0000016356 00000 n 
+0000016447 00000 n 
+trailer
+<< /Size 18 /Root 17 0 R >>
+startxref
+16498
+%%EOF

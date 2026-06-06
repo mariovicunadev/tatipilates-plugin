@@ -228,6 +228,12 @@ Documentacion completa:
 docs/updater-workflow.md
 ```
 
+## Guias operativas
+
+- `docs/updater-workflow.md`: releases por canales `staging` y `stable`.
+- `docs/codex-workflow-guide.md`: como abrir chats nuevos, pedir cambios, versionar y documentar.
+- `docs/codex-workflow-guide.pdf`: version imprimible/rapida de la guia de trabajo con Codex.
+
 ## Seguridad
 
 El plugin usa:
