@@ -3,13 +3,13 @@
   "repository": "wefefino/tatipilates-plugin",
   "channels": {
     "staging": {
-      "version": "1.0.1",
-      "tag": "v1.0.1",
-      "asset": "tatipilates-1.0.1.zip",
+      "version": "1.1.1-rc.1",
+      "tag": "v1.1.1-rc.1",
+      "asset": "tatipilates-1.1.1-rc.1.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Version actual instalada. No hay update de staging publicado."
+      "notes": "Prueba del updater privado por canal staging."
     },
     "stable": {
       "version": "1.0.1",
