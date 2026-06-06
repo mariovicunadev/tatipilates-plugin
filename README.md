@@ -230,9 +230,19 @@ docs/updater-workflow.md
 
 ## Guias operativas
 
-- `docs/updater-workflow.md`: releases por canales `staging` y `stable`.
+- `docs/README.md`: indice de documentacion tecnica y operativa.
+- `docs/architecture.md`: mapa de clases, capas y responsabilidades.
 - `docs/codex-workflow-guide.md`: como abrir chats nuevos, pedir cambios, versionar y documentar.
 - `docs/codex-workflow-guide.pdf`: version imprimible/rapida de la guia de trabajo con Codex.
+- `docs/data-model.md`: tablas propias, relaciones, indices y reglas de datos.
+- `docs/local-development.md`: LocalWP, symlink, PHP local, datos demo y flujo local.
+- `docs/product-decisions.md`: decisiones funcionales que deben respetarse.
+- `docs/release-runbook.md`: pasos para publicar a staging y promover a live.
+- `docs/roadmap.md`: mejoras futuras y deuda tecnica.
+- `docs/security-checklist.md`: checklist de seguridad para cambios sensibles.
+- `docs/testing-checklist.md`: pruebas antes de publicar una version.
+- `docs/troubleshooting.md`: problemas frecuentes y diagnostico.
+- `docs/updater-workflow.md`: releases por canales `staging` y `stable`.
 
 ## Seguridad
 

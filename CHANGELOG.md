@@ -8,6 +8,13 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - `MINOR`: funcionalidades nuevas.
 - `PATCH`: fixes y mejoras pequenas.
 
+## [1.1.2] - 2026-06-06
+
+### Added
+
+- Agrega paquete de documentacion operativa y tecnica en `docs/`.
+- Agrega checklists de testing, seguridad, release, troubleshooting, arquitectura, datos y desarrollo local.
+
 ## [1.1.0] - 2026-06-05
 
 ### Added
