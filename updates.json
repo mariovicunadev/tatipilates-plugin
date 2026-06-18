@@ -12,13 +12,13 @@
       "notes": "Hotfix del updater privado para el nuevo repositorio; incluye el rediseño, notificaciones sin recarga y backups de la versión 1.2."
     },
     "stable": {
-      "version": "1.2.0",
-      "tag": "v1.2.0",
-      "asset": "tatipilates-1.2.0.zip",
+      "version": "1.2.1",
+      "tag": "v1.2.1",
+      "asset": "tatipilates-1.2.1.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Rediseño integral del admin y portal, interacciones de notificaciones sin recarga y backups JSON del plugin."
+      "notes": "Hotfix del updater privado para el nuevo repositorio; incluye el rediseño, notificaciones sin recarga y backups de la versión 1.2."
     }
   }
 }
