@@ -909,6 +909,8 @@ body.wp-admin {
 }
 
 .tp-reminders-grid .tp-field-checkbox {
+    grid-template-columns: 20px minmax(0, 1fr);
+    grid-template-rows: auto auto;
     min-height: 92px;
     align-items: start;
     border: 1px solid var(--tp-line);
@@ -917,8 +919,20 @@ body.wp-admin {
     background: #fbf8f4;
 }
 
+.tp-reminders-grid .tp-field-checkbox input[type="checkbox"] {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+}
+
+.tp-reminders-grid .tp-field-checkbox span {
+    grid-column: 2;
+    grid-row: 1;
+}
+
 .tp-reminders-grid .tp-field-checkbox small {
     grid-column: 2;
+    grid-row: 2;
 }
 
 .tp-reminder-days {

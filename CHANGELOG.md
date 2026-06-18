@@ -10,6 +10,12 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-06-18
+
+### Fixed
+
+- Corrige la alineacion de checkbox, titulo y descripcion en las opciones de recordatorios del panel de Configuracion.
+
 ## [1.2.1] - 2026-06-18
 
 ### Fixed
