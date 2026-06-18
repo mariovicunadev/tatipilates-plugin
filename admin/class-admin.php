@@ -20,6 +20,7 @@ class TP_Admin {
     public function __construct() {
         add_action('admin_menu', array($this, 'registrar_menus'));
         add_action('admin_init', array($this, 'asegurar_schema'));
+        add_action('admin_init', array($this, 'render_dashboard_partial'), 20);
         add_action('admin_enqueue_scripts', array($this, 'cargar_assets'));
         add_action('admin_post_tp_guardar_horario', array($this, 'guardar_horario'));
         add_action('admin_post_tp_cambiar_estado_horario', array($this, 'cambiar_estado_horario'));
@@ -43,6 +44,10 @@ class TP_Admin {
         add_action('admin_post_tp_guardar_notificaciones_config', array($this, 'guardar_notificaciones_config'));
         add_action('admin_post_tp_guardar_updater_config', array($this, 'guardar_updater_config'));
         add_action('admin_post_tp_seed_test_data', array($this, 'generar_datos_prueba'));
+        add_action('admin_post_tp_backup_descargar', array($this, 'descargar_backup'));
+        add_action('admin_post_tp_backup_generar', array($this, 'generar_backup'));
+        add_action('admin_post_tp_backup_importar', array($this, 'importar_backup'));
+        add_action('admin_post_tp_guardar_uninstall_config', array($this, 'guardar_uninstall_config'));
     }
 
     /**
@@ -234,6 +239,32 @@ class TP_Admin {
     public function render_dashboard() {
         $this->require_admin();
         include TP_PLUGIN_DIR . 'admin/views/dashboard.php';
+    }
+
+    /**
+     * Returns only the dashboard content for fast week navigation.
+     *
+     * @return void
+     */
+    public function render_dashboard_partial() {
+        if (
+            empty($_GET['tp_dashboard_partial']) ||
+            empty($_GET['page']) ||
+            'tatipilates' !== sanitize_key(wp_unslash($_GET['page']))
+        ) {
+            return;
+        }
+
+        $this->require_admin();
+        check_admin_referer('tp_dashboard_partial');
+
+        $tp_dashboard_partial = true;
+
+        nocache_headers();
+        header('Content-Type: text/html; charset=' . get_option('blog_charset'));
+
+        include TP_PLUGIN_DIR . 'admin/views/dashboard.php';
+        exit;
     }
 
     /**
@@ -578,11 +609,30 @@ class TP_Admin {
         check_admin_referer('tp_admin_notificacion_vista_' . $notificacion_id);
 
         if (!current_user_can(TP_Roles::CAP_MANAGE_PILATES)) {
+            if ($this->admin_json_requested()) {
+                wp_send_json_error(array('message' => 'No tienes permisos para gestionar notificaciones.'), 403);
+            }
+
             wp_die(esc_html__('No tienes permisos para gestionar notificaciones.', 'tatipilates'));
         }
 
+        $actualizada = false;
+
         if ($notificacion_id && class_exists('TP_Notificaciones')) {
-            TP_Notificaciones::marcar_vista($notificacion_id, 'admin');
+            $actualizada = TP_Notificaciones::marcar_vista($notificacion_id, 'admin');
+        }
+
+        if ($this->admin_json_requested()) {
+            if ($actualizada) {
+                wp_send_json_success(
+                    array(
+                        'notificacion_id' => $notificacion_id,
+                        'estado'          => 'vista',
+                    )
+                );
+            }
+
+            wp_send_json_error(array('message' => 'No se pudo marcar la notificacion.'), 400);
         }
 
         wp_safe_redirect(add_query_arg(array('page' => 'tatipilates', 'tab' => 'notificaciones'), admin_url('admin.php')));
@@ -600,15 +650,46 @@ class TP_Admin {
         check_admin_referer('tp_admin_notificacion_eliminar_' . $notificacion_id);
 
         if (!current_user_can(TP_Roles::CAP_MANAGE_PILATES)) {
+            if ($this->admin_json_requested()) {
+                wp_send_json_error(array('message' => 'No tienes permisos para gestionar notificaciones.'), 403);
+            }
+
             wp_die(esc_html__('No tienes permisos para gestionar notificaciones.', 'tatipilates'));
         }
 
+        $eliminada = false;
+
         if ($notificacion_id && class_exists('TP_Notificaciones')) {
-            TP_Notificaciones::eliminar($notificacion_id, 'admin');
+            $eliminada = TP_Notificaciones::eliminar($notificacion_id, 'admin');
+        }
+
+        if ($this->admin_json_requested()) {
+            if ($eliminada) {
+                wp_send_json_success(
+                    array(
+                        'notificacion_id' => $notificacion_id,
+                        'estado'          => 'eliminada',
+                    )
+                );
+            }
+
+            wp_send_json_error(array('message' => 'No se pudo eliminar la notificacion.'), 400);
         }
 
         wp_safe_redirect(add_query_arg(array('page' => 'tatipilates', 'tab' => 'notificaciones'), admin_url('admin.php')));
         exit;
+    }
+
+    /**
+     * Detects enhanced admin requests that expect JSON instead of redirects.
+     *
+     * @return bool
+     */
+    private function admin_json_requested() {
+        $requested_with = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REQUESTED_WITH'])) : '';
+        $accept         = isset($_SERVER['HTTP_ACCEPT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_ACCEPT'])) : '';
+
+        return 'XMLHttpRequest' === $requested_with || false !== strpos($accept, 'application/json');
     }
 
     /**
@@ -1514,6 +1595,115 @@ class TP_Admin {
         }
 
         wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Downloads a plugin-only backup JSON.
+     *
+     * @return void
+     */
+    public function descargar_backup() {
+        $this->require_admin();
+        check_admin_referer('tp_backup_descargar');
+
+        if (!class_exists('TP_Backups')) {
+            wp_die(esc_html__('El modulo de backups no esta disponible.', 'tatipilates'), '', array('response' => 403));
+        }
+
+        TP_Backups::descargar();
+    }
+
+    /**
+     * Generates an on-demand backup file.
+     *
+     * @return void
+     */
+    public function generar_backup() {
+        $this->require_admin();
+        check_admin_referer('tp_backup_generar');
+
+        $args = array('page' => 'tatipilates-configuracion');
+
+        if (!class_exists('TP_Backups')) {
+            $args['tp_error'] = rawurlencode('El modulo de backups no esta disponible.');
+        } else {
+            $resultado = TP_Backups::crear_archivo_diario();
+
+            if (is_wp_error($resultado)) {
+                $args['tp_error'] = rawurlencode($resultado->get_error_message());
+            } else {
+                $args['tp_mensaje'] = rawurlencode('Backup generado correctamente.');
+            }
+        }
+
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Imports a plugin-only backup JSON.
+     *
+     * @return void
+     */
+    public function importar_backup() {
+        $this->require_admin();
+        check_admin_referer('tp_backup_importar');
+
+        $args = array('page' => 'tatipilates-configuracion');
+
+        if (!class_exists('TP_Backups')) {
+            $args['tp_error'] = rawurlencode('El modulo de backups no esta disponible.');
+        } elseif (empty($_FILES['tp_backup_file']['tmp_name'])) {
+            $args['tp_error'] = rawurlencode('Selecciona un archivo JSON de backup.');
+        } else {
+            $resultado = TP_Backups::importar_archivo($_FILES['tp_backup_file']['tmp_name']);
+
+            if (is_wp_error($resultado)) {
+                $args['tp_error'] = rawurlencode($resultado->get_error_message());
+            } else {
+                $args['tp_mensaje'] = rawurlencode(
+                    sprintf(
+                        'Backup importado: %d usuarios revisados y %d filas sincronizadas.',
+                        (int) ($resultado['usuarios'] ?? 0),
+                        (int) ($resultado['filas'] ?? 0)
+                    )
+                );
+            }
+        }
+
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Saves uninstall data deletion preference.
+     *
+     * @return void
+     */
+    public function guardar_uninstall_config() {
+        $this->require_admin();
+        check_admin_referer('tp_guardar_uninstall_config');
+
+        $borrar = isset($_POST['delete_data_on_uninstall']) && '1' === sanitize_text_field(wp_unslash($_POST['delete_data_on_uninstall']));
+
+        if (class_exists('TP_Backups')) {
+            TP_Backups::guardar_borrado_desinstalacion($borrar);
+        }
+
+        $mensaje = $borrar
+            ? 'Zona peligrosa actualizada: eliminar el plugin borrara los datos.'
+            : 'Zona peligrosa actualizada: eliminar el plugin conservara los datos.';
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page'       => 'tatipilates-configuracion',
+                    'tp_mensaje' => rawurlencode($mensaje),
+                ),
+                admin_url('admin.php')
+            )
+        );
         exit;
     }
 

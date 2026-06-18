@@ -253,12 +253,25 @@ Reglas:
 - `tp_rewrite_version`
 - `tp_notificaciones_config`
 - `tp_updater_config`
+- `tp_delete_data_on_uninstall`
 
 ## Uninstall
 
-`uninstall.php` elimina:
+`uninstall.php` conserva datos por defecto. Si `tp_delete_data_on_uninstall` esta apagada, solo limpia crons y sale sin borrar tablas, opciones ni roles.
+
+Si la Zona peligrosa activa `tp_delete_data_on_uninstall = 1`, `uninstall.php` elimina:
 
 - tablas `tp_*`;
 - opciones del plugin;
 - rol `tp_admin_pilates`;
 - capability `tp_manage_pilates` del administrador.
+
+## Backups JSON
+
+El backup propio del plugin incluye:
+
+- filas de todas las tablas `tp_*`;
+- usuarios WordPress vinculados a alumnas, sin contrasenas;
+- configuracion de notificaciones.
+
+La importacion sincroniza por ID y por claves logicas conocidas: si una fila existe se actualiza, y si no existe se inserta. Esto evita duplicados y permite restaurar datos faltantes aunque algunos IDs hayan cambiado entre instalaciones.

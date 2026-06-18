@@ -8,6 +8,31 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - `MINOR`: funcionalidades nuevas.
 - `PATCH`: fixes y mejoras pequenas.
 
+## [Unreleased]
+
+## [1.2.0] - 2026-06-18
+
+### Added
+
+- Agrega backups JSON propios del plugin con descarga manual, generacion bajo demanda, importacion idempotente y cron diario.
+- Agrega Zona peligrosa para controlar si `uninstall.php` conserva o elimina la data del plugin.
+
+### Changed
+
+- Rediseña la experiencia visual del admin y del portal PWA con una interfaz mas premium, moderna y tactil, manteniendo la paleta base.
+- Refina la vista de login del portal con mejor balance visual, jerarquia y estados tactiles.
+- Corrige la jerarquia de navegacion del dashboard admin para que todos los accesos compartan el mismo peso visual.
+- Corrige el contraste hover de los botones destructivos del dashboard admin.
+- Corrige el dropdown de notificaciones del portal en mobile para evitar overflow horizontal.
+- Las notificaciones del dashboard admin se pueden marcar como vistas o eliminar sin recargar la pagina.
+- Las notificaciones del portal se pueden marcar como vistas o eliminar sin recargar la pagina.
+- Corrige el envio AJAX de las acciones de notificacion del portal cuando el formulario incluye un campo `action`.
+- `uninstall.php` conserva datos por defecto y solo borra tablas/opciones/roles si la opcion explicita de borrado esta activada.
+- El selector semanal del Dashboard usa semanas completas, navega automaticamente al cambiar y elimina los botones redundantes.
+- La navegacion entre semanas actualiza solo el Dashboard para evitar recargar todo wp-admin y sus plugins en cada cambio.
+- El selector semanal muestra el rango de lunes a domingo y abre el calendario al pulsar cualquier parte del control.
+- La metrica semanal de recuperaciones cuenta los creditos generados por faltas de esa semana, en lugar de las reservas que usaron un credito.
+
 ## [1.1.2] - 2026-06-06
 
 ### Added

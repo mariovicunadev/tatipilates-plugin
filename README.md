@@ -164,6 +164,8 @@ git push origin v1.0.1
 - No editar directamente el plugin en staging/live sin replicar el cambio en este repo.
 - Si se cambia estructura de base de datos, actualizar activacion/migracion y probar en staging antes de live.
 - Si se cambia seguridad o permisos, probar con admin, Admin Pilates y alumna.
+- Desactivar el plugin conserva datos. Eliminarlo tambien conserva datos por defecto; solo borra data si se activa explicitamente en Zona peligrosa.
+- Antes de depurar cambios riesgosos en staging/live, descargar un backup JSON desde `Tati Pilates > Configuracion`.
 
 ## Deploy a staging y live
 

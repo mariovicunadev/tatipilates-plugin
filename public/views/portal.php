@@ -94,9 +94,9 @@ if (!defined('ABSPATH')) {
                     <div class="tp-portal-notifications">
                         <?php if ($notificaciones) : ?>
                             <?php foreach ($notificaciones as $notificacion) : ?>
-                                <article class="<?php echo esc_attr((int) $notificacion->visto_alumna ? 'is-read' : 'is-unread'); ?>">
+                                <article class="<?php echo esc_attr((int) $notificacion->visto_alumna ? 'is-read' : 'is-unread'); ?>" data-tp-portal-notification-card="<?php echo esc_attr((int) $notificacion->id); ?>">
                                     <div>
-                                        <span class="tp-pill <?php echo esc_attr((int) $notificacion->visto_alumna ? '' : 'tp-pill-active'); ?>">
+                                        <span class="tp-pill <?php echo esc_attr((int) $notificacion->visto_alumna ? '' : 'tp-pill-active'); ?>" data-tp-portal-notification-state>
                                             <?php echo esc_html((int) $notificacion->visto_alumna ? __('Vista', 'tatipilates') : __('Nueva', 'tatipilates')); ?>
                                         </span>
                                         <strong><?php echo esc_html($notificacion->titulo); ?></strong>
@@ -104,22 +104,23 @@ if (!defined('ABSPATH')) {
                                         <small><?php echo esc_html(mysql2date('d/m/Y g:i a', $notificacion->created_at)); ?></small>
                                     </div>
                                     <div class="tp-portal-notification-actions">
-                                        <?php if (!empty($notificacion->url_accion)) : ?>
-                                            <a class="tp-button tp-button-soft" href="<?php echo esc_url($notificacion->url_accion); ?>"><?php echo esc_html__('Abrir', 'tatipilates'); ?></a>
-                                        <?php endif; ?>
                                         <?php if (!(int) $notificacion->visto_alumna) : ?>
-                                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-tp-portal-notification-mark>
                                                 <?php wp_nonce_field('tp_portal_notificacion_vista_' . (int) $notificacion->id); ?>
                                                 <input type="hidden" name="action" value="tp_portal_notificacion_vista">
                                                 <input type="hidden" name="notificacion_id" value="<?php echo esc_attr((int) $notificacion->id); ?>">
-                                                <button class="tp-button" type="submit"><?php echo esc_html__('Marcar vista', 'tatipilates'); ?></button>
+                                                <button class="tp-button tp-portal-action-icon" type="submit" aria-label="<?php echo esc_attr__('Marcar como vista', 'tatipilates'); ?>" title="<?php echo esc_attr__('Marcar como vista', 'tatipilates'); ?>">
+                                                    <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
+                                                </button>
                                             </form>
                                         <?php endif; ?>
-                                        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                                        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" data-tp-portal-notification-delete>
                                             <?php wp_nonce_field('tp_portal_notificacion_eliminar_' . (int) $notificacion->id); ?>
                                             <input type="hidden" name="action" value="tp_portal_notificacion_eliminar">
                                             <input type="hidden" name="notificacion_id" value="<?php echo esc_attr((int) $notificacion->id); ?>">
-                                            <button class="tp-button tp-button-ghost" type="submit"><?php echo esc_html__('Eliminar', 'tatipilates'); ?></button>
+                                            <button class="tp-button tp-portal-action-icon tp-portal-action-icon-danger" type="submit" aria-label="<?php echo esc_attr__('Eliminar notificacion', 'tatipilates'); ?>" title="<?php echo esc_attr__('Eliminar notificacion', 'tatipilates'); ?>">
+                                                <span class="dashicons dashicons-trash" aria-hidden="true"></span>
+                                            </button>
                                         </form>
                                     </div>
                                 </article>

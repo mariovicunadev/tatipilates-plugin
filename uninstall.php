@@ -12,6 +12,11 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
 global $wpdb;
 
 wp_clear_scheduled_hook('tp_cron_diario');
+wp_clear_scheduled_hook('tp_backup_diario');
+
+if ('1' !== (string) get_option('tp_delete_data_on_uninstall', '0')) {
+    exit;
+}
 
 $administrator = get_role('administrator');
 
@@ -27,6 +32,7 @@ delete_option('tp_schema_version');
 delete_option('tp_portal_page_id');
 delete_option('tp_rewrite_version');
 delete_option('tp_notificaciones_config');
+delete_option('tp_delete_data_on_uninstall');
 
 $tablas = array(
     $wpdb->prefix . 'tp_notificaciones',

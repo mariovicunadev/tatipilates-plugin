@@ -16,6 +16,17 @@ $fecha_base   = isset($_GET['semana']) ? sanitize_text_field(wp_unslash($_GET['s
 $semana       = TP_Reservas::rango_semana($fecha_base);
 $anterior     = gmdate('Y-m-d', strtotime($semana['inicio'] . ' -7 days'));
 $siguiente    = gmdate('Y-m-d', strtotime($semana['inicio'] . ' +7 days'));
+$selector_semana = gmdate('o-\WW', strtotime($semana['inicio']));
+$selector_semana_label = sprintf(
+    __('Semana %1$d, %2$d', 'tatipilates'),
+    (int) gmdate('W', strtotime($semana['inicio'])),
+    (int) gmdate('o', strtotime($semana['inicio']))
+);
+$selector_semana_rango = sprintf(
+    __('Del %1$s al %2$s', 'tatipilates'),
+    TP_Pagos::formatear_fecha($semana['inicio']),
+    TP_Pagos::formatear_fecha($semana['fin'])
+);
 $mes_actual   = TP_Pagos::normalizar_mes($hoy);
 $estado_pagos = TP_Pagos::estado_mensual($mes_actual);
 $en_gracia    = TP_Pagos::mes_en_gracia($mes_actual);
@@ -119,10 +130,21 @@ $resumen_semana = $wpdb->get_row(
             SUM(CASE WHEN estado = 'reservada' THEN 1 ELSE 0 END) AS reservadas,
             SUM(CASE WHEN estado = 'asistio' THEN 1 ELSE 0 END) AS asistieron,
             SUM(CASE WHEN estado = 'falto' THEN 1 ELSE 0 END) AS faltas,
-            SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END) AS canceladas,
-            SUM(CASE WHEN tipo = 'recuperacion' AND estado != 'cancelada' THEN 1 ELSE 0 END) AS recuperaciones
+            SUM(CASE WHEN estado = 'cancelada' THEN 1 ELSE 0 END) AS canceladas
         FROM {$wpdb->prefix}tp_reservas
         WHERE fecha BETWEEN %s AND %s",
+        $semana['inicio'],
+        $semana['fin']
+    )
+);
+
+$recups_semana = (int) $wpdb->get_var(
+    $wpdb->prepare(
+        "SELECT COUNT(*)
+        FROM {$wpdb->prefix}tp_recuperaciones recuperacion
+        INNER JOIN {$wpdb->prefix}tp_reservas origen
+            ON origen.id = recuperacion.reserva_origen_id
+        WHERE origen.fecha BETWEEN %s AND %s",
         $semana['inicio'],
         $semana['fin']
     )
@@ -132,7 +154,6 @@ $reservadas      = (int) ($resumen_semana->reservadas ?? 0);
 $asistieron      = (int) ($resumen_semana->asistieron ?? 0);
 $faltas          = (int) ($resumen_semana->faltas ?? 0);
 $canceladas      = (int) ($resumen_semana->canceladas ?? 0);
-$recups_semana   = (int) ($resumen_semana->recuperaciones ?? 0);
 $estudiantes     = TP_Alumnas::obtener_todas();
 $estudiantes_activos = count(
     array_filter(
@@ -254,9 +275,9 @@ $notificaciones_pendientes = class_exists('TP_Notificaciones') ? TP_Notificacion
                                 'tp_admin_notificacion_eliminar_' . (int) $notificacion->id
                             );
                             ?>
-                            <article class="<?php echo esc_attr((int) $notificacion->visto_admin ? 'is-read' : 'is-unread'); ?>">
+                            <article class="<?php echo esc_attr((int) $notificacion->visto_admin ? 'is-read' : 'is-unread'); ?>" data-tp-admin-notification-card="<?php echo esc_attr((int) $notificacion->id); ?>">
                                 <div>
-                                    <span class="tp-status <?php echo esc_attr((int) $notificacion->visto_admin ? '' : 'tp-status-active'); ?>">
+                                    <span class="tp-status <?php echo esc_attr((int) $notificacion->visto_admin ? '' : 'tp-status-active'); ?>" data-tp-admin-notification-state>
                                         <?php echo esc_html((int) $notificacion->visto_admin ? __('Vista', 'tatipilates') : __('Nueva', 'tatipilates')); ?>
                                     </span>
                                     <strong><?php echo esc_html($notificacion->titulo); ?></strong>
@@ -278,11 +299,11 @@ $notificaciones_pendientes = class_exists('TP_Notificaciones') ? TP_Notificacion
                                         </a>
                                     <?php endif; ?>
                                     <?php if (!(int) $notificacion->visto_admin) : ?>
-                                        <a class="tp-icon-button" href="<?php echo esc_url($marcar_url); ?>" aria-label="<?php echo esc_attr__('Marcar vista', 'tatipilates'); ?>" title="<?php echo esc_attr__('Marcar vista', 'tatipilates'); ?>">
+                                        <a class="tp-icon-button" href="<?php echo esc_url($marcar_url); ?>" aria-label="<?php echo esc_attr__('Marcar vista', 'tatipilates'); ?>" title="<?php echo esc_attr__('Marcar vista', 'tatipilates'); ?>" data-tp-admin-notification-mark="<?php echo esc_attr((int) $notificacion->id); ?>">
                                             <span class="dashicons dashicons-yes-alt" aria-hidden="true"></span>
                                         </a>
                                     <?php endif; ?>
-                                    <a class="tp-icon-button tp-icon-button-danger" href="<?php echo esc_url($eliminar_url); ?>" aria-label="<?php echo esc_attr__('Eliminar', 'tatipilates'); ?>" title="<?php echo esc_attr__('Eliminar', 'tatipilates'); ?>">
+                                    <a class="tp-icon-button tp-icon-button-danger" href="<?php echo esc_url($eliminar_url); ?>" aria-label="<?php echo esc_attr__('Eliminar', 'tatipilates'); ?>" title="<?php echo esc_attr__('Eliminar', 'tatipilates'); ?>" data-tp-admin-notification-delete="<?php echo esc_attr((int) $notificacion->id); ?>">
                                         <span class="dashicons dashicons-trash" aria-hidden="true"></span>
                                     </a>
                                 </div>
@@ -319,6 +340,119 @@ $notificaciones_pendientes = class_exists('TP_Notificaciones') ? TP_Notificacion
                         });
                     });
                 });
+
+                document.querySelectorAll('[data-tp-admin-notification-mark], [data-tp-admin-notification-delete]').forEach(function (link) {
+                    link.addEventListener('click', function (event) {
+                        if (!window.fetch || link.dataset.tpNotificationBusy === '1') {
+                            return;
+                        }
+
+                        event.preventDefault();
+
+                        var notificationId = link.getAttribute('data-tp-admin-notification-mark') || link.getAttribute('data-tp-admin-notification-delete');
+                        var card = link.closest('[data-tp-admin-notification-card]');
+                        var isDelete = link.hasAttribute('data-tp-admin-notification-delete');
+                        var wasUnread = card ? card.classList.contains('is-unread') : false;
+
+                        if (!notificationId || !card) {
+                            window.location.href = link.href;
+                            return;
+                        }
+
+                        link.dataset.tpNotificationBusy = '1';
+                        link.setAttribute('aria-busy', 'true');
+                        link.classList.add('is-busy');
+
+                        window.fetch(link.href, {
+                            method: 'GET',
+                            credentials: 'same-origin',
+                            headers: {
+                                'Accept': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        }).then(function (response) {
+                            if (!response.ok) {
+                                throw new Error('admin-notification-action-failed');
+                            }
+
+                            return response.json().catch(function () {
+                                return { success: true };
+                            });
+                        }).then(function (payload) {
+                            if (payload && payload.success === false) {
+                                throw new Error('admin-notification-action-failed');
+                            }
+
+                            if (wasUnread) {
+                                decrementAdminNotificationBadge();
+                            }
+
+                            if (isDelete) {
+                                removeAdminNotificationCard(card);
+                                return;
+                            }
+
+                            markAdminNotificationCardRead(card, link);
+                        }).catch(function () {
+                            link.dataset.tpNotificationBusy = '0';
+                            link.removeAttribute('aria-busy');
+                            link.classList.remove('is-busy');
+                        });
+                    });
+                });
+
+                function markAdminNotificationCardRead(card, link) {
+                    var state = card.querySelector('[data-tp-admin-notification-state]');
+
+                    card.classList.remove('is-unread');
+                    card.classList.add('is-read');
+
+                    if (state) {
+                        state.classList.remove('tp-status-active');
+                        state.textContent = '<?php echo esc_js(__('Vista', 'tatipilates')); ?>';
+                    }
+
+                    link.remove();
+                }
+
+                function removeAdminNotificationCard(card) {
+                    card.classList.add('is-removing');
+
+                    window.setTimeout(function () {
+                        var list = card.closest('.tp-notifications-list');
+
+                        card.remove();
+                        ensureAdminNotificationsEmptyState(list);
+                    }, 180);
+                }
+
+                function decrementAdminNotificationBadge() {
+                    var badge = document.querySelector('.tp-dashboard-tabs a.is-active span');
+
+                    if (!badge) {
+                        return;
+                    }
+
+                    var count = parseInt(badge.textContent, 10);
+
+                    if (!count || count <= 1) {
+                        badge.remove();
+                        return;
+                    }
+
+                    badge.textContent = String(count - 1);
+                }
+
+                function ensureAdminNotificationsEmptyState(list) {
+                    if (!list || list.querySelector('[data-tp-admin-notification-card]') || list.querySelector('.tp-empty-state')) {
+                        return;
+                    }
+
+                    var empty = document.createElement('p');
+                    empty.className = 'tp-empty-state';
+                    empty.textContent = '<?php echo esc_js(__('Todavia no hay notificaciones.', 'tatipilates')); ?>';
+                    list.appendChild(empty);
+                }
             }());
         </script>
     <?php else : ?>
@@ -349,37 +483,41 @@ $notificaciones_pendientes = class_exists('TP_Notificaciones') ? TP_Notificacion
                         <strong><?php echo esc_html($canceladas); ?></strong>
                     </div>
                     <div>
-                        <span><?php echo esc_html__('Recuperaciones', 'tatipilates'); ?></span>
+                        <span><?php echo esc_html__('Recuperaciones generadas', 'tatipilates'); ?></span>
                         <strong><?php echo esc_html($recups_semana); ?></strong>
                     </div>
                 </div>
 
                 <div class="tp-dashboard-actions">
-                    <a class="button button-primary" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates-asistencia', 'semana' => $semana['inicio']), admin_url('admin.php'))); ?>"><?php echo esc_html__('Ver asistencia', 'tatipilates'); ?></a>
-                    <a class="button button-primary" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates-agenda', 'semana' => $semana['inicio']), admin_url('admin.php'))); ?>"><?php echo esc_html__('Agenda semanal', 'tatipilates'); ?></a>
-                    <a class="button button-primary" href="<?php echo esc_url(add_query_arg('page', 'tatipilates-reservar', admin_url('admin.php'))); ?>"><?php echo esc_html__('Reservar clase', 'tatipilates'); ?></a>
+                    <a class="button" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates-asistencia', 'semana' => $semana['inicio']), admin_url('admin.php'))); ?>"><?php echo esc_html__('Ver asistencia', 'tatipilates'); ?></a>
+                    <a class="button" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates-agenda', 'semana' => $semana['inicio']), admin_url('admin.php'))); ?>"><?php echo esc_html__('Agenda semanal', 'tatipilates'); ?></a>
+                    <a class="button" href="<?php echo esc_url(add_query_arg('page', 'tatipilates-reservar', admin_url('admin.php'))); ?>"><?php echo esc_html__('Reservar clase', 'tatipilates'); ?></a>
                     <a class="button" href="<?php echo esc_url(add_query_arg('page', 'tatipilates-pagos', admin_url('admin.php'))); ?>"><?php echo esc_html__('Pagos', 'tatipilates'); ?></a>
                     <a class="button" href="<?php echo esc_url(add_query_arg('page', 'tatipilates-alumnas', admin_url('admin.php'))); ?>"><?php echo esc_html__('Estudiantes', 'tatipilates'); ?></a>
                     <a class="button" href="<?php echo esc_url(add_query_arg('page', 'tatipilates-horarios', admin_url('admin.php'))); ?>"><?php echo esc_html__('Horarios', 'tatipilates'); ?></a>
                 </div>
 
                 <div class="tp-dashboard-week-selector">
-                <a class="tp-icon-button" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates', 'semana' => $anterior), admin_url('admin.php'))); ?>" aria-label="<?php echo esc_attr__('Semana anterior', 'tatipilates'); ?>" title="<?php echo esc_attr__('Semana anterior', 'tatipilates'); ?>">
+                    <a class="tp-icon-button" data-tp-dashboard-week-nav href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates', 'semana' => $anterior), admin_url('admin.php'))); ?>" aria-label="<?php echo esc_attr__('Semana anterior', 'tatipilates'); ?>" title="<?php echo esc_attr__('Semana anterior', 'tatipilates'); ?>">
                         <span class="dashicons dashicons-arrow-left-alt2" aria-hidden="true"></span>
                     </a>
 
-                    <form method="get" action="<?php echo esc_url(admin_url('admin.php')); ?>">
+                    <form method="get" action="<?php echo esc_url(admin_url('admin.php')); ?>" data-tp-dashboard-week-form>
                         <input type="hidden" name="page" value="tatipilates">
                         <label class="tp-field">
-                            <span><?php echo esc_html__('Ver semana', 'tatipilates'); ?></span>
-                            <input type="date" name="semana" value="<?php echo esc_attr($semana['inicio']); ?>">
+                            <span><?php echo esc_html__('Seleccionar semana', 'tatipilates'); ?></span>
+                            <span class="tp-week-picker-control" data-tp-week-picker>
+                                <span class="tp-week-picker-copy" aria-hidden="true">
+                                    <strong><?php echo esc_html($selector_semana_label); ?></strong>
+                                    <small><?php echo esc_html($selector_semana_rango); ?></small>
+                                </span>
+                                <span class="dashicons dashicons-calendar-alt" aria-hidden="true"></span>
+                                <input type="week" name="semana" value="<?php echo esc_attr($selector_semana); ?>" aria-label="<?php echo esc_attr($selector_semana_label . '. ' . $selector_semana_rango); ?>" onchange="window.tpDashboardNavigate ? window.tpDashboardNavigate(this.form) : this.form.submit();">
+                            </span>
                         </label>
-                    <?php submit_button(__('Ver semana', 'tatipilates'), 'secondary', 'submit', false); ?>
                     </form>
 
-                    <a class="button" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates'), admin_url('admin.php'))); ?>"><?php echo esc_html__('Semana actual', 'tatipilates'); ?></a>
-
-                <a class="tp-icon-button" href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates', 'semana' => $siguiente), admin_url('admin.php'))); ?>" aria-label="<?php echo esc_attr__('Semana siguiente', 'tatipilates'); ?>" title="<?php echo esc_attr__('Semana siguiente', 'tatipilates'); ?>">
+                    <a class="tp-icon-button" data-tp-dashboard-week-nav href="<?php echo esc_url(add_query_arg(array('page' => 'tatipilates', 'semana' => $siguiente), admin_url('admin.php'))); ?>" aria-label="<?php echo esc_attr__('Semana siguiente', 'tatipilates'); ?>" title="<?php echo esc_attr__('Semana siguiente', 'tatipilates'); ?>">
                         <span class="dashicons dashicons-arrow-right-alt2" aria-hidden="true"></span>
                     </a>
                 </div>
@@ -525,3 +663,122 @@ $notificaciones_pendientes = class_exists('TP_Notificaciones') ? TP_Notificacion
     </div>
     <?php endif; ?>
 </div>
+
+<?php if (empty($tp_dashboard_partial)) : ?>
+<script>
+    (function () {
+        if (window.tpDashboardNavigate) {
+            return;
+        }
+
+        var loading = false;
+        var partialNonce = '<?php echo esc_js(wp_create_nonce('tp_dashboard_partial')); ?>';
+
+        function targetUrl(target) {
+            if (target instanceof HTMLFormElement) {
+                var url = new URL(target.action, window.location.href);
+                var pageField = target.querySelector('[name="page"]');
+                var weekField = target.querySelector('[name="semana"]');
+
+                if (pageField) {
+                    url.searchParams.set('page', pageField.value);
+                }
+
+                if (weekField) {
+                    url.searchParams.set('semana', weekField.value);
+                }
+
+                return url.toString();
+            }
+
+            return String(target);
+        }
+
+        window.tpDashboardNavigate = function (target, addHistory) {
+            var url = targetUrl(target);
+            var requestUrl = new URL(url);
+            var currentPage = document.querySelector('.tp-dashboard-page');
+
+            if (loading || !currentPage) {
+                return;
+            }
+
+            requestUrl.searchParams.set('tp_dashboard_partial', '1');
+            requestUrl.searchParams.set('_wpnonce', partialNonce);
+
+            loading = true;
+            currentPage.classList.add('is-week-loading');
+            currentPage.setAttribute('aria-busy', 'true');
+
+            window.fetch(requestUrl.toString(), {
+                credentials: 'same-origin',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('Dashboard request failed.');
+                    }
+
+                    return response.text();
+                })
+                .then(function (html) {
+                    var nextDocument = new DOMParser().parseFromString(html, 'text/html');
+                    var nextPage = nextDocument.querySelector('.tp-dashboard-page');
+
+                    if (!nextPage) {
+                        throw new Error('Dashboard response is incomplete.');
+                    }
+
+                    currentPage.replaceWith(document.importNode(nextPage, true));
+
+                    if (false !== addHistory) {
+                        window.history.pushState({tpDashboardWeek: true}, '', url);
+                    }
+                })
+                .catch(function () {
+                    window.location.assign(url);
+                })
+                .finally(function () {
+                    loading = false;
+
+                    var activePage = document.querySelector('.tp-dashboard-page');
+
+                    if (activePage) {
+                        activePage.classList.remove('is-week-loading');
+                        activePage.removeAttribute('aria-busy');
+                    }
+                });
+        };
+
+        document.addEventListener('click', function (event) {
+            var link = event.target.closest('[data-tp-dashboard-week-nav]');
+            var picker = event.target.closest('[data-tp-week-picker]');
+
+            if (picker && !event.defaultPrevented && event.button === 0) {
+                var weekInput = picker.querySelector('input[type="week"]');
+
+                if (weekInput && 'function' === typeof weekInput.showPicker) {
+                    try {
+                        weekInput.showPicker();
+                    } catch (error) {
+                        weekInput.focus();
+                    }
+                }
+            }
+
+            if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+                return;
+            }
+
+            event.preventDefault();
+            window.tpDashboardNavigate(link.href);
+        });
+
+        window.addEventListener('popstate', function () {
+            window.tpDashboardNavigate(window.location.href, false);
+        });
+    }());
+</script>
+<?php endif; ?>

@@ -13,13 +13,15 @@ $mensaje = isset($_GET['tp_mensaje']) ? sanitize_text_field(wp_unslash($_GET['tp
 $error   = isset($_GET['tp_error']) ? sanitize_text_field(wp_unslash($_GET['tp_error'])) : '';
 $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::configuracion() : array();
 $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : array();
+$ultimo_backup = class_exists('TP_Backups') ? TP_Backups::ultimo_backup() : null;
+$borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_datos_al_desinstalar() : false;
 ?>
 
 <div class="wrap tp-admin tp-configuracion-page">
     <div class="tp-page-hero">
         <p class="tp-kicker"><?php echo esc_html__('Herramientas', 'tatipilates'); ?></p>
         <h1><?php echo esc_html__('Configuración', 'tatipilates'); ?></h1>
-        <p><?php echo esc_html__('Opciones de mantenimiento para probar y administrar el sistema en local.', 'tatipilates'); ?></p>
+        <p><?php echo esc_html__('Opciones de mantenimiento, backups, actualizaciones y seguridad operativa del plugin.', 'tatipilates'); ?></p>
     </div>
 
     <?php if ($mensaje) : ?>
@@ -127,6 +129,58 @@ $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : arr
             <div class="tp-window-bar">
                 <span></span>
                 <span></span>
+                <strong><?php echo esc_html__('Backups del plugin', 'tatipilates'); ?></strong>
+            </div>
+
+            <div class="tp-window-body">
+                <p><?php echo esc_html__('Exporta e importa solo la data propia de Tati Pilates: horarios, alumnas, reservas, recuperaciones, pagos, logros, notificaciones y configuracion de recordatorios.', 'tatipilates'); ?></p>
+                <p><?php echo esc_html__('La importacion es idempotente: actualiza lo que ya existe por ID e inserta lo que falte, sin duplicar filas.', 'tatipilates'); ?></p>
+
+                <?php if ($ultimo_backup) : ?>
+                    <p>
+                        <strong><?php echo esc_html__('Ultimo backup automatico:', 'tatipilates'); ?></strong><br>
+                        <code><?php echo esc_html($ultimo_backup['name']); ?></code><br>
+                        <small><?php echo esc_html($ultimo_backup['date']); ?> · <?php echo esc_html(size_format((int) $ultimo_backup['size'])); ?></small>
+                    </p>
+                <?php else : ?>
+                    <p><?php echo esc_html__('Aun no hay backups automaticos guardados.', 'tatipilates'); ?></p>
+                <?php endif; ?>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <?php wp_nonce_field('tp_backup_descargar'); ?>
+                    <input type="hidden" name="action" value="tp_backup_descargar">
+                    <button type="submit" class="button button-primary">
+                        <?php echo esc_html__('Descargar backup JSON', 'tatipilates'); ?>
+                    </button>
+                </form>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin-top: 10px;">
+                    <?php wp_nonce_field('tp_backup_generar'); ?>
+                    <input type="hidden" name="action" value="tp_backup_generar">
+                    <button type="submit" class="button">
+                        <?php echo esc_html__('Generar backup ahora', 'tatipilates'); ?>
+                    </button>
+                </form>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" enctype="multipart/form-data" style="margin-top: 16px;">
+                    <?php wp_nonce_field('tp_backup_importar'); ?>
+                    <input type="hidden" name="action" value="tp_backup_importar">
+                    <label class="tp-field">
+                        <span><?php echo esc_html__('Importar backup JSON', 'tatipilates'); ?></span>
+                        <input type="file" name="tp_backup_file" accept="application/json,.json" required>
+                        <small><?php echo esc_html__('Recomendado: descargar un backup actual antes de importar.', 'tatipilates'); ?></small>
+                    </label>
+                    <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('La importacion sincronizara datos del backup con la base actual. Continuar?', 'tatipilates')); ?>');">
+                        <?php echo esc_html__('Importar backup', 'tatipilates'); ?>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tp-window tp-admin-side">
+            <div class="tp-window-bar">
+                <span></span>
+                <span></span>
                 <strong><?php echo esc_html__('Datos de prueba', 'tatipilates'); ?></strong>
             </div>
 
@@ -144,11 +198,44 @@ $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : arr
 
                 <hr>
                 <p><strong><?php echo esc_html__('Desactivar plugin:', 'tatipilates'); ?></strong> <?php echo esc_html__('conserva las tablas y los datos.', 'tatipilates'); ?></p>
-                <p><strong><?php echo esc_html__('Eliminar/desinstalar plugin:', 'tatipilates'); ?></strong> <?php echo esc_html__('ejecuta uninstall.php y borra las tablas tp_*, opciones, roles y capabilities del plugin.', 'tatipilates'); ?></p>
+                <p><strong><?php echo esc_html__('Eliminar/desinstalar plugin:', 'tatipilates'); ?></strong> <?php echo esc_html__('por defecto conserva las tablas y los datos. Solo borra si lo activas en Zona peligrosa.', 'tatipilates'); ?></p>
                 <hr>
                 <p><?php echo esc_html__('Credenciales demo:', 'tatipilates'); ?></p>
                 <p><code>*.demo@tatipilates.test</code><br><code>Pilates2026!</code></p>
                 <p><code>admin.pilates.demo@tatipilates.test</code><br><code>AdminPilates2026!</code></p>
+            </div>
+        </div>
+
+        <div class="tp-window tp-admin-side">
+            <div class="tp-window-bar">
+                <span></span>
+                <span></span>
+                <strong><?php echo esc_html__('Zona peligrosa', 'tatipilates'); ?></strong>
+            </div>
+
+            <div class="tp-window-body">
+                <p><?php echo esc_html__('Controla que ocurre si alguien elimina el plugin desde WordPress. La opcion segura es conservar los datos.', 'tatipilates'); ?></p>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <?php wp_nonce_field('tp_guardar_uninstall_config'); ?>
+                    <input type="hidden" name="action" value="tp_guardar_uninstall_config">
+
+                    <label class="tp-field tp-field-checkbox">
+                        <input type="radio" name="delete_data_on_uninstall" value="0" <?php checked($borrar_datos_al_desinstalar, false); ?>>
+                        <span><?php echo esc_html__('NO borrar datos al eliminar el plugin', 'tatipilates'); ?></span>
+                        <small><?php echo esc_html__('Recomendado para staging y live. Conserva tablas, opciones, roles y backups.', 'tatipilates'); ?></small>
+                    </label>
+
+                    <label class="tp-field tp-field-checkbox">
+                        <input type="radio" name="delete_data_on_uninstall" value="1" <?php checked($borrar_datos_al_desinstalar, true); ?>>
+                        <span><?php echo esc_html__('Borrar todos los datos al eliminar el plugin', 'tatipilates'); ?></span>
+                        <small><?php echo esc_html__('Solo para limpiezas controladas. Borra tablas tp_*, opciones, roles y capabilities.', 'tatipilates'); ?></small>
+                    </label>
+
+                    <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('Estas cambiando una preferencia sensible de desinstalacion. Continuar?', 'tatipilates')); ?>');">
+                        <?php echo esc_html__('Guardar zona peligrosa', 'tatipilates'); ?>
+                    </button>
+                </form>
             </div>
         </div>
 

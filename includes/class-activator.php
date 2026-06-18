@@ -37,6 +37,8 @@ class TP_Activator {
     public static function ensure_schema() {
         $schema_version = '2026-06-02-notification-reminders';
 
+        self::programar_cron();
+
         if (get_option('tp_schema_version') === $schema_version) {
             return;
         }
@@ -52,6 +54,7 @@ class TP_Activator {
      */
     public static function deactivate() {
         wp_clear_scheduled_hook('tp_cron_diario');
+        wp_clear_scheduled_hook('tp_backup_diario');
     }
 
     /**
@@ -390,13 +393,17 @@ class TP_Activator {
     }
 
     /**
-     * Schedules the daily recovery expiration event.
+     * Schedules daily plugin maintenance events.
      *
      * @return void
      */
     private static function programar_cron() {
         if (!wp_next_scheduled('tp_cron_diario')) {
             wp_schedule_event(time(), 'daily', 'tp_cron_diario');
+        }
+
+        if (!wp_next_scheduled('tp_backup_diario')) {
+            wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'tp_backup_diario');
         }
     }
 }

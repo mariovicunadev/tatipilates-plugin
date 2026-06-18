@@ -183,7 +183,134 @@
                 });
             });
         });
+
+        bindPortalNotificationActions();
     });
+
+    function bindPortalNotificationActions() {
+        document.querySelectorAll('[data-tp-portal-notification-mark], [data-tp-portal-notification-delete]').forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!window.TPPortalPWA || !window.TPPortalPWA.adminPostUrl || !window.fetch || form.dataset.tpNotificationBusy === '1') {
+                    return;
+                }
+
+                event.preventDefault();
+
+                var card = form.closest('[data-tp-portal-notification-card]');
+                var notificationId = getFormNotificationId(form);
+                var isDelete = form.hasAttribute('data-tp-portal-notification-delete');
+                var wasUnread = card ? card.classList.contains('is-unread') : false;
+                var submit = form.querySelector('button[type="submit"]');
+
+                if (!card || !notificationId) {
+                    form.submit();
+                    return;
+                }
+
+                form.dataset.tpNotificationBusy = '1';
+
+                if (submit) {
+                    submit.disabled = true;
+                    submit.setAttribute('aria-busy', 'true');
+                }
+
+                var requestUrl = form.getAttribute('action') || window.TPPortalPWA.adminPostUrl;
+
+                window.fetch(requestUrl, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }).then(function (response) {
+                    if (!response.ok) {
+                        throw new Error('notification-action-failed');
+                    }
+
+                    return response.json().catch(function () {
+                        return { success: true };
+                    });
+                }).then(function (payload) {
+                    if (payload && payload.success === false) {
+                        throw new Error('notification-action-failed');
+                    }
+
+                    removeDropdownNotification(notificationId);
+
+                    if (wasUnread) {
+                        decrementNotificationBadge();
+                    }
+
+                    if (isDelete) {
+                        removePortalNotificationCard(card);
+                        return;
+                    }
+
+                    markPortalNotificationCardRead(card, form);
+                }).catch(function () {
+                    form.dataset.tpNotificationBusy = '0';
+
+                    if (submit) {
+                        submit.disabled = false;
+                        submit.removeAttribute('aria-busy');
+                    }
+                });
+            });
+        });
+    }
+
+    function getFormNotificationId(form) {
+        var field = form.querySelector('input[name="notificacion_id"]');
+        return field ? field.value : '';
+    }
+
+    function markPortalNotificationCardRead(card, form) {
+        var state = card.querySelector('[data-tp-portal-notification-state]');
+
+        card.classList.remove('is-unread');
+        card.classList.add('is-read');
+
+        if (state) {
+            state.classList.remove('tp-pill-active');
+            state.textContent = 'Vista';
+        }
+
+        form.remove();
+    }
+
+    function removePortalNotificationCard(card) {
+        card.classList.add('is-removing');
+
+        window.setTimeout(function () {
+            var list = card.closest('.tp-portal-notifications');
+
+            card.remove();
+            ensurePortalNotificationsEmptyState(list);
+        }, 180);
+    }
+
+    function removeDropdownNotification(notificationId) {
+        var item = document.querySelector('[data-tp-notification-item="' + notificationId + '"]');
+
+        if (item) {
+            item.remove();
+        }
+
+        ensureNotificationEmptyState();
+    }
+
+    function ensurePortalNotificationsEmptyState(list) {
+        if (!list || list.querySelector('[data-tp-portal-notification-card]') || list.querySelector('.tp-empty-state')) {
+            return;
+        }
+
+        var empty = document.createElement('p');
+        empty.className = 'tp-empty-state';
+        empty.textContent = 'No tienes notificaciones por ahora.';
+        list.appendChild(empty);
+    }
 
     function decrementNotificationBadge() {
         var badge = document.querySelector('.tp-notification-menu summary em');

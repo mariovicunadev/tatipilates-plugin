@@ -1169,8 +1169,23 @@ class TP_Portal {
 
         check_admin_referer('tp_portal_notificacion_vista_' . $notificacion_id);
 
+        $actualizada = false;
+
         if ($notificacion_id && class_exists('TP_Notificaciones')) {
-            TP_Notificaciones::marcar_vista($notificacion_id, 'alumna', (int) $estudiante->id);
+            $actualizada = TP_Notificaciones::marcar_vista($notificacion_id, 'alumna', (int) $estudiante->id);
+        }
+
+        if ($this->portal_json_requested()) {
+            if ($actualizada) {
+                wp_send_json_success(
+                    array(
+                        'notificacion_id' => $notificacion_id,
+                        'estado'          => 'vista',
+                    )
+                );
+            }
+
+            wp_send_json_error(array('message' => 'No se pudo marcar la notificacion.'), 400);
         }
 
         wp_safe_redirect(add_query_arg('vista', 'notificaciones', TP_Roles::portal_url()));
@@ -1188,12 +1203,39 @@ class TP_Portal {
 
         check_admin_referer('tp_portal_notificacion_eliminar_' . $notificacion_id);
 
+        $eliminada = false;
+
         if ($notificacion_id && class_exists('TP_Notificaciones')) {
-            TP_Notificaciones::eliminar($notificacion_id, 'alumna', (int) $estudiante->id);
+            $eliminada = TP_Notificaciones::eliminar($notificacion_id, 'alumna', (int) $estudiante->id);
+        }
+
+        if ($this->portal_json_requested()) {
+            if ($eliminada) {
+                wp_send_json_success(
+                    array(
+                        'notificacion_id' => $notificacion_id,
+                        'estado'          => 'eliminada',
+                    )
+                );
+            }
+
+            wp_send_json_error(array('message' => 'No se pudo eliminar la notificacion.'), 400);
         }
 
         wp_safe_redirect(add_query_arg('vista', 'notificaciones', TP_Roles::portal_url()));
         exit;
+    }
+
+    /**
+     * Detects enhanced portal requests that expect JSON instead of redirects.
+     *
+     * @return bool
+     */
+    private function portal_json_requested() {
+        $requested_with = isset($_SERVER['HTTP_X_REQUESTED_WITH']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REQUESTED_WITH'])) : '';
+        $accept         = isset($_SERVER['HTTP_ACCEPT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_ACCEPT'])) : '';
+
+        return 'XMLHttpRequest' === $requested_with || false !== strpos($accept, 'application/json');
     }
 
     /**

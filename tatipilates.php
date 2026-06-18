@@ -80,5 +80,9 @@ add_action(
             add_action('tp_cron_diario', array('TP_Notificaciones', 'generar_recordatorios_recuperacion_por_vencer'));
             add_action('tp_cron_diario', array('TP_Notificaciones', 'generar_recordatorios_pago_mensual'));
         }
+
+        if (class_exists('TP_Backups')) {
+            add_action('tp_backup_diario', array('TP_Backups', 'crear_archivo_diario'));
+        }
     }
 );

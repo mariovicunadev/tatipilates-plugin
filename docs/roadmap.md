@@ -23,6 +23,7 @@ Lista viva de mejoras futuras. Cada item deberia convertirse en una tanda separa
 - Export de agenda semanal.
 - Mejorar flujo de recuperaciones disponibles.
 - Crear pruebas automatizadas basicas para helpers y reservas.
+- Mejorar pantalla de backups con historial descargable y restauracion selectiva.
 
 ## Largo plazo
 
@@ -31,7 +32,6 @@ Lista viva de mejoras futuras. Cada item deberia convertirse en una tanda separa
 - Integracion con proveedor SMTP/API desde configuracion.
 - Panel de perfil editable por alumna.
 - Reportes mensuales.
-- Backup/export de datos del plugin.
 
 ## Deuda tecnica
 

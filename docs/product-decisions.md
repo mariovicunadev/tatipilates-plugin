@@ -25,6 +25,7 @@ Decisiones funcionales importantes del plugin.
 - La seccion "Reportar ausencia" solo aparece si hay reservas futuras reportables.
 - Recuperaciones vencen a los 3 meses.
 - Usar recuperacion debe ser atomico con la reserva.
+- La metrica semanal "Recuperaciones generadas" cuenta los creditos cuya falta de origen pertenece a la semana seleccionada, sin importar si luego fueron usados o expiraron.
 
 ## Alumnas
 
@@ -74,7 +75,15 @@ Decisiones funcionales importantes del plugin.
 ## Uninstall
 
 - Desactivar plugin conserva datos.
-- Eliminar/desinstalar plugin borra tablas, opciones, roles y capabilities.
+- Eliminar/desinstalar plugin conserva datos por defecto.
+- Borrar tablas, opciones, roles y capabilities solo ocurre si se activa explicitamente la opcion de Zona peligrosa.
+
+## Backups del plugin
+
+- El plugin puede exportar solo su data propia en JSON.
+- La importacion es idempotente: actualiza filas existentes por `id` e inserta las que falten.
+- Los backups automaticos diarios viven en `wp-content/uploads/tatipilates-backups/`.
+- Los backups del plugin complementan los backups del hosting; no los reemplazan.
 
 ## Seguridad
 
