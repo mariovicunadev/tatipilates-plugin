@@ -12,13 +12,13 @@
       "notes": "Rediseño integral del admin y portal, interacciones de notificaciones sin recarga y backups JSON del plugin."
     },
     "stable": {
-      "version": "1.1.2",
-      "tag": "v1.1.2",
-      "asset": "tatipilates-1.1.2.zip",
+      "version": "1.2.0",
+      "tag": "v1.2.0",
+      "asset": "tatipilates-1.2.0.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Version estable de mantenimiento con documentacion operativa."
+      "notes": "Rediseño integral del admin y portal, interacciones de notificaciones sin recarga y backups JSON del plugin."
     }
   }
 }
