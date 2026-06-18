@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
 class TP_Updater {
 
     const OPTION_CONFIG  = 'tp_updater_config';
-    const OWNER          = 'wefefino';
+    const OWNER          = 'mariovicunadev';
     const REPO           = 'tatipilates-plugin';
     const MANIFEST_PATH  = 'updates.json';
     const MANIFEST_REF   = 'main';

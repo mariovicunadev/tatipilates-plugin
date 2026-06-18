@@ -165,7 +165,7 @@ El updater no hace rollback automatico.
 ```zsh
 git status
 git log --oneline -5
-gh workflow list --repo wefefino/tatipilates-plugin
-gh run list --repo wefefino/tatipilates-plugin --limit 5
-gh release list --repo wefefino/tatipilates-plugin --limit 10
+gh workflow list --repo mariovicunadev/tatipilates-plugin
+gh run list --repo mariovicunadev/tatipilates-plugin --limit 5
+gh release list --repo mariovicunadev/tatipilates-plugin --limit 10
 ```

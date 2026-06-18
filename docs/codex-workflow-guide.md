@@ -131,7 +131,7 @@ Estamos trabajando en el repo local:
 /Users/vicunav/Documents/Codex/Mi Pilates Admin
 
 Plugin privado de WordPress: Tati Pilates.
-Repo GitHub privado: https://github.com/wefefino/tatipilates-plugin
+Repo GitHub privado: https://github.com/mariovicunadev/tatipilates-plugin
 Branch principal: main.
 
 Lee README.md, CHANGELOG.md y docs/updater-workflow.md antes de tocar codigo.
@@ -235,8 +235,8 @@ git status
 git diff
 ./pre-release-check.sh --yes
 git log --oneline -5
-gh workflow list --repo wefefino/tatipilates-plugin
-gh run list --repo wefefino/tatipilates-plugin --limit 5
+gh workflow list --repo mariovicunadev/tatipilates-plugin
+gh run list --repo mariovicunadev/tatipilates-plugin --limit 5
 ```
 
 ## Flujo resumido

@@ -7,7 +7,7 @@
  * Author:      Tati Pilates
  * Text Domain: tatipilates
  * Domain Path: /languages
- * Update URI:  https://github.com/wefefino/tatipilates-plugin
+ * Update URI:  https://github.com/mariovicunadev/tatipilates-plugin
  *
  * @package TatiPilates
  */

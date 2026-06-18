@@ -266,7 +266,7 @@ El plugin usa:
 Repositorio privado:
 
 ```text
-https://github.com/wefefino/tatipilates-plugin
+https://github.com/mariovicunadev/tatipilates-plugin
 ```
 
 ## Prompt base para nuevos chats
@@ -278,7 +278,7 @@ Estamos trabajando en el repo local:
 /Users/vicunav/Documents/Codex/Mi Pilates Admin
 
 Plugin privado de WordPress: Tati Pilates.
-Repo GitHub privado: https://github.com/wefefino/tatipilates-plugin
+Repo GitHub privado: https://github.com/mariovicunadev/tatipilates-plugin
 Branch principal: main.
 
 Lee README.md, CHANGELOG.md y docs/updater-workflow.md antes de tocar codigo.

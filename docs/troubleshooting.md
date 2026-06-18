@@ -74,7 +74,7 @@ Solucion:
 
 - revocar token viejo si fue expuesto;
 - crear fine-grained token;
-- repo: `wefefino/tatipilates-plugin`;
+- repo: `mariovicunadev/tatipilates-plugin`;
 - permiso: `Contents: Read-only`;
 - pegarlo de nuevo en WordPress.
 
@@ -163,8 +163,8 @@ Revisar:
 Revisar:
 
 ```zsh
-gh run list --repo wefefino/tatipilates-plugin --limit 5
-gh run view RUN_ID --repo wefefino/tatipilates-plugin --log
+gh run list --repo mariovicunadev/tatipilates-plugin --limit 5
+gh run view RUN_ID --repo mariovicunadev/tatipilates-plugin --log
 ```
 
 Errores comunes:

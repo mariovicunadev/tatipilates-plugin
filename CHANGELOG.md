@@ -10,6 +10,12 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-06-18
+
+### Fixed
+
+- Actualiza el updater privado al nuevo repositorio `mariovicunadev/tatipilates-plugin` para autorizar correctamente la descarga de assets privados.
+
 ## [1.2.0] - 2026-06-18
 
 ### Added

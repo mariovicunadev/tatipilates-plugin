@@ -54,7 +54,7 @@ El token no se guarda en Git. Se guarda solo en la base de datos de WordPress.
 Permiso minimo recomendado para el token:
 
 ```text
-Repository access: only wefefino/tatipilates-plugin
+Repository access: only mariovicunadev/tatipilates-plugin
 Permissions:
 - Contents: Read-only
 ```

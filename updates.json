@@ -1,6 +1,6 @@
 {
   "plugin": "tatipilates/tatipilates.php",
-  "repository": "wefefino/tatipilates-plugin",
+  "repository": "mariovicunadev/tatipilates-plugin",
   "channels": {
     "staging": {
       "version": "1.2.0-rc.1",
