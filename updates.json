@@ -3,13 +3,13 @@
   "repository": "mariovicunadev/tatipilates-plugin",
   "channels": {
     "staging": {
-      "version": "1.2.1-rc.1",
-      "tag": "v1.2.1-rc.1",
-      "asset": "tatipilates-1.2.1-rc.1.zip",
+      "version": "1.2.2-rc.1",
+      "tag": "v1.2.2-rc.1",
+      "asset": "tatipilates-1.2.2-rc.1.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Hotfix del updater privado para el nuevo repositorio; incluye el rediseño, notificaciones sin recarga y backups de la versión 1.2."
+      "notes": "Corrige la alineación de las opciones de recordatorios en Configuración."
     },
     "stable": {
       "version": "1.2.1",
