@@ -10,6 +10,21 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+### Fixed
+
+- Invalida el manifiesto privado cuando WordPress fuerza una nueva comprobacion de plugins, evitando esperar 30 minutos para ver un release reciente.
+- Mueve los backups automaticos fuera del webroot, migra y verifica por hash los JSON legacy de `uploads`, y permite descargar el ultimo archivo mediante un handler administrativo autenticado.
+- Notifica al administrador dentro del plugin y por email cuando el backup automatico no puede escribir en el directorio privado, con deduplicacion diaria.
+- Restringe el generador de datos demo a entornos `local` o `development` con opt-in explicito, reemplaza las credenciales fijas por passwords aleatorios de un solo uso y bloquea el handler en otros entornos.
+- En produccion rota las credenciales de cuentas `*.demo@tatipilates.test`, retira privilegios al admin demo y conserva intactos sus datos para revision manual.
+- Versiona los backups con `format_version: 2` y valida completamente usuarios, tablas, columnas, tipos, longitudes, enums, relaciones y limites antes de abrir la transaccion de importacion.
+- Endurece el upload de backups con limite configurable de 10 MiB, verificacion de error, origen HTTP, extension, MIME y tamano real; conserva compatibilidad explicita con backups legacy v1.
+- Rechaza formatos futuros con un mensaje claro y garantiza rollback/restauracion de foreign keys ante cualquier fallo de escritura.
+- Mueve el PAT del updater privado a `TP_GITHUB_TOKEN` en `wp-config.php` o el entorno, oculta el secreto de la configuracion publica y elimina automaticamente su copia legacy de `wp_options` al detectar la fuente segura.
+- Mantiene una transicion compatible para instalaciones con PAT legacy, muestra advertencias operativas y evita que el formulario administrativo pueda guardar, reemplazar o borrar el token.
+- Separa el acceso a historia medica, alergias y motivo de Pilates mediante `tp_view_medical_data`, asignada por defecto solo a administradores de WordPress y no al rol Admin Pilates.
+- Elimina los campos medicos de listados y perfiles operativos con columnas SQL explicitas; las lecturas completas y escrituras requieren la capability dedicada, y las ediciones sin permiso preservan los valores existentes.
+
 ## [1.2.2] - 2026-06-18
 
 ### Fixed

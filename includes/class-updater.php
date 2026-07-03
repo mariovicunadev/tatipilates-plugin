@@ -28,6 +28,7 @@ class TP_Updater {
         add_filter('pre_set_site_transient_update_plugins', array($this, 'inyectar_actualizacion'));
         add_filter('plugins_api', array($this, 'informacion_plugin'), 10, 3);
         add_filter('http_request_args', array($this, 'autorizar_descarga_github'), 10, 2);
+        add_action('delete_site_transient_update_plugins', array(__CLASS__, 'limpiar_cache'));
         add_action('upgrader_process_complete', array($this, 'limpiar_cache_actualizacion'), 10, 2);
     }
 
@@ -37,16 +38,23 @@ class TP_Updater {
      * @return array<string,mixed>
      */
     public static function configuracion() {
-        $config = get_option(self::OPTION_CONFIG, array());
-        $config = is_array($config) ? $config : array();
+        $config = self::configuracion_guardada();
+        $canal  = isset($config['channel']) ? sanitize_key($config['channel']) : 'stable';
+        $fuente = self::fuente_token($config);
 
-        return wp_parse_args(
-            $config,
-            array(
-                'enabled' => 0,
-                'channel' => 'stable',
-                'token'   => '',
-            )
+        if (!in_array($canal, array('stable', 'staging'), true)) {
+            $canal = 'stable';
+        }
+
+        if ('server' === $fuente) {
+            self::limpiar_token_legacy($config);
+        }
+
+        return array(
+            'enabled'          => !empty($config['enabled']) ? 1 : 0,
+            'channel'          => $canal,
+            'token_configured' => 'none' !== $fuente,
+            'token_source'     => $fuente,
         );
     }
 
@@ -57,34 +65,107 @@ class TP_Updater {
      * @return bool
      */
     public static function guardar_configuracion($datos) {
-        $actual = self::configuracion();
+        $actual = self::configuracion_guardada();
         $canal  = isset($datos['channel']) ? sanitize_key(wp_unslash($datos['channel'])) : 'stable';
 
         if (!in_array($canal, array('stable', 'staging'), true)) {
             $canal = 'stable';
         }
 
-        $token = $actual['token'];
-
-        if (!empty($datos['clear_token'])) {
-            $token = '';
-        } elseif (isset($datos['token']) && '' !== trim((string) wp_unslash($datos['token']))) {
-            $token = sanitize_text_field(wp_unslash($datos['token']));
-        }
+        $actual['enabled'] = !empty($datos['enabled']) ? 1 : 0;
+        $actual['channel'] = $canal;
 
         $guardado = update_option(
             self::OPTION_CONFIG,
-            array(
-                'enabled' => !empty($datos['enabled']) ? 1 : 0,
-                'channel' => $canal,
-                'token'   => $token,
-            ),
+            $actual,
             false
         );
+
+        if ('server' === self::fuente_token($actual)) {
+            self::limpiar_token_legacy($actual);
+        }
 
         self::limpiar_cache();
 
         return (bool) $guardado;
+    }
+
+    /**
+     * Returns the raw updater option for the legacy transition.
+     *
+     * @return array<string,mixed>
+     */
+    private static function configuracion_guardada() {
+        $config = get_option(self::OPTION_CONFIG, array());
+
+        return is_array($config) ? $config : array();
+    }
+
+    /**
+     * Resolves the GitHub token without exposing it through public settings.
+     *
+     * @return string
+     */
+    private static function token() {
+        $config = self::configuracion_guardada();
+        $token  = self::token_servidor();
+
+        if ('' !== $token) {
+            self::limpiar_token_legacy($config);
+            return $token;
+        }
+
+        return isset($config['token']) && is_string($config['token'])
+            ? trim($config['token'])
+            : '';
+    }
+
+    /**
+     * Reports which token source is active without returning the secret.
+     *
+     * @param array<string,mixed> $config Raw stored settings.
+     * @return string server|legacy|none
+     */
+    private static function fuente_token($config) {
+        if ('' !== self::token_servidor()) {
+            return 'server';
+        }
+
+        if (isset($config['token']) && is_string($config['token']) && '' !== trim($config['token'])) {
+            return 'legacy';
+        }
+
+        return 'none';
+    }
+
+    /**
+     * Resolves the token from wp-config.php or the environment.
+     *
+     * @return string
+     */
+    private static function token_servidor() {
+        if (defined('TP_GITHUB_TOKEN') && is_string(TP_GITHUB_TOKEN) && '' !== trim(TP_GITHUB_TOKEN)) {
+            return trim(TP_GITHUB_TOKEN);
+        }
+
+        $token = getenv('TP_GITHUB_TOKEN');
+
+        return is_string($token) ? trim($token) : '';
+    }
+
+    /**
+     * Removes the legacy database copy once a server token is available.
+     *
+     * @param array<string,mixed> $config Raw stored settings.
+     * @return void
+     */
+    private static function limpiar_token_legacy($config) {
+        if (!array_key_exists('token', $config)) {
+            return;
+        }
+
+        unset($config['token']);
+        update_option(self::OPTION_CONFIG, $config, false);
     }
 
     /**
@@ -109,7 +190,7 @@ class TP_Updater {
 
         $config = self::configuracion();
 
-        if (empty($config['enabled']) || empty($config['token'])) {
+        if (empty($config['enabled']) || empty($config['token_configured'])) {
             return $transient;
         }
 
@@ -191,14 +272,14 @@ class TP_Updater {
             return $args;
         }
 
-        $config = self::configuracion();
+        $token = self::token();
 
-        if (empty($config['token'])) {
+        if ('' === $token) {
             return $args;
         }
 
         $args['headers'] = isset($args['headers']) && is_array($args['headers']) ? $args['headers'] : array();
-        $args['headers']['Authorization'] = 'Bearer ' . $config['token'];
+        $args['headers']['Authorization'] = 'Bearer ' . $token;
         $args['headers']['Accept'] = 'application/octet-stream';
         $args['headers']['User-Agent'] = 'TatiPilates-Updater/' . TP_VERSION;
 
@@ -246,9 +327,7 @@ class TP_Updater {
             return $cached;
         }
 
-        $config = self::configuracion();
-
-        if (empty($config['token'])) {
+        if ('' === self::token()) {
             return null;
         }
 
@@ -352,12 +431,17 @@ class TP_Updater {
      * @return array<string,string>
      */
     private function github_headers($accept) {
-        $config = self::configuracion();
+        $token = self::token();
 
-        return array(
-            'Authorization' => 'Bearer ' . $config['token'],
-            'Accept'        => $accept,
-            'User-Agent'    => 'TatiPilates-Updater/' . TP_VERSION,
+        $headers = array(
+            'Accept'     => $accept,
+            'User-Agent' => 'TatiPilates-Updater/' . TP_VERSION,
         );
+
+        if ('' !== $token) {
+            $headers['Authorization'] = 'Bearer ' . $token;
+        }
+
+        return $headers;
     }
 }

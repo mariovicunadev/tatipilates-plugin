@@ -64,20 +64,18 @@ Desde wp-admin:
 Tati Pilates > Configuracion > Datos de prueba
 ```
 
-Credenciales demo:
+El seeder solo aparece cuando WordPress usa `local` o `development` y existe
+este opt-in explicito en `wp-config.php`:
 
-```text
-*.demo@tatipilates.test
-Pilates2026!
-
-admin.pilates.demo@tatipilates.test
-AdminPilates2026!
+```php
+define('TP_ALLOW_DEMO_DATA', true);
 ```
 
 Reglas:
 
 - El seed es idempotente.
 - Rehace datos demo sin duplicarlos.
+- Genera contrasenas aleatorias nuevas y las muestra una sola vez.
 - No subir `dev/seed-test-data.php` en releases.
 
 ## Git

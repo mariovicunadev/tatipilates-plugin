@@ -55,14 +55,27 @@ Checklist recurrente antes de publicar cambios sensibles.
 ## Updater privado
 
 - Nunca hardcodear tokens.
-- Token se guarda solo en WordPress.
+- Definir el PAT mediante `TP_GITHUB_TOKEN` en `wp-config.php` o el entorno.
+- No guardar, pegar ni volver a introducir el PAT desde wp-admin.
 - Token fine-grained con acceso solo al repo.
 - Permiso minimo: `Contents: Read-only`.
+- Confirmar que la pantalla muestre `Configurado por servidor` y no
+  `Usando configuracion legacy`.
 - No pegar tokens en chats, issues, commits ni capturas.
 - Si un token se expone, revocarlo y generar uno nuevo.
 
 ## Datos sensibles
 
+- Los listados de alumnas usan columnas explicitas y no recuperan
+  `historia_medica`, `alergias` ni `motivo_pilates`.
+- Leer o editar esos campos requiere `tp_view_medical_data`; no aceptar
+  `tp_manage_pilates` como sustituto.
+- `administrator` recibe acceso medico por defecto; `Admin Pilates` no.
+- Para autorizar a una persona concreta usar una capability individual, por
+  ejemplo `wp user add-cap ID tp_view_medical_data`, y retirarla cuando deje de
+  necesitarla.
+- Los campos medicos aun permanecen en texto plano hasta implementar AUD-02
+  Entrega 2.
 - `CONTEXTO.md` no se sube.
 - `guia-rapida-tatiana.*` no se sube.
 - `checklist-pruebas-tati-pilates.*` no se sube.

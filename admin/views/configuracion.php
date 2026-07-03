@@ -14,7 +14,16 @@ $error   = isset($_GET['tp_error']) ? sanitize_text_field(wp_unslash($_GET['tp_e
 $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::configuracion() : array();
 $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : array();
 $ultimo_backup = class_exists('TP_Backups') ? TP_Backups::ultimo_backup() : null;
+$aviso_backup = class_exists('TP_Backups') ? TP_Backups::aviso_almacenamiento() : null;
 $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_datos_al_desinstalar() : false;
+$demo_disponible = class_exists('TP_Test_Data') && TP_Test_Data::is_available();
+$credenciales_demo = $demo_disponible ? get_transient('tp_demo_credentials_' . get_current_user_id()) : null;
+$aviso_demo_produccion = class_exists('TP_Test_Data') ? get_option(TP_Test_Data::OPTION_HARDENING_NOTICE, array()) : array();
+$backup_max_upload = class_exists('TP_Backups') ? TP_Backups::max_upload_bytes() : 0;
+
+if ($credenciales_demo) {
+    delete_transient('tp_demo_credentials_' . get_current_user_id());
+}
 ?>
 
 <div class="wrap tp-admin tp-configuracion-page">
@@ -33,6 +42,32 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
     <?php if ($error) : ?>
         <div class="notice notice-error is-dismissible">
             <p><?php echo esc_html(rawurldecode($error)); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($aviso_backup) : ?>
+        <div class="notice notice-error">
+            <p><strong><?php echo esc_html__('Backups:', 'tatipilates'); ?></strong> <?php echo esc_html($aviso_backup['message']); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if (!empty($aviso_demo_produccion['emails']) && is_array($aviso_demo_produccion['emails'])) : ?>
+        <div class="notice notice-warning">
+            <p>
+                <strong><?php echo esc_html__('Cuentas demo desactivadas:', 'tatipilates'); ?></strong>
+                <?php echo esc_html(implode(', ', array_map('sanitize_email', $aviso_demo_produccion['emails']))); ?>
+            </p>
+            <p><?php echo esc_html__('Sus contrasenas fueron rotadas y la cuenta administrativa demo perdio sus privilegios. Revisa estas cuentas y elimina las que no deban conservarse.', 'tatipilates'); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($updater_config && 'legacy' === $updater_config['token_source']) : ?>
+        <div class="notice notice-warning">
+            <p><strong><?php echo esc_html__('Updater privado:', 'tatipilates'); ?></strong> <?php echo esc_html__('Este sitio aun usa el PAT legacy guardado en la base de datos. Define TP_GITHUB_TOKEN en el servidor para que el plugin elimine esa copia automaticamente.', 'tatipilates'); ?></p>
+        </div>
+    <?php elseif ($updater_config && !empty($updater_config['enabled']) && 'none' === $updater_config['token_source']) : ?>
+        <div class="notice notice-error">
+            <p><strong><?php echo esc_html__('Updater privado:', 'tatipilates'); ?></strong> <?php echo esc_html__('Esta activado, pero TP_GITHUB_TOKEN no esta configurado. WordPress no podra consultar ni descargar actualizaciones privadas.', 'tatipilates'); ?></p>
         </div>
     <?php endif; ?>
 
@@ -142,6 +177,14 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
                         <code><?php echo esc_html($ultimo_backup['name']); ?></code><br>
                         <small><?php echo esc_html($ultimo_backup['date']); ?> · <?php echo esc_html(size_format((int) $ultimo_backup['size'])); ?></small>
                     </p>
+                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                        <?php wp_nonce_field('tp_backup_archivo_descargar'); ?>
+                        <input type="hidden" name="action" value="tp_backup_archivo_descargar">
+                        <input type="hidden" name="backup" value="<?php echo esc_attr($ultimo_backup['name']); ?>">
+                        <button type="submit" class="button">
+                            <?php echo esc_html__('Descargar ultimo guardado', 'tatipilates'); ?>
+                        </button>
+                    </form>
                 <?php else : ?>
                     <p><?php echo esc_html__('Aun no hay backups automaticos guardados.', 'tatipilates'); ?></p>
                 <?php endif; ?>
@@ -168,7 +211,17 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
                     <label class="tp-field">
                         <span><?php echo esc_html__('Importar backup JSON', 'tatipilates'); ?></span>
                         <input type="file" name="tp_backup_file" accept="application/json,.json" required>
-                        <small><?php echo esc_html__('Recomendado: descargar un backup actual antes de importar.', 'tatipilates'); ?></small>
+                        <small>
+                            <?php
+                            echo esc_html(
+                                sprintf(
+                                    __('Formatos soportados: legacy v1 y actual v%1$d. Limite: %2$s.', 'tatipilates'),
+                                    TP_Backups::BACKUP_FORMAT_VERSION,
+                                    size_format($backup_max_upload)
+                                )
+                            );
+                            ?>
+                        </small>
                     </label>
                     <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('La importacion sincronizara datos del backup con la base actual. Continuar?', 'tatipilates')); ?>');">
                         <?php echo esc_html__('Importar backup', 'tatipilates'); ?>
@@ -177,6 +230,7 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
             </div>
         </div>
 
+        <?php if ($demo_disponible) : ?>
         <div class="tp-window tp-admin-side">
             <div class="tp-window-bar">
                 <span></span>
@@ -196,15 +250,22 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
                     </button>
                 </form>
 
-                <hr>
-                <p><strong><?php echo esc_html__('Desactivar plugin:', 'tatipilates'); ?></strong> <?php echo esc_html__('conserva las tablas y los datos.', 'tatipilates'); ?></p>
-                <p><strong><?php echo esc_html__('Eliminar/desinstalar plugin:', 'tatipilates'); ?></strong> <?php echo esc_html__('por defecto conserva las tablas y los datos. Solo borra si lo activas en Zona peligrosa.', 'tatipilates'); ?></p>
-                <hr>
-                <p><?php echo esc_html__('Credenciales demo:', 'tatipilates'); ?></p>
-                <p><code>*.demo@tatipilates.test</code><br><code>Pilates2026!</code></p>
-                <p><code>admin.pilates.demo@tatipilates.test</code><br><code>AdminPilates2026!</code></p>
+                <?php if ($credenciales_demo) : ?>
+                    <hr>
+                    <p><strong><?php echo esc_html__('Credenciales temporales recien generadas', 'tatipilates'); ?></strong></p>
+                    <p>
+                        <code><?php echo esc_html(implode(', ', (array) $credenciales_demo['usuarios_alumnas'])); ?></code><br>
+                        <code><?php echo esc_html($credenciales_demo['password_alumnas']); ?></code>
+                    </p>
+                    <p>
+                        <code><?php echo esc_html($credenciales_demo['usuario_admin_pilates']); ?></code><br>
+                        <code><?php echo esc_html($credenciales_demo['password_admin_pilates']); ?></code>
+                    </p>
+                    <p><a href="<?php echo esc_url($credenciales_demo['portal']); ?>" target="_blank" rel="noreferrer"><?php echo esc_html($credenciales_demo['portal']); ?></a></p>
+                <?php endif; ?>
             </div>
         </div>
+        <?php endif; ?>
 
         <div class="tp-window tp-admin-side">
             <div class="tp-window-bar">
@@ -269,19 +330,21 @@ $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_d
                             <small><?php echo esc_html__('Usa staging en el sitio de pruebas y stable en el sitio live.', 'tatipilates'); ?></small>
                         </label>
 
-                        <label class="tp-field">
+                        <div class="tp-field">
                             <span><?php echo esc_html__('GitHub token privado', 'tatipilates'); ?></span>
-                            <input type="password" name="token" value="" autocomplete="new-password" placeholder="<?php echo esc_attr(!empty($updater_config['token']) ? __('Token guardado. Dejalo vacio para conservarlo.', 'tatipilates') : __('Pega un token fine-grained de GitHub.', 'tatipilates')); ?>">
-                            <small><?php echo esc_html__('Permiso minimo recomendado: Contents read-only solo para este repositorio.', 'tatipilates'); ?></small>
-                        </label>
-
-                        <?php if (!empty($updater_config['token'])) : ?>
-                            <label class="tp-field tp-field-checkbox">
-                                <input type="checkbox" name="clear_token" value="1">
-                                <span><?php echo esc_html__('Borrar token guardado', 'tatipilates'); ?></span>
-                                <small><?php echo esc_html__('Usalo si queres desconectar este sitio de GitHub.', 'tatipilates'); ?></small>
-                            </label>
-                        <?php endif; ?>
+                            <?php if ('server' === $updater_config['token_source']) : ?>
+                                <strong><?php echo esc_html__('Configurado por servidor', 'tatipilates'); ?></strong>
+                                <small><?php echo esc_html__('El PAT se obtiene de TP_GITHUB_TOKEN y no se guarda en WordPress.', 'tatipilates'); ?></small>
+                            <?php elseif ('legacy' === $updater_config['token_source']) : ?>
+                                <strong><?php echo esc_html__('Usando configuracion legacy', 'tatipilates'); ?></strong>
+                                <small><?php echo esc_html__('El updater sigue operativo temporalmente, pero el PAT permanece en la base de datos hasta configurar el servidor.', 'tatipilates'); ?></small>
+                            <?php else : ?>
+                                <strong><?php echo esc_html__('No configurado', 'tatipilates'); ?></strong>
+                                <small><?php echo esc_html__('El updater privado no puede autenticarse con GitHub.', 'tatipilates'); ?></small>
+                            <?php endif; ?>
+                            <code class="tp-updater-token-example"><?php echo esc_html("define('TP_GITHUB_TOKEN', 'github_pat_REEMPLAZAR');"); ?></code>
+                            <small><?php echo esc_html__('Agrega la constante en wp-config.php antes de la linea que detiene la edicion, o define una variable de entorno con el mismo nombre. Usa Contents: read-only solo para este repositorio.', 'tatipilates'); ?></small>
+                        </div>
 
                         <div class="tp-form-actions">
                             <?php submit_button(__('Guardar updater', 'tatipilates'), 'primary', 'submit', false); ?>

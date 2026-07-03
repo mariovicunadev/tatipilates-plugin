@@ -14,8 +14,20 @@ if (!defined('ABSPATH')) {
  */
 class TP_Test_Data {
 
-    const PASSWORD_ALUMNAS = 'Pilates2026!';
-    const PASSWORD_ADMIN   = 'AdminPilates2026!';
+    const OPTION_HARDENED_VERSION = 'tp_demo_accounts_hardened_version';
+    const OPTION_HARDENING_NOTICE = 'tp_demo_accounts_hardening_notice';
+    const ADMIN_DEMO_EMAIL        = 'admin.pilates.demo@tatipilates.test';
+
+    /**
+     * Whether demo data tools are explicitly enabled in this environment.
+     *
+     * @return bool
+     */
+    public static function is_available() {
+        return in_array(wp_get_environment_type(), array('local', 'development'), true)
+            && defined('TP_ALLOW_DEMO_DATA')
+            && true === TP_ALLOW_DEMO_DATA;
+    }
 
     /**
      * Creates or refreshes demo users and Pilates data.
@@ -24,6 +36,13 @@ class TP_Test_Data {
      */
     public static function seed() {
         global $wpdb;
+
+        if (!self::is_available()) {
+            return new WP_Error(
+                'tp_demo_data_disabled',
+                'Los datos de prueba solo estan disponibles en local o development con TP_ALLOW_DEMO_DATA=true.'
+            );
+        }
 
         if (class_exists('TP_Roles')) {
             TP_Roles::registrar_roles();
@@ -43,14 +62,16 @@ class TP_Test_Data {
         $lunes_actual = gmdate('Y-m-d', strtotime($hoy . ' monday this week'));
         $mes_actual   = gmdate('Y-m-01', strtotime($hoy));
         $mes_anterior = gmdate('Y-m-01', strtotime($hoy . ' -1 month'));
+        $password_alumnas = wp_generate_password(24, true, true);
+        $password_admin   = wp_generate_password(24, true, true);
         $horarios     = self::crear_horarios();
-        $alumnas      = self::crear_alumnas();
+        $alumnas      = self::crear_alumnas($password_alumnas);
 
         foreach ($alumnas as $alumna_id) {
             self::limpiar_alumna($alumna_id);
         }
 
-        self::ensure_user('admin.pilates.demo@tatipilates.test', 'Admin Pilates Demo', TP_Roles::ROLE_ADMIN_PILATES, self::PASSWORD_ADMIN);
+        self::ensure_user(self::ADMIN_DEMO_EMAIL, 'Admin Pilates Demo', TP_Roles::ROLE_ADMIN_PILATES, $password_admin);
 
         self::crear_pagos($alumnas, $mes_actual, $mes_anterior);
         self::crear_reservas($alumnas, $horarios, $lunes_actual, $hoy);
@@ -58,12 +79,76 @@ class TP_Test_Data {
 
         return array(
             'portal'                 => home_url('/mi-pilates/'),
-            'password_alumnas'       => self::PASSWORD_ALUMNAS,
-            'password_admin_pilates' => self::PASSWORD_ADMIN,
+            'password_alumnas'       => $password_alumnas,
+            'password_admin_pilates' => $password_admin,
             'usuarios_alumnas'       => self::emails_alumnas(),
-            'usuario_admin_pilates'  => 'admin.pilates.demo@tatipilates.test',
+            'usuario_admin_pilates'  => self::ADMIN_DEMO_EMAIL,
             'alumnas_creadas'        => count($alumnas),
         );
+    }
+
+    /**
+     * Rotates known demo credentials and removes demo admin privileges in production.
+     *
+     * @return array<int,string> Hardened user emails.
+     */
+    public static function harden_production_accounts() {
+        if ('production' !== wp_get_environment_type()) {
+            return array();
+        }
+
+        if (TP_VERSION === get_option(self::OPTION_HARDENED_VERSION)) {
+            $notice = get_option(self::OPTION_HARDENING_NOTICE, array());
+            return is_array($notice) && !empty($notice['emails']) ? array_values($notice['emails']) : array();
+        }
+
+        global $wpdb;
+
+        $like     = '%' . $wpdb->esc_like('.demo@tatipilates.test');
+        $user_ids = $wpdb->get_col(
+            $wpdb->prepare(
+                "SELECT ID FROM {$wpdb->users} WHERE user_email LIKE %s ORDER BY ID ASC",
+                $like
+            )
+        );
+        $emails = array();
+
+        foreach ($user_ids as $user_id) {
+            $user = get_userdata((int) $user_id);
+
+            if (!$user) {
+                continue;
+            }
+
+            wp_set_password(wp_generate_password(64, true, true), (int) $user->ID);
+
+            if (self::ADMIN_DEMO_EMAIL === strtolower((string) $user->user_email)) {
+                $user->set_role('subscriber');
+
+                if (class_exists('TP_Roles')) {
+                    $user->remove_cap(TP_Roles::CAP_MANAGE_PILATES);
+                }
+            }
+
+            $emails[] = sanitize_email($user->user_email);
+        }
+
+        if ($emails) {
+            update_option(
+                self::OPTION_HARDENING_NOTICE,
+                array(
+                    'emails'     => array_values($emails),
+                    'created_at' => gmdate('c', current_time('timestamp')),
+                ),
+                false
+            );
+        } else {
+            delete_option(self::OPTION_HARDENING_NOTICE);
+        }
+
+        update_option(self::OPTION_HARDENED_VERSION, TP_VERSION, false);
+
+        return $emails;
     }
 
     /**
@@ -130,13 +215,14 @@ class TP_Test_Data {
     /**
      * Creates demo student profiles.
      *
+     * @param string $password Shared temporary student password.
      * @return array<string,int>
      */
-    private static function crear_alumnas() {
+    private static function crear_alumnas($password) {
         $alumnas = array();
 
         foreach (self::alumnas_demo() as $key => $definicion) {
-            $alumnas[$key] = self::ensure_alumna($definicion[0], $definicion[1], $definicion[2], $definicion[3], $definicion[4]);
+            $alumnas[$key] = self::ensure_alumna($definicion[0], $definicion[1], $definicion[2], $definicion[3], $definicion[4], $password);
         }
 
         return $alumnas;
@@ -252,6 +338,7 @@ class TP_Test_Data {
                     'first_name'   => $nombre,
                 )
             );
+            wp_set_password($password, $user_id);
         } else {
             $user_id = wp_insert_user(
                 array(
@@ -328,10 +415,10 @@ class TP_Test_Data {
      *
      * @return int
      */
-    private static function ensure_alumna($email, $nombre, $plan, $activa, $extras = array()) {
+    private static function ensure_alumna($email, $nombre, $plan, $activa, $extras, $password) {
         global $wpdb;
 
-        $user_id = self::ensure_user($email, $nombre, TP_Roles::ROLE_ALUMNA, self::PASSWORD_ALUMNAS);
+        $user_id = self::ensure_user($email, $nombre, TP_Roles::ROLE_ALUMNA, $password);
         $table   = $wpdb->prefix . 'tp_alumnas';
         $alumna  = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE wp_user_id = %d", $user_id));
         $data    = array_merge(

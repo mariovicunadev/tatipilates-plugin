@@ -36,6 +36,13 @@ class TP_Roles {
     const CAP_MANAGE_PILATES = 'tp_manage_pilates';
 
     /**
+     * Capability required to read or edit medical profile fields.
+     *
+     * @var string
+     */
+    const CAP_VIEW_MEDICAL_DATA = 'tp_view_medical_data';
+
+    /**
      * Registers runtime hooks.
      */
     public function __construct() {
@@ -94,6 +101,10 @@ class TP_Roles {
 
         if ($administrator && !$administrator->has_cap(self::CAP_MANAGE_PILATES)) {
             $administrator->add_cap(self::CAP_MANAGE_PILATES);
+        }
+
+        if ($administrator && !$administrator->has_cap(self::CAP_VIEW_MEDICAL_DATA)) {
+            $administrator->add_cap(self::CAP_VIEW_MEDICAL_DATA);
         }
 
         self::actualizar_nombre_visible_rol();

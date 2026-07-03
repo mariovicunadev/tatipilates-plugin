@@ -38,7 +38,7 @@ En staging:
 ```text
 Activar updater privado: si
 Canal de updates: staging
-GitHub token privado: token fine-grained
+GitHub token privado: configurado por servidor
 ```
 
 En live:
@@ -46,10 +46,18 @@ En live:
 ```text
 Activar updater privado: si
 Canal de updates: stable
-GitHub token privado: token fine-grained
+GitHub token privado: configurado por servidor
 ```
 
-El token no se guarda en Git. Se guarda solo en la base de datos de WordPress.
+El PAT no se introduce en wp-admin ni se guarda en la base de datos. Definirlo
+en `wp-config.php`, antes de la linea que detiene la edicion:
+
+```php
+define('TP_GITHUB_TOKEN', 'github_pat_REEMPLAZAR');
+```
+
+Como alternativa, el servidor puede exponer una variable de entorno
+`TP_GITHUB_TOKEN`. La constante tiene precedencia sobre la variable.
 
 Permiso minimo recomendado para el token:
 
@@ -58,6 +66,12 @@ Repository access: only mariovicunadev/tatipilates-plugin
 Permissions:
 - Contents: Read-only
 ```
+
+Durante la version de transicion, una instalacion que todavia tenga un PAT
+legacy en `tp_updater_config` puede seguir actualizando. La pantalla muestra una
+advertencia y, en cuanto detecta `TP_GITHUB_TOKEN` en el servidor, elimina
+automaticamente la copia legacy conservando el canal y el estado del updater.
+El valor del PAT nunca se muestra en la interfaz.
 
 ## Manifest
 

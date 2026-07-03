@@ -39,6 +39,10 @@ class TP_Activator {
 
         self::programar_cron();
 
+        if (class_exists('TP_Test_Data')) {
+            TP_Test_Data::harden_production_accounts();
+        }
+
         if (get_option('tp_schema_version') === $schema_version) {
             return;
         }

@@ -45,6 +45,7 @@ class TP_Admin {
         add_action('admin_post_tp_guardar_updater_config', array($this, 'guardar_updater_config'));
         add_action('admin_post_tp_seed_test_data', array($this, 'generar_datos_prueba'));
         add_action('admin_post_tp_backup_descargar', array($this, 'descargar_backup'));
+        add_action('admin_post_tp_backup_archivo_descargar', array($this, 'descargar_backup_guardado'));
         add_action('admin_post_tp_backup_generar', array($this, 'generar_backup'));
         add_action('admin_post_tp_backup_importar', array($this, 'importar_backup'));
         add_action('admin_post_tp_guardar_uninstall_config', array($this, 'guardar_uninstall_config'));
@@ -822,19 +823,31 @@ class TP_Admin {
         $this->require_admin();
         check_admin_referer('tp_guardar_alumna');
 
-        $alumna_id = isset($_POST['alumna_id']) ? absint($_POST['alumna_id']) : 0;
-        $datos     = array(
+        $alumna_id                  = isset($_POST['alumna_id']) ? absint($_POST['alumna_id']) : 0;
+        $campos_medicos             = array('historia_medica', 'alergias', 'motivo_pilates');
+        $puede_editar_datos_medicos = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
+
+        foreach ($campos_medicos as $campo_medico) {
+            if (array_key_exists($campo_medico, $_POST) && !$puede_editar_datos_medicos) {
+                wp_die(esc_html__('No tienes permisos para editar los datos medicos.', 'tatipilates'), '', array('response' => 403));
+            }
+        }
+
+        $datos = array(
             'nombre' => isset($_POST['nombre']) ? sanitize_text_field(wp_unslash($_POST['nombre'])) : '',
             'email'  => isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : '',
             'plan'   => isset($_POST['plan']) ? sanitize_text_field(wp_unslash($_POST['plan'])) : '',
             'activa' => isset($_POST['activa']) ? 1 : 0,
             'notas'  => isset($_POST['notas']) ? sanitize_textarea_field(wp_unslash($_POST['notas'])) : '',
-            'historia_medica' => isset($_POST['historia_medica']) ? sanitize_textarea_field(wp_unslash($_POST['historia_medica'])) : '',
-            'alergias' => isset($_POST['alergias']) ? sanitize_textarea_field(wp_unslash($_POST['alergias'])) : '',
-            'motivo_pilates' => isset($_POST['motivo_pilates']) ? sanitize_textarea_field(wp_unslash($_POST['motivo_pilates'])) : '',
             'fecha_nacimiento' => isset($_POST['fecha_nacimiento']) ? sanitize_text_field(wp_unslash($_POST['fecha_nacimiento'])) : '',
             'fecha_inicio_pilates' => isset($_POST['fecha_inicio_pilates']) ? sanitize_text_field(wp_unslash($_POST['fecha_inicio_pilates'])) : '',
         );
+
+        if ($puede_editar_datos_medicos) {
+            foreach ($campos_medicos as $campo_medico) {
+                $datos[$campo_medico] = isset($_POST[$campo_medico]) ? sanitize_textarea_field(wp_unslash($_POST[$campo_medico])) : '';
+            }
+        }
 
         $resultado = $alumna_id ? TP_Alumnas::actualizar($alumna_id, $datos) : TP_Alumnas::crear($datos);
         $args      = array('page' => 'tatipilates-alumnas');
@@ -1580,12 +1593,28 @@ class TP_Admin {
         $this->require_admin();
         check_admin_referer('tp_seed_test_data');
 
-        $resultado = TP_Test_Data::seed();
         $args      = array('page' => 'tatipilates-configuracion');
 
-        if (is_wp_error($resultado)) {
-            $args['tp_error'] = rawurlencode($resultado->get_error_message());
+        if (!class_exists('TP_Test_Data') || !TP_Test_Data::is_available()) {
+            $args['tp_error'] = rawurlencode('Los datos de prueba no estan habilitados en este entorno.');
         } else {
+            $resultado = TP_Test_Data::seed();
+        }
+
+        if (isset($resultado) && is_wp_error($resultado)) {
+            $args['tp_error'] = rawurlencode($resultado->get_error_message());
+        } elseif (isset($resultado)) {
+            set_transient(
+                'tp_demo_credentials_' . get_current_user_id(),
+                array(
+                    'portal'                 => esc_url_raw($resultado['portal'] ?? ''),
+                    'usuarios_alumnas'       => array_map('sanitize_email', (array) ($resultado['usuarios_alumnas'] ?? array())),
+                    'password_alumnas'       => (string) ($resultado['password_alumnas'] ?? ''),
+                    'usuario_admin_pilates'  => sanitize_email($resultado['usuario_admin_pilates'] ?? ''),
+                    'password_admin_pilates' => (string) ($resultado['password_admin_pilates'] ?? ''),
+                ),
+                10 * MINUTE_IN_SECONDS
+            );
             $args['tp_mensaje'] = rawurlencode(
                 sprintf(
                     'Datos de prueba generados: %d alumnas demo.',
@@ -1615,6 +1644,23 @@ class TP_Admin {
     }
 
     /**
+     * Downloads one saved backup from private storage.
+     *
+     * @return void
+     */
+    public function descargar_backup_guardado() {
+        $this->require_admin();
+        check_admin_referer('tp_backup_archivo_descargar');
+
+        if (!class_exists('TP_Backups')) {
+            wp_die(esc_html__('El modulo de backups no esta disponible.', 'tatipilates'), '', array('response' => 403));
+        }
+
+        $nombre = isset($_POST['backup']) ? sanitize_file_name(wp_unslash($_POST['backup'])) : '';
+        TP_Backups::descargar_archivo($nombre);
+    }
+
+    /**
      * Generates an on-demand backup file.
      *
      * @return void
@@ -1628,7 +1674,7 @@ class TP_Admin {
         if (!class_exists('TP_Backups')) {
             $args['tp_error'] = rawurlencode('El modulo de backups no esta disponible.');
         } else {
-            $resultado = TP_Backups::crear_archivo_diario();
+            $resultado = TP_Backups::crear_archivo_diario(false);
 
             if (is_wp_error($resultado)) {
                 $args['tp_error'] = rawurlencode($resultado->get_error_message());
@@ -1654,10 +1700,14 @@ class TP_Admin {
 
         if (!class_exists('TP_Backups')) {
             $args['tp_error'] = rawurlencode('El modulo de backups no esta disponible.');
-        } elseif (empty($_FILES['tp_backup_file']['tmp_name'])) {
-            $args['tp_error'] = rawurlencode('Selecciona un archivo JSON de backup.');
         } else {
-            $resultado = TP_Backups::importar_archivo($_FILES['tp_backup_file']['tmp_name']);
+            $archivo = $this->validar_upload_backup($_FILES['tp_backup_file'] ?? null);
+
+            if (is_wp_error($archivo)) {
+                $resultado = $archivo;
+            } else {
+                $resultado = TP_Backups::importar_archivo($archivo);
+            }
 
             if (is_wp_error($resultado)) {
                 $args['tp_error'] = rawurlencode($resultado->get_error_message());
@@ -1674,6 +1724,83 @@ class TP_Admin {
 
         wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
         exit;
+    }
+
+    /**
+     * Validates the HTTP upload before the backup parser reads it.
+     *
+     * @param mixed $file Uploaded file entry.
+     * @return string|WP_Error
+     */
+    private function validar_upload_backup($file) {
+        if (!is_array($file) || empty($file['tmp_name'])) {
+            return new WP_Error('tp_backup_upload_missing', 'Selecciona un archivo JSON de backup.');
+        }
+
+        $upload_error = isset($file['error']) ? (int) $file['error'] : UPLOAD_ERR_NO_FILE;
+
+        if (UPLOAD_ERR_OK !== $upload_error) {
+            $messages = array(
+                UPLOAD_ERR_INI_SIZE   => 'El backup supera el limite de carga configurado en PHP.',
+                UPLOAD_ERR_FORM_SIZE  => 'El backup supera el limite permitido por el formulario.',
+                UPLOAD_ERR_PARTIAL    => 'El backup se recibio de forma incompleta.',
+                UPLOAD_ERR_NO_FILE    => 'Selecciona un archivo JSON de backup.',
+                UPLOAD_ERR_NO_TMP_DIR => 'El servidor no tiene directorio temporal para recibir el backup.',
+                UPLOAD_ERR_CANT_WRITE => 'El servidor no pudo escribir temporalmente el backup.',
+                UPLOAD_ERR_EXTENSION  => 'Una extension de PHP detuvo la carga del backup.',
+            );
+
+            return new WP_Error('tp_backup_upload_error', $messages[$upload_error] ?? 'No se pudo recibir el archivo de backup.');
+        }
+
+        $tmp_path = (string) $file['tmp_name'];
+        $name     = sanitize_file_name((string) ($file['name'] ?? ''));
+
+        if ('json' !== strtolower((string) pathinfo($name, PATHINFO_EXTENSION))) {
+            return new WP_Error('tp_backup_invalid_extension', 'El archivo de backup debe usar la extension .json.');
+        }
+
+        if (!is_uploaded_file($tmp_path)) {
+            return new WP_Error('tp_backup_invalid_upload', 'El archivo recibido no es un upload HTTP valido.');
+        }
+
+        $declared_size = isset($file['size']) ? (int) $file['size'] : -1;
+        $actual_size   = filesize($tmp_path);
+
+        if (false === $actual_size || $declared_size < 0 || $declared_size !== $actual_size) {
+            return new WP_Error('tp_backup_size_mismatch', 'El tamano recibido no coincide con el archivo temporal.');
+        }
+
+        if ($actual_size > TP_Backups::max_upload_bytes()) {
+            return new WP_Error(
+                'tp_backup_file_too_large',
+                sprintf(
+                    'El backup pesa %1$s y supera el limite permitido de %2$s.',
+                    size_format($actual_size),
+                    size_format(TP_Backups::max_upload_bytes())
+                )
+            );
+        }
+
+        if (function_exists('finfo_open')) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime  = $finfo ? finfo_file($finfo, $tmp_path) : false;
+
+            if ($finfo) {
+                finfo_close($finfo);
+            }
+
+            $allowed_mimes = apply_filters(
+                'tp_backup_allowed_mime_types',
+                array('application/json', 'text/plain')
+            );
+
+            if (!$mime || !in_array(strtolower((string) $mime), $allowed_mimes, true)) {
+                return new WP_Error('tp_backup_invalid_mime', 'El contenido del archivo no tiene un MIME JSON permitido.');
+            }
+        }
+
+        return $tmp_path;
     }
 
     /**

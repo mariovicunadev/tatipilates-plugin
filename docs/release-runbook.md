@@ -75,7 +75,8 @@ Si no aparece:
 
 - guardar de nuevo `Tati Pilates > Configuracion > Actualizaciones privadas`;
 - confirmar canal `staging`;
-- confirmar token con `Contents: Read-only`;
+- confirmar que el estado del token sea `Configurado por servidor`;
+- confirmar `TP_GITHUB_TOKEN` y permiso `Contents: Read-only`;
 - confirmar que GitHub release tiene asset ZIP.
 
 ## Probar staging

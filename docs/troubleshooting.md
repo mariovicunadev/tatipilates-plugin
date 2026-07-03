@@ -76,7 +76,16 @@ Solucion:
 - crear fine-grained token;
 - repo: `mariovicunadev/tatipilates-plugin`;
 - permiso: `Contents: Read-only`;
-- pegarlo de nuevo en WordPress.
+- definir `TP_GITHUB_TOKEN` en `wp-config.php` o como variable de entorno;
+- confirmar en `Tati Pilates > Configuracion` que figure
+  `Configurado por servidor`;
+- guardar el canal y volver a comprobar actualizaciones.
+
+Ejemplo para `wp-config.php`, antes de la linea que detiene la edicion:
+
+```php
+define('TP_GITHUB_TOKEN', 'github_pat_REEMPLAZAR');
+```
 
 ## PWA muestra CSS viejo
 

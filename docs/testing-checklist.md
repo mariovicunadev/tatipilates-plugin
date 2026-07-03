@@ -88,6 +88,12 @@ Checklist para probar una version antes de publicarla a `stable`.
 ## Admin Pilates
 
 - Puede acceder a pantallas permitidas por `tp_manage_pilates`.
+- Sin `tp_view_medical_data`, no ve campos medicos en ficha o formulario.
+- Editar nombre, plan, fechas o notas sin acceso medico conserva los valores
+  medicos existentes.
+- Un `POST` manual de campos medicos sin la capability recibe 403.
+- Al asignar `tp_view_medical_data` a un usuario concreto, aparecen y se pueden
+  editar los tres campos.
 - No debe ver opciones nativas innecesarias de WordPress.
 - No debe poder hacer acciones fuera de la capability configurada.
 
@@ -114,6 +120,31 @@ Checklist para probar una version antes de publicarla a `stable`.
 - Token incorrecto no expone errores sensibles al usuario.
 - Guardar updater limpia cache de manifest.
 - `Escritorio > Actualizaciones > Comprobar de nuevo` refresca updates.
+
+## Backups
+
+- Un backup nuevo declara `format_version: 2`.
+- Un backup legacy v1 sigue validando e importando.
+- Archivos mayores al límite, JSON truncado, tablas/campos desconocidos, tipos,
+  longitudes, enums y referencias inválidas se rechazan antes de importar.
+- Un `format_version` futuro se rechaza con mensaje claro y sin cambios parciales.
+- Un fallo de base durante la importación revierte filas y restaura
+  `FOREIGN_KEY_CHECKS`.
+
+Checks automatizados:
+
+```zsh
+TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php
+php tests/updater-token-configuration.php
+php tests/medical-data-access.php
+```
+
+El check del updater usa stubs y tokens ficticios: valida fallback legacy,
+ausencia de token, precedencia constante/entorno, limpieza de `wp_options` y
+que el formulario no pueda modificar el secreto.
+
+El check de datos medicos valida la separacion de roles, SQL de listados,
+lectura autorizada/rechazada y preservacion de columnas en ediciones operativas.
 
 ## Pre-release local
 

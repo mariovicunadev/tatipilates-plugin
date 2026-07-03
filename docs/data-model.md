@@ -255,6 +255,11 @@ Reglas:
 - `tp_updater_config`
 - `tp_delete_data_on_uninstall`
 
+`tp_updater_config` conserva solo el estado habilitado y el canal. Durante una
+version de transicion puede contener una clave `token` legacy; se elimina
+automaticamente cuando el plugin detecta `TP_GITHUB_TOKEN` en `wp-config.php` o
+en el entorno.
+
 ## Uninstall
 
 `uninstall.php` conserva datos por defecto. Si `tp_delete_data_on_uninstall` esta apagada, solo limpia crons y sale sin borrar tablas, opciones ni roles.
@@ -264,7 +269,7 @@ Si la Zona peligrosa activa `tp_delete_data_on_uninstall = 1`, `uninstall.php` e
 - tablas `tp_*`;
 - opciones del plugin;
 - rol `tp_admin_pilates`;
-- capability `tp_manage_pilates` del administrador.
+- capabilities `tp_manage_pilates` y `tp_view_medical_data` del administrador.
 
 ## Backups JSON
 

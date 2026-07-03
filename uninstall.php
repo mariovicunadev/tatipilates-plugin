@@ -24,6 +24,16 @@ if ($administrator && $administrator->has_cap('tp_manage_pilates')) {
     $administrator->remove_cap('tp_manage_pilates');
 }
 
+if ($administrator && $administrator->has_cap('tp_view_medical_data')) {
+    $administrator->remove_cap('tp_view_medical_data');
+}
+
+foreach (get_users(array('fields' => 'all')) as $user) {
+    if (isset($user->caps['tp_view_medical_data'])) {
+        $user->remove_cap('tp_view_medical_data');
+    }
+}
+
 remove_role('tp_alumna');
 remove_role('tp_admin_pilates');
 

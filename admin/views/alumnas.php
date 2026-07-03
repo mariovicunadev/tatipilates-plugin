@@ -11,14 +11,22 @@ if (!defined('ABSPATH')) {
 
 $planes   = TP_Alumnas::planes();
 $alumnas  = TP_Alumnas::obtener_todas();
+$puede_ver_datos_medicos = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
 $edit_id  = isset($_GET['editar']) ? absint($_GET['editar']) : 0;
-$editando = $edit_id ? TP_Alumnas::obtener($edit_id) : null;
+$editando = $edit_id
+    ? ($puede_ver_datos_medicos ? TP_Alumnas::obtener_con_datos_medicos($edit_id) : TP_Alumnas::obtener($edit_id))
+    : null;
 $ficha_id = isset($_GET['ficha']) ? absint($_GET['ficha']) : 0;
-$ficha    = $ficha_id ? TP_Alumnas::obtener($ficha_id) : null;
+$ficha    = $ficha_id
+    ? ($puede_ver_datos_medicos ? TP_Alumnas::obtener_con_datos_medicos($ficha_id) : TP_Alumnas::obtener($ficha_id))
+    : null;
 $mensaje  = isset($_GET['tp_mensaje']) ? sanitize_text_field(wp_unslash($_GET['tp_mensaje'])) : '';
 $error    = isset($_GET['tp_error']) ? sanitize_text_field(wp_unslash($_GET['tp_error'])) : '';
 $credenciales = get_transient('tp_credenciales_' . get_current_user_id());
 $tp_alumnas_vista = isset($tp_alumnas_vista) ? $tp_alumnas_vista : 'registrados';
+
+$editando = is_wp_error($editando) ? null : $editando;
+$ficha    = is_wp_error($ficha) ? null : $ficha;
 
 if ($editando) {
     $tp_alumnas_vista = 'registrar';
@@ -243,18 +251,20 @@ if ($ficha) {
                         <span><?php echo esc_html__('Inicio', 'tatipilates'); ?></span>
                         <strong><?php echo esc_html($ficha->fecha_inicio_pilates ? TP_Pagos::formatear_fecha($ficha->fecha_inicio_pilates) : 'Sin registrar'); ?></strong>
                     </section>
-                    <section>
-                        <span><?php echo esc_html__('Historia medica', 'tatipilates'); ?></span>
-                        <p><?php echo esc_html($ficha->historia_medica ?: 'Sin notas medicas.'); ?></p>
-                    </section>
-                    <section>
-                        <span><?php echo esc_html__('Alergias', 'tatipilates'); ?></span>
-                        <p><?php echo esc_html($ficha->alergias ?: 'Sin alergias registradas.'); ?></p>
-                    </section>
-                    <section class="tp-profile-info-wide">
-                        <span><?php echo esc_html__('Motivo para asistir a Pilates', 'tatipilates'); ?></span>
-                        <p><?php echo esc_html($ficha->motivo_pilates ?: 'Sin motivo registrado.'); ?></p>
-                    </section>
+                    <?php if ($puede_ver_datos_medicos) : ?>
+                        <section>
+                            <span><?php echo esc_html__('Historia medica', 'tatipilates'); ?></span>
+                            <p><?php echo esc_html($ficha->historia_medica ?: 'Sin notas medicas.'); ?></p>
+                        </section>
+                        <section>
+                            <span><?php echo esc_html__('Alergias', 'tatipilates'); ?></span>
+                            <p><?php echo esc_html($ficha->alergias ?: 'Sin alergias registradas.'); ?></p>
+                        </section>
+                        <section class="tp-profile-info-wide">
+                            <span><?php echo esc_html__('Motivo para asistir a Pilates', 'tatipilates'); ?></span>
+                            <p><?php echo esc_html($ficha->motivo_pilates ?: 'Sin motivo registrado.'); ?></p>
+                        </section>
+                    <?php endif; ?>
                 </div>
 
                 <div class="tp-attendance-week-selector tp-week-range-nav">
@@ -561,20 +571,22 @@ if ($ficha) {
                     <input type="date" name="fecha_inicio_pilates" value="<?php echo esc_attr($editando ? $editando->fecha_inicio_pilates : gmdate('Y-m-d', current_time('timestamp'))); ?>">
                 </label>
 
-                <label class="tp-field tp-field-medical">
-                    <span><?php echo esc_html__('Historia medica', 'tatipilates'); ?></span>
-                    <textarea name="historia_medica" rows="3"><?php echo esc_textarea($editando ? $editando->historia_medica : ''); ?></textarea>
-                </label>
+                <?php if ($puede_ver_datos_medicos) : ?>
+                    <label class="tp-field tp-field-medical">
+                        <span><?php echo esc_html__('Historia medica', 'tatipilates'); ?></span>
+                        <textarea name="historia_medica" rows="3"><?php echo esc_textarea($editando ? $editando->historia_medica : ''); ?></textarea>
+                    </label>
 
-                <label class="tp-field tp-field-medical">
-                    <span><?php echo esc_html__('Alergias', 'tatipilates'); ?></span>
-                    <textarea name="alergias" rows="3"><?php echo esc_textarea($editando ? $editando->alergias : ''); ?></textarea>
-                </label>
+                    <label class="tp-field tp-field-medical">
+                        <span><?php echo esc_html__('Alergias', 'tatipilates'); ?></span>
+                        <textarea name="alergias" rows="3"><?php echo esc_textarea($editando ? $editando->alergias : ''); ?></textarea>
+                    </label>
 
-                <label class="tp-field tp-field-full">
-                    <span><?php echo esc_html__('Causas por las que asiste a Pilates', 'tatipilates'); ?></span>
-                    <textarea name="motivo_pilates" rows="3"><?php echo esc_textarea($editando ? $editando->motivo_pilates : ''); ?></textarea>
-                </label>
+                    <label class="tp-field tp-field-full">
+                        <span><?php echo esc_html__('Causas por las que asiste a Pilates', 'tatipilates'); ?></span>
+                        <textarea name="motivo_pilates" rows="3"><?php echo esc_textarea($editando ? $editando->motivo_pilates : ''); ?></textarea>
+                    </label>
+                <?php endif; ?>
 
                 <label class="tp-field tp-field-full">
                     <span><?php echo esc_html__('Notas', 'tatipilates'); ?></span>

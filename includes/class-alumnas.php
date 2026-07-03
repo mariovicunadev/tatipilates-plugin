@@ -44,7 +44,8 @@ class TP_Alumnas {
 
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT a.*, u.display_name, u.user_email,
+                "SELECT a.id, a.wp_user_id, a.plan, a.activa,
+                    u.display_name, u.user_email,
                     p.fecha_pago AS pago_mes_actual,
                     COUNT(r.id) AS recuperaciones_pendientes
                 FROM {$tabla_alumnas} a
@@ -76,8 +77,43 @@ class TP_Alumnas {
 
         return $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT a.*, u.display_name, u.user_email
+                "SELECT a.id, a.wp_user_id, a.plan, a.activa, a.notas,
+                    a.fecha_nacimiento, a.fecha_inicio_pilates, a.created_at,
+                    u.display_name, u.user_email
                 FROM {$tabla_alumnas} a
+                INNER JOIN {$wpdb->users} u ON u.ID = a.wp_user_id
+                WHERE a.id = %d",
+                $alumna_id
+            )
+        );
+    }
+
+    /**
+     * Gets a complete student profile when the current user may read medical data.
+     *
+     * @param int $alumna_id Student profile ID.
+     * @return object|null|WP_Error
+     */
+    public static function obtener_con_datos_medicos($alumna_id) {
+        global $wpdb;
+
+        if (!current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA)) {
+            return new WP_Error('tp_datos_medicos_prohibidos', 'No tienes permisos para ver los datos medicos.');
+        }
+
+        $alumna_id = absint($alumna_id);
+
+        if (!$alumna_id) {
+            return null;
+        }
+
+        return $wpdb->get_row(
+            $wpdb->prepare(
+                "SELECT a.id, a.wp_user_id, a.plan, a.activa, a.notas,
+                    a.historia_medica, a.alergias, a.motivo_pilates,
+                    a.fecha_nacimiento, a.fecha_inicio_pilates, a.created_at,
+                    u.display_name, u.user_email
+                FROM {$wpdb->prefix}tp_alumnas a
                 INNER JOIN {$wpdb->users} u ON u.ID = a.wp_user_id
                 WHERE a.id = %d",
                 $alumna_id
@@ -102,7 +138,8 @@ class TP_Alumnas {
 
         return $wpdb->get_row(
             $wpdb->prepare(
-                "SELECT a.*, u.display_name, u.user_email
+                "SELECT a.id, a.wp_user_id, a.plan, a.activa,
+                    u.display_name, u.user_email
                 FROM {$wpdb->prefix}tp_alumnas a
                 INNER JOIN {$wpdb->users} u ON u.ID = a.wp_user_id
                 WHERE a.wp_user_id = %d",
@@ -119,6 +156,12 @@ class TP_Alumnas {
      */
     public static function crear($datos) {
         global $wpdb;
+
+        $acceso_medico = self::validar_acceso_datos_medicos($datos);
+
+        if (is_wp_error($acceso_medico)) {
+            return $acceso_medico;
+        }
 
         $validado = self::validar_datos_creacion($datos);
 
@@ -153,9 +196,9 @@ class TP_Alumnas {
                 'plan'       => $validado['plan'],
                 'activa'     => 1,
                 'notas'      => $validado['notas'],
-                'historia_medica' => $validado['historia_medica'],
-                'alergias' => $validado['alergias'],
-                'motivo_pilates' => $validado['motivo_pilates'],
+                'historia_medica' => $validado['historia_medica'] ?? '',
+                'alergias' => $validado['alergias'] ?? '',
+                'motivo_pilates' => $validado['motivo_pilates'] ?? '',
                 'fecha_nacimiento' => $validado['fecha_nacimiento'],
                 'fecha_inicio_pilates' => $validado['fecha_inicio_pilates'],
             ),
@@ -194,12 +237,17 @@ class TP_Alumnas {
     public static function actualizar($alumna_id, $datos) {
         global $wpdb;
 
-        $alumna_id = absint($alumna_id);
-        $alumna    = self::obtener($alumna_id);
-        $validado  = self::validar_datos_edicion($datos);
+        $alumna_id     = absint($alumna_id);
+        $alumna        = self::obtener($alumna_id);
+        $acceso_medico = self::validar_acceso_datos_medicos($datos);
+        $validado      = self::validar_datos_edicion($datos);
 
         if (!$alumna) {
             return new WP_Error('tp_alumna_no_existe', 'El estudiante no existe.');
+        }
+
+        if (is_wp_error($acceso_medico)) {
+            return $acceso_medico;
         }
 
         if (is_wp_error($validado)) {
@@ -220,20 +268,27 @@ class TP_Alumnas {
 
         $wpdb->query('START TRANSACTION');
 
+        $datos_actualizar = array(
+            'plan'                  => $validado['plan'],
+            'activa'                => $validado['activa'],
+            'notas'                 => $validado['notas'],
+            'fecha_nacimiento'      => $validado['fecha_nacimiento'],
+            'fecha_inicio_pilates'  => $validado['fecha_inicio_pilates'],
+        );
+        $formatos_actualizar = array('%s', '%d', '%s', '%s', '%s');
+
+        foreach (self::campos_medicos() as $campo) {
+            if (array_key_exists($campo, $validado)) {
+                $datos_actualizar[$campo] = $validado[$campo];
+                $formatos_actualizar[]    = '%s';
+            }
+        }
+
         $actualizado = $wpdb->update(
             $wpdb->prefix . 'tp_alumnas',
-            array(
-                'plan'   => $validado['plan'],
-                'activa' => $validado['activa'],
-                'notas'  => $validado['notas'],
-                'historia_medica' => $validado['historia_medica'],
-                'alergias' => $validado['alergias'],
-                'motivo_pilates' => $validado['motivo_pilates'],
-                'fecha_nacimiento' => $validado['fecha_nacimiento'],
-                'fecha_inicio_pilates' => $validado['fecha_inicio_pilates'],
-            ),
+            $datos_actualizar,
             array('id' => $alumna_id),
-            array('%s', '%d', '%s', '%s', '%s', '%s', '%s', '%s'),
+            $formatos_actualizar,
             array('%d')
         );
 
@@ -371,7 +426,7 @@ class TP_Alumnas {
 
         return $wpdb->get_results(
             $wpdb->prepare(
-                "SELECT a.*, u.display_name, u.user_email
+                "SELECT a.id, a.fecha_nacimiento, u.display_name, u.user_email
                 FROM {$wpdb->prefix}tp_alumnas a
                 INNER JOIN {$wpdb->users} u ON u.ID = a.wp_user_id
                 WHERE a.activa = 1
@@ -705,9 +760,6 @@ class TP_Alumnas {
         $plan   = isset($datos['plan']) ? sanitize_text_field(wp_unslash($datos['plan'])) : '';
         $activa = isset($datos['activa']) ? absint($datos['activa']) : 0;
         $notas  = isset($datos['notas']) ? sanitize_textarea_field(wp_unslash($datos['notas'])) : '';
-        $historia_medica = isset($datos['historia_medica']) ? sanitize_textarea_field(wp_unslash($datos['historia_medica'])) : '';
-        $alergias = isset($datos['alergias']) ? sanitize_textarea_field(wp_unslash($datos['alergias'])) : '';
-        $motivo_pilates = isset($datos['motivo_pilates']) ? sanitize_textarea_field(wp_unslash($datos['motivo_pilates'])) : '';
         $fecha_nacimiento = isset($datos['fecha_nacimiento']) ? self::normalizar_fecha($datos['fecha_nacimiento']) : null;
         $fecha_inicio_pilates = isset($datos['fecha_inicio_pilates']) ? self::normalizar_fecha($datos['fecha_inicio_pilates']) : null;
 
@@ -719,17 +771,49 @@ class TP_Alumnas {
             return new WP_Error('tp_plan_invalido', 'Selecciona un plan valido.');
         }
 
-        return array(
+        $validado = array(
             'nombre' => $nombre,
             'plan'   => $plan,
             'activa' => $activa ? 1 : 0,
             'notas'  => $notas,
-            'historia_medica' => $historia_medica,
-            'alergias' => $alergias,
-            'motivo_pilates' => $motivo_pilates,
             'fecha_nacimiento' => $fecha_nacimiento,
             'fecha_inicio_pilates' => $fecha_inicio_pilates,
         );
+
+        foreach (self::campos_medicos() as $campo) {
+            if (array_key_exists($campo, $datos)) {
+                $validado[$campo] = sanitize_textarea_field(wp_unslash($datos[$campo]));
+            }
+        }
+
+        return $validado;
+    }
+
+    /**
+     * Rejects attempts to write medical fields without the dedicated capability.
+     *
+     * @param array<string,mixed> $datos Raw profile data.
+     * @return true|WP_Error
+     */
+    private static function validar_acceso_datos_medicos($datos) {
+        $puede_editar = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
+
+        foreach (self::campos_medicos() as $campo) {
+            if (array_key_exists($campo, $datos) && !$puede_editar) {
+                return new WP_Error('tp_datos_medicos_prohibidos', 'No tienes permisos para editar los datos medicos.');
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns the medical column allowlist.
+     *
+     * @return array<int,string>
+     */
+    private static function campos_medicos() {
+        return array('historia_medica', 'alergias', 'motivo_pilates');
     }
 
     /**

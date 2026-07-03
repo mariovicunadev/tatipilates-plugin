@@ -876,6 +876,17 @@ body.wp-admin {
     font-size: 12px;
 }
 
+.tp-updater-token-example {
+    display: block;
+    max-width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--tp-line);
+    border-radius: 8px;
+    background: var(--tp-cream);
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
 .tp-field-full {
     grid-column: 1 / -1;
 }

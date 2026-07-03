@@ -61,6 +61,8 @@ Responsabilidades:
 
 - Roles `tp_alumna` y `tp_admin_pilates`.
 - Capability `tp_manage_pilates`.
+- Capability independiente `tp_view_medical_data`, asignada por defecto solo
+  a `administrator`.
 - Helpers de rol.
 - Redirecciones para alumnas.
 - Ocultar admin bar para alumnas.
