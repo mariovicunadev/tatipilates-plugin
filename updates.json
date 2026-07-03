@@ -7,7 +7,7 @@
       "tag": "v1.2.3-rc.2",
       "asset": "tatipilates-1.2.3-rc.2.zip",
       "requires": "6.0",
-      "tested": "6.5",
+      "tested": "7.0",
       "requires_php": "8.0",
       "notes": "Sin cambios funcionales. Release candidate para validar deteccion y descarga con TP_GITHUB_TOKEN en staging."
     },

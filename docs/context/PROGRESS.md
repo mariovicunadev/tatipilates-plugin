@@ -1,15 +1,14 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-07-02
-**Qué se hizo:** Se cerró la tanda de seguridad formada por AUD-01, AUD-03, AUD-04, AUD-08 y AUD-02 Entrega 1, junto con la invalidación inmediata del caché privado del updater. La tanda se publicó como `1.2.3-rc.1` para validación en staging.
+**Fecha:** 2026-07-03
+**Qué se hizo:** Staging completó el checklist de `1.2.3-rc.1` y detectó `1.2.3-rc.2` mediante el updater nuevo con `TP_GITHUB_TOKEN`. Se corrigió la metadata de compatibilidad para declarar WordPress 7.0 como versión probada en staging y futuras promociones stable.
 
 ## Próximo paso inmediato
-- Instalar `1.2.3-rc.1` en staging y ejecutar el checklist de backups, updater, datos demo, permisos médicos y regresión general antes de promover a stable.
+- Confirmar la instalación de `1.2.3-rc.2` en staging y promover `1.2.3` a stable cuando la validación quede cerrada.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.
-- Falta asignar número de versión al fix local del updater; por secuencia corresponde un patch posterior a `1.2.2`.
 
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)

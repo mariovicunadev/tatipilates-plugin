@@ -8,6 +8,7 @@ Checklist para probar una version antes de publicarla a `stable`.
   - staging: `Tati Pilates > Configuracion > Actualizaciones privadas > staging`
   - live: `Tati Pilates > Configuracion > Actualizaciones privadas > stable`
 - Confirmar version instalada en `Plugins > Tati Pilates`.
+- Confirmar la regresion principal en WordPress 7.0, version declarada como probada.
 - Limpiar cache del navegador si se probaron cambios de CSS/JS/PWA.
 - Usar al menos:
   - un usuario administrador WordPress;
