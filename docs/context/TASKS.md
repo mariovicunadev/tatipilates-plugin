@@ -1,7 +1,7 @@
 # TASKS.md
 
 ## En progreso
-- [~] Confirmar instalación y smoke test final de `1.2.3-rc.2` en staging.
+- [~] Instalar y validar `1.2.3-rc.3` en staging mediante el updater nuevo.
 
 ## Pendientes
 - [ ] Promover el patch a stable solo después de confirmar detección, descarga e instalación en staging.
@@ -13,6 +13,7 @@
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Crear el rol Tatiana con gestión operativa y acceso médico, manteniendo Admin Pilates sin acceso médico.
 - [x] Automatizar la metadata `tested` desde la versión WordPress validada por el pre-release local.
 - [x] Validar que el updater nuevo detecta `1.2.3-rc.2` con `TP_GITHUB_TOKEN`.
 - [x] Publicar la tanda de auditoría y el fix de caché del updater como `1.2.3-rc.1`.

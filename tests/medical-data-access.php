@@ -31,6 +31,17 @@ class WP_Error {
 }
 
 /**
+ * Minimal user object used by role helper checks.
+ */
+class WP_User {
+    public $roles;
+
+    public function __construct($roles = array()) {
+        $this->roles = $roles;
+    }
+}
+
+/**
  * Minimal role object.
  */
 class TP_Medical_Test_Role {
@@ -108,7 +119,14 @@ class TP_Helpers {
 
 $wp_roles = new TP_Medical_Test_Roles_Registry();
 $tp_medical_test_roles = array(
-    'administrator' => new TP_Medical_Test_Role(array('read' => true)),
+    'administrator'    => new TP_Medical_Test_Role(array('read' => true)),
+    'tp_admin_pilates' => new TP_Medical_Test_Role(
+        array(
+            'read'                 => true,
+            'tp_manage_pilates'    => true,
+            'tp_view_medical_data' => true,
+        )
+    ),
 );
 $tp_medical_test_can_view = false;
 $wpdb = new TP_Medical_Test_Wpdb();
@@ -205,11 +223,18 @@ try {
 
         $administrator = $tp_medical_test_roles['administrator'];
         $pilates_admin = $tp_medical_test_roles[TP_Roles::ROLE_ADMIN_PILATES];
+        $tatiana       = $tp_medical_test_roles[TP_Roles::ROLE_TATIANA];
 
         tp_medical_test_assert($administrator->has_cap(TP_Roles::CAP_MANAGE_PILATES), 'Administrator no recibio gestion.');
         tp_medical_test_assert($administrator->has_cap(TP_Roles::CAP_VIEW_MEDICAL_DATA), 'Administrator no recibio acceso medico.');
         tp_medical_test_assert($pilates_admin->has_cap(TP_Roles::CAP_MANAGE_PILATES), 'Admin Pilates no recibio gestion.');
         tp_medical_test_assert(!$pilates_admin->has_cap(TP_Roles::CAP_VIEW_MEDICAL_DATA), 'Admin Pilates heredo acceso medico.');
+        tp_medical_test_assert($tatiana->has_cap(TP_Roles::CAP_MANAGE_PILATES), 'Tatiana no recibio gestion.');
+        tp_medical_test_assert($tatiana->has_cap(TP_Roles::CAP_VIEW_MEDICAL_DATA), 'Tatiana no recibio acceso medico.');
+        tp_medical_test_assert(
+            TP_Roles::usuario_es_admin_pilates(new WP_User(array(TP_Roles::ROLE_TATIANA))),
+            'Tatiana no comparte el comportamiento de navegacion de Admin Pilates.'
+        );
     };
 
     $checks['student_listing_excludes_medical_fields'] = function () use ($wpdb) {

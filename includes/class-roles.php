@@ -29,6 +29,13 @@ class TP_Roles {
     const ROLE_ADMIN_PILATES = 'tp_admin_pilates';
 
     /**
+     * Owner role with operational and medical access.
+     *
+     * @var string
+     */
+    const ROLE_TATIANA = 'tp_tatiana';
+
+    /**
      * Capability required to manage the Pilates system.
      *
      * @var string
@@ -95,6 +102,32 @@ class TP_Roles {
 
         if ($admin_pilates && !$admin_pilates->has_cap(self::CAP_MANAGE_PILATES)) {
             $admin_pilates->add_cap(self::CAP_MANAGE_PILATES);
+        }
+
+        if ($admin_pilates && $admin_pilates->has_cap(self::CAP_VIEW_MEDICAL_DATA)) {
+            $admin_pilates->remove_cap(self::CAP_VIEW_MEDICAL_DATA);
+        }
+
+        if (!get_role(self::ROLE_TATIANA)) {
+            add_role(
+                self::ROLE_TATIANA,
+                'Tatiana',
+                array(
+                    'read'                      => true,
+                    self::CAP_MANAGE_PILATES    => true,
+                    self::CAP_VIEW_MEDICAL_DATA => true,
+                )
+            );
+        }
+
+        $tatiana = get_role(self::ROLE_TATIANA);
+
+        if ($tatiana && !$tatiana->has_cap(self::CAP_MANAGE_PILATES)) {
+            $tatiana->add_cap(self::CAP_MANAGE_PILATES);
+        }
+
+        if ($tatiana && !$tatiana->has_cap(self::CAP_VIEW_MEDICAL_DATA)) {
+            $tatiana->add_cap(self::CAP_VIEW_MEDICAL_DATA);
         }
 
         $administrator = get_role('administrator');
@@ -190,7 +223,7 @@ class TP_Roles {
     }
 
     /**
-     * Checks whether the current logged-in user has the Pilates admin role.
+     * Checks whether the current logged-in user has an operational Pilates role.
      *
      * @return bool
      */
@@ -201,7 +234,7 @@ class TP_Roles {
     }
 
     /**
-     * Checks whether a given user has the Pilates admin role.
+     * Checks whether a given user has an operational Pilates role.
      *
      * @param WP_User|null $user User object.
      * @return bool
@@ -211,7 +244,10 @@ class TP_Roles {
             return false;
         }
 
-        return in_array(self::ROLE_ADMIN_PILATES, (array) $user->roles, true);
+        return (bool) array_intersect(
+            array(self::ROLE_ADMIN_PILATES, self::ROLE_TATIANA),
+            (array) $user->roles
+        );
     }
 
     /**

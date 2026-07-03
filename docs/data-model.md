@@ -268,7 +268,7 @@ Si la Zona peligrosa activa `tp_delete_data_on_uninstall = 1`, `uninstall.php` e
 
 - tablas `tp_*`;
 - opciones del plugin;
-- rol `tp_admin_pilates`;
+- roles `tp_admin_pilates` y `tp_tatiana`;
 - capabilities `tp_manage_pilates` y `tp_view_medical_data` del administrador.
 
 ## Backups JSON

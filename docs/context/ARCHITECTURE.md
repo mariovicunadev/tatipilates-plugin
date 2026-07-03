@@ -63,9 +63,9 @@ Reglas estructurales:
 
 - Nunca asumir el prefijo `wp_`; usar `$wpdb->prefix`.
 - `TP_Reservas::cupo_plan_semana()` es la fuente central del límite semanal.
-- `tp_manage_pilates` habilita operacion administrativa;
-  `tp_view_medical_data` controla por separado la lectura y escritura de campos
-  medicos.
+- `tp_manage_pilates` habilita operacion administrativa a Admin Pilates y
+  Tatiana; `tp_view_medical_data` se agrega solo a Tatiana y administrator para
+  controlar la lectura y escritura de campos medicos.
 - Operaciones que afectan varias tablas deben usar transacciones.
 - `TP_Activator::ensure_schema()` mantiene instalaciones activas migradas.
 

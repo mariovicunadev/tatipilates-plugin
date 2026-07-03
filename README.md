@@ -18,7 +18,8 @@ Este repositorio contiene solo el codigo del plugin. No incluye credenciales, do
 - Notificaciones internas para admin y alumnas.
 - PWA ligera del portal de alumnas.
 - Datos de prueba para entornos locales.
-- Rol limitado `tp_admin_pilates` con capability `tp_manage_pilates`.
+- Roles limitados `tp_admin_pilates` y `tp_tatiana`; Tatiana agrega acceso a
+  datos medicos sin recibir privilegios nativos de WordPress.
 
 ## Estructura
 
@@ -148,7 +149,8 @@ chore: update release checks
 - Agenda semanal.
 - Pagos, asistencia y notificaciones.
 - PWA/offline.
-- Admin Pilates con permisos limitados.
+- Admin Pilates con permisos operativos limitados.
+- Tatiana con los mismos permisos operativos y acceso medico.
 
 10. Si staging esta correcto, subir el mismo ZIP a live.
 11. Despues del deploy live, crear un tag de version:
@@ -167,7 +169,8 @@ git push origin v1.0.1
 - No subir `dev/`.
 - No editar directamente el plugin en staging/live sin replicar el cambio en este repo.
 - Si se cambia estructura de base de datos, actualizar activacion/migracion y probar en staging antes de live.
-- Si se cambia seguridad o permisos, probar con admin, Admin Pilates y alumna.
+- Si se cambia seguridad o permisos, probar con administrator, Tatiana, Admin
+  Pilates y alumna.
 - Desactivar el plugin conserva datos. Eliminarlo tambien conserva datos por defecto; solo borra data si se activa explicitamente en Zona peligrosa.
 - Antes de depurar cambios riesgosos en staging/live, descargar un backup JSON desde `Tati Pilates > Configuracion`.
 

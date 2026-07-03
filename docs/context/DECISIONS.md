@@ -69,7 +69,7 @@
 **Decisión:** Conectar `delete_site_transient_update_plugins` con la limpieza de `tp_updater_manifest`.
 **Alternativas consideradas:** Esperar el TTL de 30 minutos; pedir guardar la configuración manualmente.
 **Por qué se eligió esta:** Hace que “Comprobar de nuevo” refresque también el caché privado y muestre releases recientes inmediatamente.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente
 
 ---
 
@@ -109,6 +109,14 @@
 **Decisión:** Crear `tp_view_medical_data`, asignarla por defecto solo a `administrator` y permitir autorizaciones individuales para usuarios Admin Pilates que realmente la necesiten.
 **Alternativas consideradas:** Mantener todo bajo `tp_manage_pilates`; dar la capability al rol Admin Pilates completo; ocultar campos solo en la interfaz.
 **Por qué se eligió esta:** Aplica menor privilegio, evita que las tareas de agenda, pagos o asistencia impliquen acceso de salud y mantiene una via explicita para personal autorizado.
+**Estado:** Reemplazada parcialmente por el rol Tatiana; Admin Pilates permanece sin acceso medico.
+
+---
+
+## [2026-07-03] Crear un rol propietario con acceso medico
+**Decisión:** Crear `tp_tatiana` como copia operativa de Admin Pilates y agregarle `tp_view_medical_data`, manteniendo a las asistentes en `tp_admin_pilates` sin acceso medico.
+**Alternativas consideradas:** Dar acceso medico a todo Admin Pilates; asignar una capability individual sin rol visible; usar administrator para Tatiana.
+**Por qué se eligió esta:** Hace explicita la diferencia entre propietaria y asistentes, conserva menor privilegio y evita otorgar a Tatiana capacidades nativas innecesarias de WordPress.
 **Estado:** Vigente en local; pendiente de publicación
 
 ---

@@ -36,6 +36,7 @@ foreach (get_users(array('fields' => 'all')) as $user) {
 
 remove_role('tp_alumna');
 remove_role('tp_admin_pilates');
+remove_role('tp_tatiana');
 
 delete_option('tp_db_version');
 delete_option('tp_schema_version');

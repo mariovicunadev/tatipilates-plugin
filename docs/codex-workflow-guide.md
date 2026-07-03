@@ -28,7 +28,7 @@ Checklist de pruebas antes de publicar una version. Deberia cubrir:
 - Pagos y asistencia.
 - Notificaciones.
 - Updater privado.
-- Roles: admin, Admin Pilates y alumna.
+- Roles: administrator, Tatiana, Admin Pilates y alumna.
 
 2. `docs/release-runbook.md`
 

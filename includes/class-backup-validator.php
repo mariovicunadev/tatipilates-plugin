@@ -807,7 +807,7 @@ class TP_Backup_Validator {
             return self::error('invalid_roles', 'debe ser una lista corta de roles.');
         }
 
-        $allowed = array('tp_alumna', 'tp_admin_pilates');
+        $allowed = array('tp_alumna', 'tp_admin_pilates', 'tp_tatiana');
         $roles   = array_values(array_unique($value));
 
         foreach ($roles as $role) {

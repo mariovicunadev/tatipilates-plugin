@@ -13,6 +13,7 @@ Checklist para probar una version antes de publicarla a `stable`.
 - Limpiar cache del navegador si se probaron cambios de CSS/JS/PWA.
 - Usar al menos:
   - un usuario administrador WordPress;
+  - un usuario con rol Tatiana;
   - un usuario con rol Admin Pilates;
   - una alumna activa;
   - una alumna inactiva o sin pago, si aplica.
@@ -98,6 +99,13 @@ Checklist para probar una version antes de publicarla a `stable`.
   editar los tres campos.
 - No debe ver opciones nativas innecesarias de WordPress.
 - No debe poder hacer acciones fuera de la capability configurada.
+
+## Tatiana
+
+- Puede acceder a las mismas pantallas operativas que Admin Pilates.
+- Puede ver Historia medica, Alergias y Motivo en la ficha.
+- Puede editar los tres campos y guardar cambios.
+- No recibe menus ni capacidades nativas adicionales de WordPress.
 
 ## Emails
 

@@ -107,7 +107,7 @@ class TP_Backups {
                 'roles'           => array_values(
                     array_intersect(
                         (array) $usuario->roles,
-                        array('tp_alumna', 'tp_admin_pilates')
+                        array('tp_alumna', 'tp_admin_pilates', 'tp_tatiana')
                     )
                 ) ?: array('tp_alumna'),
             );
@@ -558,7 +558,7 @@ class TP_Backups {
                 'first_name'   => sanitize_text_field($usuario['first_name'] ?? ''),
                 'last_name'    => sanitize_text_field($usuario['last_name'] ?? ''),
                 'nickname'     => sanitize_text_field($usuario['nickname'] ?? $login),
-                'role'         => in_array('tp_admin_pilates', (array) ($usuario['roles'] ?? array()), true) ? 'tp_admin_pilates' : 'tp_alumna',
+                'role'         => self::rol_usuario_importado((array) ($usuario['roles'] ?? array())),
             );
 
             if ($user) {
@@ -793,6 +793,24 @@ class TP_Backups {
         }
 
         return true;
+    }
+
+    /**
+     * Resolves the primary plugin role restored from a backup.
+     *
+     * @param array<int,string> $roles Validated role list.
+     * @return string
+     */
+    private static function rol_usuario_importado($roles) {
+        if (in_array('tp_tatiana', $roles, true)) {
+            return 'tp_tatiana';
+        }
+
+        if (in_array('tp_admin_pilates', $roles, true)) {
+            return 'tp_admin_pilates';
+        }
+
+        return 'tp_alumna';
     }
 
     /**

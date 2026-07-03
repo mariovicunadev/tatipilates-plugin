@@ -70,7 +70,9 @@ Checklist recurrente antes de publicar cambios sensibles.
   `historia_medica`, `alergias` ni `motivo_pilates`.
 - Leer o editar esos campos requiere `tp_view_medical_data`; no aceptar
   `tp_manage_pilates` como sustituto.
-- `administrator` recibe acceso medico por defecto; `Admin Pilates` no.
+- `administrator` y `Tatiana` reciben acceso medico; `Admin Pilates` no.
+- Mantener a las asistentes en `Admin Pilates` y asignar `Tatiana` solo a la
+  propietaria autorizada.
 - Para autorizar a una persona concreta usar una capability individual, por
   ejemplo `wp user add-cap ID tp_view_medical_data`, y retirarla cuando deje de
   necesitarla.

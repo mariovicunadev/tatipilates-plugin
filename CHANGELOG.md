@@ -25,6 +25,8 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - Separa el acceso a historia medica, alergias y motivo de Pilates mediante `tp_view_medical_data`, asignada por defecto solo a administradores de WordPress y no al rol Admin Pilates.
 - Elimina los campos medicos de listados y perfiles operativos con columnas SQL explicitas; las lecturas completas y escrituras requieren la capability dedicada, y las ediciones sin permiso preservan los valores existentes.
 - Detecta la version de WordPress del entorno local durante pre-release y la usa como metadata probada en los manifiestos de staging y stable.
+- Agrega el rol `Tatiana` con la misma gestion operativa de Admin Pilates y acceso explicito a datos medicos; Admin Pilates conserva la gestion sin esa capability.
+- Conserva el rol `Tatiana` al validar, exportar e importar backups y lo elimina durante una desinstalacion destructiva.
 
 ## [1.2.2] - 2026-06-18
 

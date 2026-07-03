@@ -59,10 +59,10 @@ includes/class-roles.php
 
 Responsabilidades:
 
-- Roles `tp_alumna` y `tp_admin_pilates`.
+- Roles `tp_alumna`, `tp_admin_pilates` y `tp_tatiana`.
 - Capability `tp_manage_pilates`.
-- Capability independiente `tp_view_medical_data`, asignada por defecto solo
-  a `administrator`.
+- Capability independiente `tp_view_medical_data`, asignada a `administrator`
+  y `tp_tatiana`, pero no a `tp_admin_pilates`.
 - Helpers de rol.
 - Redirecciones para alumnas.
 - Ocultar admin bar para alumnas.

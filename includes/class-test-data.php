@@ -127,6 +127,7 @@ class TP_Test_Data {
 
                 if (class_exists('TP_Roles')) {
                     $user->remove_cap(TP_Roles::CAP_MANAGE_PILATES);
+                    $user->remove_cap(TP_Roles::CAP_VIEW_MEDICAL_DATA);
                 }
             }
 

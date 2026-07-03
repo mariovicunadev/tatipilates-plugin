@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-07-03
-**Qué se hizo:** Staging completó el checklist de `1.2.3-rc.1` y detectó `1.2.3-rc.2` mediante el updater nuevo con `TP_GITHUB_TOKEN`. La compatibilidad dejó de estar hardcodeada: el pre-release detecta el WordPress local validado, actualiza `release-metadata.json` y ambos workflows consumen esa fuente.
+**Qué se hizo:** Se preparó `1.2.3-rc.3` con `tp_tatiana`, la misma operación que Admin Pilates y acceso médico explícito. Admin Pilates permanece sin `tp_view_medical_data`; pasaron las pruebas de permisos (9/9), updater (6/6), backups (14/14) y el pre-release completo.
 
 ## Próximo paso inmediato
-- Confirmar la instalación de `1.2.3-rc.2` en staging y promover `1.2.3` a stable cuando la validación quede cerrada.
+- Instalar `1.2.3-rc.3` en staging mediante el updater y validar Tatiana, Admin Pilates y administrator antes de promover a stable.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.

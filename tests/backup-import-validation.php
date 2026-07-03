@@ -159,6 +159,23 @@ try {
         tp_backup_test_assert(!is_wp_error($result) && 2 === $result['format_version'], 'El backup legacy v1 no se normalizo a v2.');
     };
 
+    $checks['valid_tatiana_role'] = function () use ($fixture) {
+        $payload = $fixture;
+        $payload['users'][] = array(
+            'ID'              => 900002,
+            'user_login'      => 'tatiana.fixture@example.test',
+            'user_email'      => 'tatiana.fixture@example.test',
+            'display_name'    => 'Tatiana Fixture',
+            'first_name'      => 'Tatiana',
+            'last_name'       => 'Fixture',
+            'nickname'        => 'Tatiana Fixture',
+            'user_registered' => '2026-01-01 00:00:00',
+            'roles'           => array('tp_tatiana'),
+        );
+
+        tp_backup_test_assert(!is_wp_error(TP_Backups::validar_payload($payload)), 'El rol Tatiana fue rechazado por el contrato de backup.');
+    };
+
     $checks['truncated_json'] = function () {
         $path = tp_backup_test_temp_file('{"plugin":"tatipilates"', true);
 

@@ -11,7 +11,7 @@
 - [x] RF8: Proveer login, recuperación de contraseña y dashboard dentro de `/mi-pilates`.
 - [x] RF9: Crear, marcar y eliminar notificaciones internas para admin y alumnas sin recargas completas cuando aplica.
 - [x] RF10: Funcionar como PWA ligera con manifest, service worker, página offline e iconos.
-- [x] RF11: Restringir administración mediante `tp_manage_pilates` y el rol `tp_admin_pilates`.
+- [x] RF11: Restringir administración mediante `tp_manage_pilates`; Admin Pilates opera sin datos médicos y Tatiana agrega `tp_view_medical_data`.
 - [x] RF12: Exportar/importar backups JSON del plugin y conservar datos al desinstalar por defecto.
 - [x] RF13: Distribuir versiones privadas por canales `staging` y `stable` mediante GitHub Releases.
 - [x] RF14: Separar el acceso a campos médicos mediante `tp_view_medical_data` sin exponerlos en listados operativos.
