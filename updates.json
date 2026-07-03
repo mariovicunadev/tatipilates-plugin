@@ -3,13 +3,13 @@
   "repository": "mariovicunadev/tatipilates-plugin",
   "channels": {
     "staging": {
-      "version": "1.2.3-rc.2",
-      "tag": "v1.2.3-rc.2",
-      "asset": "tatipilates-1.2.3-rc.2.zip",
+      "version": "1.2.3-rc.3",
+      "tag": "v1.2.3-rc.3",
+      "asset": "tatipilates-1.2.3-rc.3.zip",
       "requires": "6.0",
       "tested": "7.0",
       "requires_php": "8.0",
-      "notes": "Sin cambios funcionales. Release candidate para validar deteccion y descarga con TP_GITHUB_TOKEN en staging."
+      "notes": "Agrega el rol Tatiana con gestion operativa y acceso medico, manteniendo Admin Pilates sin acceso medico."
     },
     "stable": {
       "version": "1.2.2",
