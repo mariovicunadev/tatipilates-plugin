@@ -20,13 +20,17 @@ git diff
 ```
 
 2. Confirmar que `CHANGELOG.md` describe la tanda.
-3. Correr pre-release local:
+3. Confirmar que la regresion se ejecuto en el WordPress local.
+4. Correr pre-release local:
 
 ```zsh
 ./pre-release-check.sh --yes
 ```
 
-4. Si pasa, commitear:
+El script detecta la version local y actualiza `release-metadata.json`. Revisar
+y commitear ese cambio junto con la tanda.
+
+5. Si pasa, commitear:
 
 ```zsh
 git add .

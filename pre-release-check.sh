@@ -4,7 +4,10 @@ set -u
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PHP_BIN="/Users/vicunav/Library/Application Support/Local/lightning-services/php-8.2.29+0/bin/darwin/bin/php"
+DEFAULT_WP_ROOT="/Users/vicunav/Documents/wps/app/public"
+RELEASE_METADATA_FILE="$ROOT_DIR/release-metadata.json"
 ASSUME_YES=false
+TESTED_WP_OVERRIDE=""
 
 GREEN=$'\033[0;32m'
 RED=$'\033[0;31m'
@@ -18,10 +21,11 @@ CHECK_NAMES=(
   "Debug code"
   "Release desactualizado"
   "Version del plugin"
+  "Compatibilidad WordPress"
 )
 
-CHECK_STATUS=("pending" "pending" "pending" "pending" "pending")
-CHECK_NOTES=("" "" "" "" "")
+CHECK_STATUS=("pending" "pending" "pending" "pending" "pending" "pending")
+CHECK_NOTES=("" "" "" "" "" "")
 
 cd "$ROOT_DIR" || exit 1
 
@@ -30,9 +34,12 @@ for arg in "$@"; do
     --yes)
       ASSUME_YES=true
       ;;
+    --tested-wp=*)
+      TESTED_WP_OVERRIDE="${arg#--tested-wp=}"
+      ;;
     *)
       echo "${RED}Argumento no reconocido:${RESET} $arg"
-      echo "Uso: ./pre-release-check.sh [--yes]"
+      echo "Uso: ./pre-release-check.sh [--yes] [--tested-wp=X.Y]"
       exit 1
       ;;
   esac
@@ -66,7 +73,7 @@ print_summary() {
   printf "%-28s-+-%-8s-+-%s\n" "----------------------------" "--------" "------------------------------"
 
   local i check_status symbol color note
-  for i in {1..5}; do
+  for i in {1..6}; do
     check_status="${CHECK_STATUS[$i]}"
     note="${CHECK_NOTES[$i]}"
 
@@ -215,6 +222,83 @@ case "${answer:l}" in
   *)
     echo "${RED}Respuesta no valida. Usá s o n.${RESET}"
     mark_fail 5 "Respuesta no valida"
+    exit_with_summary
+    ;;
+esac
+
+echo "${BLUE}CHECK 6 — Compatibilidad WordPress local${RESET}"
+wp_root="${TP_WP_ROOT:-$DEFAULT_WP_ROOT}"
+wp_version_file="$wp_root/wp-includes/version.php"
+
+if [[ -n "$TESTED_WP_OVERRIDE" ]]; then
+  detected_wp_version="$TESTED_WP_OVERRIDE"
+elif [[ -r "$wp_version_file" ]]; then
+  detected_wp_version="$("$PHP_BIN" -r 'require $argv[1]; echo $wp_version;' "$wp_version_file" 2>/dev/null)"
+else
+  echo "${RED}No se pudo detectar WordPress local.${RESET}"
+  echo "Define TP_WP_ROOT o usa --tested-wp=X.Y."
+  mark_fail 6 "WordPress local no encontrado"
+  exit_with_summary
+fi
+
+tested_wp_version="$(printf '%s' "$detected_wp_version" | sed -nE 's/^([0-9]+\.[0-9]+).*/\1/p')"
+
+if [[ -z "$tested_wp_version" ]]; then
+  echo "${RED}Version WordPress invalida:${RESET} $detected_wp_version"
+  mark_fail 6 "Version WordPress invalida"
+  exit_with_summary
+fi
+
+if [[ ! -f "$RELEASE_METADATA_FILE" ]]; then
+  echo "${RED}No existe release-metadata.json.${RESET}"
+  mark_fail 6 "Metadata de release ausente"
+  exit_with_summary
+fi
+
+echo "WordPress local detectado: $detected_wp_version"
+if [[ "$ASSUME_YES" == true ]]; then
+  echo "--yes activo: se confirma regresion en WordPress $tested_wp_version."
+  wp_answer="s"
+else
+  printf "¿La regresion fue probada en WordPress %s? (s/n) " "$tested_wp_version"
+  read wp_answer
+fi
+
+case "${wp_answer:l}" in
+  s|si|sí)
+    metadata_result="$("$PHP_BIN" -r '
+      $file = $argv[1];
+      $tested = $argv[2];
+      $metadata = json_decode(file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+      $previous = isset($metadata["tested"]) ? (string) $metadata["tested"] : "";
+      $metadata["tested"] = $tested;
+      $json = json_encode($metadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
+      if ($previous !== $tested && file_put_contents($file, $json, LOCK_EX) === false) {
+          throw new RuntimeException("No se pudo actualizar release-metadata.json");
+      }
+      echo $previous === $tested ? "unchanged" : "updated";
+    ' "$RELEASE_METADATA_FILE" "$tested_wp_version" 2>/dev/null)"
+
+    if [[ $? -ne 0 ]]; then
+      echo "${RED}No se pudo actualizar release-metadata.json.${RESET}"
+      mark_fail 6 "Metadata no actualizada"
+      exit_with_summary
+    fi
+
+    if [[ "$metadata_result" == "updated" ]]; then
+      mark_pass 6 "WordPress $tested_wp_version detectado y metadata actualizada"
+    else
+      mark_pass 6 "WordPress $tested_wp_version detectado; metadata vigente"
+    fi
+    ;;
+  n|no)
+    echo "No declares una version de WordPress que no completo la regresion."
+    mark_fail 6 "Regresion WordPress no confirmada"
+    exit_with_summary
+    ;;
+  *)
+    echo "${RED}Respuesta no valida. Usa s o n.${RESET}"
+    mark_fail 6 "Respuesta no valida"
     exit_with_summary
     ;;
 esac

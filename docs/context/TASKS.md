@@ -13,7 +13,7 @@
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
-- [x] Declarar WordPress 7.0 como versión probada en manifests de staging y stable.
+- [x] Automatizar la metadata `tested` desde la versión WordPress validada por el pre-release local.
 - [x] Validar que el updater nuevo detecta `1.2.3-rc.2` con `TP_GITHUB_TOKEN`.
 - [x] Publicar la tanda de auditoría y el fix de caché del updater como `1.2.3-rc.1`.
 - [x] Invalidar el manifiesto privado cuando WordPress fuerza una comprobación de updates.

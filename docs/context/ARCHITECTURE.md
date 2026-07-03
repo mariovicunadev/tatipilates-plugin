@@ -35,6 +35,7 @@ docs/                            # documentación técnica y operativa
 .github/workflows/               # publicación staging/stable
 updates.json                     # manifiesto de canales
 pre-release-check.sh             # validación y empaquetado
+release-metadata.json            # compatibilidad validada para releases
 ```
 
 ## Patrón arquitectónico

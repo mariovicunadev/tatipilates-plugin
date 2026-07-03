@@ -50,6 +50,27 @@ Lint manual:
 ./pre-release-check.sh --yes
 ```
 
+El pre-release lee la version desde:
+
+```text
+/Users/vicunav/Documents/wps/app/public/wp-includes/version.php
+```
+
+Puede usarse otra instalacion mediante `TP_WP_ROOT`:
+
+```zsh
+TP_WP_ROOT="/ruta/a/wordpress" ./pre-release-check.sh --yes
+```
+
+Si WordPress no esta disponible localmente, exige una version explicita:
+
+```zsh
+./pre-release-check.sh --yes --tested-wp=7.1
+```
+
+La version confirmada actualiza `release-metadata.json`; los workflows consumen
+ese archivo y no mantienen un `tested` hardcodeado.
+
 Genera ZIP en:
 
 ```text

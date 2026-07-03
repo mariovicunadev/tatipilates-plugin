@@ -24,7 +24,7 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - Mantiene una transicion compatible para instalaciones con PAT legacy, muestra advertencias operativas y evita que el formulario administrativo pueda guardar, reemplazar o borrar el token.
 - Separa el acceso a historia medica, alergias y motivo de Pilates mediante `tp_view_medical_data`, asignada por defecto solo a administradores de WordPress y no al rol Admin Pilates.
 - Elimina los campos medicos de listados y perfiles operativos con columnas SQL explicitas; las lecturas completas y escrituras requieren la capability dedicada, y las ediciones sin permiso preservan los valores existentes.
-- Declara WordPress 7.0 como la version probada en los manifiestos de staging y stable.
+- Detecta la version de WordPress del entorno local durante pre-release y la usa como metadata probada en los manifiestos de staging y stable.
 
 ## [1.2.2] - 2026-06-18
 

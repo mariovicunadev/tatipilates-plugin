@@ -51,14 +51,22 @@ jobs:
           const tag = `v${version}`;
           const asset = `tatipilates-${version}.zip`;
           const notes = process.env.NOTES || 'Version aprobada para live.';
+          const compatibility = JSON.parse(fs.readFileSync('release-metadata.json', 'utf8'));
           const manifest = JSON.parse(fs.readFileSync('updates.json', 'utf8'));
+
+          for (const field of ['requires', 'tested', 'requires_php']) {
+            if (!/^\d+\.\d+(?:\.\d+)?$/.test(compatibility[field] || '')) {
+              throw new Error(`Invalid ${field} in release-metadata.json`);
+            }
+          }
+
           manifest.channels.stable = {
             version,
             tag,
             asset,
-            requires: '6.0',
-            tested: '7.0',
-            requires_php: '8.0',
+            requires: compatibility.requires,
+            tested: compatibility.tested,
+            requires_php: compatibility.requires_php,
             notes
           };
           fs.writeFileSync('updates.json', JSON.stringify(manifest, null, 2) + '\n');

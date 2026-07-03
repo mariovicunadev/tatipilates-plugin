@@ -271,6 +271,7 @@ Reglas:
 
 ```text
 pre-release-check.sh
+release-metadata.json
 .github/workflows/publish-staging-release.yml
 .github/workflows/promote-stable-release.yml
 updates.json

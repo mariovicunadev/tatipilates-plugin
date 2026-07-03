@@ -73,6 +73,13 @@ advertencia y, en cuanto detecta `TP_GITHUB_TOKEN` en el servidor, elimina
 automaticamente la copia legacy conservando el canal y el estado del updater.
 El valor del PAT nunca se muestra en la interfaz.
 
+## Compatibilidad WordPress
+
+`release-metadata.json` es la fuente unica de `requires`, `tested` y
+`requires_php`. El pre-release detecta la version del WordPress local que paso
+la regresion y actualiza `tested`; los workflows copian esos valores al canal
+publicado.
+
 ## Manifest
 
 El archivo `updates.json` define que version ve cada canal.

@@ -82,6 +82,10 @@ El script verifica:
 - Codigo de debug olvidado.
 - Que no exista `release/tatipilates/`.
 - Version del plugin en `tatipilates.php`.
+- Version de WordPress usada para la regresion local.
+
+La compatibilidad confirmada se guarda en `release-metadata.json` y los
+workflows la copian automaticamente al manifiesto del canal publicado.
 
 Si todo pasa, genera un ZIP en:
 

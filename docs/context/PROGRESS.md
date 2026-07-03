@@ -2,7 +2,7 @@
 
 ## Última sesión
 **Fecha:** 2026-07-03
-**Qué se hizo:** Staging completó el checklist de `1.2.3-rc.1` y detectó `1.2.3-rc.2` mediante el updater nuevo con `TP_GITHUB_TOKEN`. Se corrigió la metadata de compatibilidad para declarar WordPress 7.0 como versión probada en staging y futuras promociones stable.
+**Qué se hizo:** Staging completó el checklist de `1.2.3-rc.1` y detectó `1.2.3-rc.2` mediante el updater nuevo con `TP_GITHUB_TOKEN`. La compatibilidad dejó de estar hardcodeada: el pre-release detecta el WordPress local validado, actualiza `release-metadata.json` y ambos workflows consumen esa fuente.
 
 ## Próximo paso inmediato
 - Confirmar la instalación de `1.2.3-rc.2` en staging y promover `1.2.3` a stable cuando la validación quede cerrada.
