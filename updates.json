@@ -3,13 +3,13 @@
   "repository": "mariovicunadev/tatipilates-plugin",
   "channels": {
     "staging": {
-      "version": "1.2.3-rc.1",
-      "tag": "v1.2.3-rc.1",
-      "asset": "tatipilates-1.2.3-rc.1.zip",
+      "version": "1.2.3-rc.2",
+      "tag": "v1.2.3-rc.2",
+      "asset": "tatipilates-1.2.3-rc.2.zip",
       "requires": "6.0",
       "tested": "6.5",
       "requires_php": "8.0",
-      "notes": "Endurece backups e importacion, datos demo, token del updater y acceso a datos medicos para validacion en staging."
+      "notes": "Sin cambios funcionales. Release candidate para validar deteccion y descarga con TP_GITHUB_TOKEN en staging."
     },
     "stable": {
       "version": "1.2.2",
