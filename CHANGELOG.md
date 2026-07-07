@@ -10,6 +10,12 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.4] - 2026-07-07
+
+### Fixed
+
+- Limpia automaticamente el aviso de cuentas demo endurecidas cuando ya no existen usuarios demo, permite ocultarlo manualmente y reacomoda Configuracion en dos columnas fluidas sin huecos grandes en la columna derecha.
+
 ## [1.2.3] - 2026-07-07
 
 ### Fixed

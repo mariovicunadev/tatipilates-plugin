@@ -265,6 +265,22 @@ body.wp-admin {
     min-width: 0;
 }
 
+.tp-config-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+}
+
+.tp-config-main-stack,
+.tp-config-side-stack {
+    display: grid;
+    gap: 16px;
+    align-content: start;
+    min-width: 0;
+}
+
+.tp-config-side-stack .tp-window {
+    width: 100%;
+}
+
 .tp-dashboard-page {
     --tp-dashboard-width: var(--tp-content-width);
 }

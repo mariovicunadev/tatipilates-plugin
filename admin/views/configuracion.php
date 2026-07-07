@@ -18,7 +18,7 @@ $aviso_backup = class_exists('TP_Backups') ? TP_Backups::aviso_almacenamiento() 
 $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_datos_al_desinstalar() : false;
 $demo_disponible = class_exists('TP_Test_Data') && TP_Test_Data::is_available();
 $credenciales_demo = $demo_disponible ? get_transient('tp_demo_credentials_' . get_current_user_id()) : null;
-$aviso_demo_produccion = class_exists('TP_Test_Data') ? get_option(TP_Test_Data::OPTION_HARDENING_NOTICE, array()) : array();
+$aviso_demo_produccion = class_exists('TP_Test_Data') ? TP_Test_Data::hardening_notice() : array();
 $backup_max_upload = class_exists('TP_Backups') ? TP_Backups::max_upload_bytes() : 0;
 
 if ($credenciales_demo) {
@@ -52,12 +52,19 @@ if ($credenciales_demo) {
     <?php endif; ?>
 
     <?php if (!empty($aviso_demo_produccion['emails']) && is_array($aviso_demo_produccion['emails'])) : ?>
-        <div class="notice notice-warning">
+        <div class="notice notice-warning tp-demo-hardening-notice">
             <p>
                 <strong><?php echo esc_html__('Cuentas demo desactivadas:', 'tatipilates'); ?></strong>
                 <?php echo esc_html(implode(', ', array_map('sanitize_email', $aviso_demo_produccion['emails']))); ?>
             </p>
             <p><?php echo esc_html__('Sus contrasenas fueron rotadas y la cuenta administrativa demo perdio sus privilegios. Revisa estas cuentas y elimina las que no deban conservarse.', 'tatipilates'); ?></p>
+            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                <?php wp_nonce_field('tp_descartar_demo_notice'); ?>
+                <input type="hidden" name="action" value="tp_descartar_demo_notice">
+                <button type="submit" class="button">
+                    <?php echo esc_html__('Ocultar aviso', 'tatipilates'); ?>
+                </button>
+            </form>
         </div>
     <?php endif; ?>
 
@@ -71,13 +78,14 @@ if ($credenciales_demo) {
         </div>
     <?php endif; ?>
 
-    <div class="tp-admin-layout">
-        <div class="tp-window tp-admin-main">
-            <div class="tp-window-bar">
-                <span></span>
-                <span></span>
-                <strong><?php echo esc_html__('Recordatorios', 'tatipilates'); ?></strong>
-            </div>
+    <div class="tp-admin-layout tp-config-layout">
+        <div class="tp-config-main-stack">
+            <div class="tp-window tp-admin-main">
+                <div class="tp-window-bar">
+                    <span></span>
+                    <span></span>
+                    <strong><?php echo esc_html__('Recordatorios', 'tatipilates'); ?></strong>
+                </div>
 
             <div class="tp-window-body">
                 <?php if ($notificaciones_config) : ?>
@@ -160,12 +168,47 @@ if ($credenciales_demo) {
             </div>
         </div>
 
-        <div class="tp-window tp-admin-side">
-            <div class="tp-window-bar">
-                <span></span>
-                <span></span>
-                <strong><?php echo esc_html__('Backups del plugin', 'tatipilates'); ?></strong>
+            <div class="tp-window tp-admin-side">
+                <div class="tp-window-bar">
+                    <span></span>
+                    <span></span>
+                    <strong><?php echo esc_html__('Zona peligrosa', 'tatipilates'); ?></strong>
+                </div>
+
+            <div class="tp-window-body">
+                <p><?php echo esc_html__('Controla que ocurre si alguien elimina el plugin desde WordPress. La opcion segura es conservar los datos.', 'tatipilates'); ?></p>
+
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <?php wp_nonce_field('tp_guardar_uninstall_config'); ?>
+                    <input type="hidden" name="action" value="tp_guardar_uninstall_config">
+
+                    <label class="tp-field tp-field-checkbox">
+                        <input type="radio" name="delete_data_on_uninstall" value="0" <?php checked($borrar_datos_al_desinstalar, false); ?>>
+                        <span><?php echo esc_html__('NO borrar datos al eliminar el plugin', 'tatipilates'); ?></span>
+                        <small><?php echo esc_html__('Recomendado para staging y live. Conserva tablas, opciones, roles y backups.', 'tatipilates'); ?></small>
+                    </label>
+
+                    <label class="tp-field tp-field-checkbox">
+                        <input type="radio" name="delete_data_on_uninstall" value="1" <?php checked($borrar_datos_al_desinstalar, true); ?>>
+                        <span><?php echo esc_html__('Borrar todos los datos al eliminar el plugin', 'tatipilates'); ?></span>
+                        <small><?php echo esc_html__('Solo para limpiezas controladas. Borra tablas tp_*, opciones, roles y capabilities.', 'tatipilates'); ?></small>
+                    </label>
+
+                    <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('Estas cambiando una preferencia sensible de desinstalacion. Continuar?', 'tatipilates')); ?>');">
+                        <?php echo esc_html__('Guardar zona peligrosa', 'tatipilates'); ?>
+                    </button>
+                </form>
             </div>
+            </div>
+        </div>
+
+        <div class="tp-config-side-stack">
+            <div class="tp-window tp-admin-side">
+                <div class="tp-window-bar">
+                    <span></span>
+                    <span></span>
+                    <strong><?php echo esc_html__('Backups del plugin', 'tatipilates'); ?></strong>
+                </div>
 
             <div class="tp-window-body">
                 <p><?php echo esc_html__('Exporta e importa solo la data propia de Tati Pilates: horarios, alumnas, reservas, recuperaciones, pagos, logros, notificaciones y configuracion de recordatorios.', 'tatipilates'); ?></p>
@@ -271,39 +314,6 @@ if ($credenciales_demo) {
             <div class="tp-window-bar">
                 <span></span>
                 <span></span>
-                <strong><?php echo esc_html__('Zona peligrosa', 'tatipilates'); ?></strong>
-            </div>
-
-            <div class="tp-window-body">
-                <p><?php echo esc_html__('Controla que ocurre si alguien elimina el plugin desde WordPress. La opcion segura es conservar los datos.', 'tatipilates'); ?></p>
-
-                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                    <?php wp_nonce_field('tp_guardar_uninstall_config'); ?>
-                    <input type="hidden" name="action" value="tp_guardar_uninstall_config">
-
-                    <label class="tp-field tp-field-checkbox">
-                        <input type="radio" name="delete_data_on_uninstall" value="0" <?php checked($borrar_datos_al_desinstalar, false); ?>>
-                        <span><?php echo esc_html__('NO borrar datos al eliminar el plugin', 'tatipilates'); ?></span>
-                        <small><?php echo esc_html__('Recomendado para staging y live. Conserva tablas, opciones, roles y backups.', 'tatipilates'); ?></small>
-                    </label>
-
-                    <label class="tp-field tp-field-checkbox">
-                        <input type="radio" name="delete_data_on_uninstall" value="1" <?php checked($borrar_datos_al_desinstalar, true); ?>>
-                        <span><?php echo esc_html__('Borrar todos los datos al eliminar el plugin', 'tatipilates'); ?></span>
-                        <small><?php echo esc_html__('Solo para limpiezas controladas. Borra tablas tp_*, opciones, roles y capabilities.', 'tatipilates'); ?></small>
-                    </label>
-
-                    <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('Estas cambiando una preferencia sensible de desinstalacion. Continuar?', 'tatipilates')); ?>');">
-                        <?php echo esc_html__('Guardar zona peligrosa', 'tatipilates'); ?>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <div class="tp-window tp-admin-side">
-            <div class="tp-window-bar">
-                <span></span>
-                <span></span>
                 <strong><?php echo esc_html__('Actualizaciones privadas', 'tatipilates'); ?></strong>
             </div>
 
@@ -354,6 +364,7 @@ if ($credenciales_demo) {
                     <p><?php echo esc_html__('El modulo de actualizaciones privadas no esta disponible.', 'tatipilates'); ?></p>
                 <?php endif; ?>
             </div>
+        </div>
         </div>
     </div>
 </div>

@@ -44,6 +44,7 @@ class TP_Admin {
         add_action('admin_post_tp_guardar_notificaciones_config', array($this, 'guardar_notificaciones_config'));
         add_action('admin_post_tp_guardar_updater_config', array($this, 'guardar_updater_config'));
         add_action('admin_post_tp_seed_test_data', array($this, 'generar_datos_prueba'));
+        add_action('admin_post_tp_descartar_demo_notice', array($this, 'descartar_aviso_demo'));
         add_action('admin_post_tp_backup_descargar', array($this, 'descargar_backup'));
         add_action('admin_post_tp_backup_archivo_descargar', array($this, 'descargar_backup_guardado'));
         add_action('admin_post_tp_backup_generar', array($this, 'generar_backup'));
@@ -1624,6 +1625,31 @@ class TP_Admin {
         }
 
         wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Dismisses the production demo hardening notice.
+     *
+     * @return void
+     */
+    public function descartar_aviso_demo() {
+        $this->require_admin();
+        check_admin_referer('tp_descartar_demo_notice');
+
+        if (class_exists('TP_Test_Data')) {
+            TP_Test_Data::dismiss_hardening_notice();
+        }
+
+        wp_safe_redirect(
+            add_query_arg(
+                array(
+                    'page'       => 'tatipilates-configuracion',
+                    'tp_mensaje' => rawurlencode('Aviso de cuentas demo ocultado.'),
+                ),
+                admin_url('admin.php')
+            )
+        );
         exit;
     }
 

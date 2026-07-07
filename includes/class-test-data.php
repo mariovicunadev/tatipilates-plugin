@@ -98,19 +98,11 @@ class TP_Test_Data {
         }
 
         if (TP_VERSION === get_option(self::OPTION_HARDENED_VERSION)) {
-            $notice = get_option(self::OPTION_HARDENING_NOTICE, array());
+            $notice = self::hardening_notice();
             return is_array($notice) && !empty($notice['emails']) ? array_values($notice['emails']) : array();
         }
 
-        global $wpdb;
-
-        $like     = '%' . $wpdb->esc_like('.demo@tatipilates.test');
-        $user_ids = $wpdb->get_col(
-            $wpdb->prepare(
-                "SELECT ID FROM {$wpdb->users} WHERE user_email LIKE %s ORDER BY ID ASC",
-                $like
-            )
-        );
+        $user_ids = self::demo_user_ids();
         $emails = array();
 
         foreach ($user_ids as $user_id) {
@@ -150,6 +142,74 @@ class TP_Test_Data {
         update_option(self::OPTION_HARDENED_VERSION, TP_VERSION, false);
 
         return $emails;
+    }
+
+    /**
+     * Returns the hardening notice, cleaning stale notices when demo users no longer exist.
+     *
+     * @return array<string,mixed>
+     */
+    public static function hardening_notice() {
+        $notice = get_option(self::OPTION_HARDENING_NOTICE, array());
+
+        if (!is_array($notice) || empty($notice['emails']) || !is_array($notice['emails'])) {
+            return array();
+        }
+
+        $user_ids = self::demo_user_ids();
+
+        if (!$user_ids) {
+            delete_option(self::OPTION_HARDENING_NOTICE);
+            return array();
+        }
+
+        $emails = array();
+
+        foreach ($user_ids as $user_id) {
+            $user = get_userdata((int) $user_id);
+
+            if ($user) {
+                $emails[] = sanitize_email($user->user_email);
+            }
+        }
+
+        if (!$emails) {
+            delete_option(self::OPTION_HARDENING_NOTICE);
+            return array();
+        }
+
+        $notice['emails'] = array_values($emails);
+        return $notice;
+    }
+
+    /**
+     * Dismisses the persisted hardening notice after an administrator reviews it.
+     *
+     * @return void
+     */
+    public static function dismiss_hardening_notice() {
+        delete_option(self::OPTION_HARDENING_NOTICE);
+    }
+
+    /**
+     * Returns known demo user IDs.
+     *
+     * @return array<int,int>
+     */
+    private static function demo_user_ids() {
+        global $wpdb;
+
+        $like = '%' . $wpdb->esc_like('.demo@tatipilates.test');
+
+        return array_map(
+            'intval',
+            (array) $wpdb->get_col(
+                $wpdb->prepare(
+                    "SELECT ID FROM {$wpdb->users} WHERE user_email LIKE %s ORDER BY ID ASC",
+                    $like
+                )
+            )
+        );
     }
 
     /**

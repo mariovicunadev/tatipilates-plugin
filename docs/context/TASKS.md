@@ -1,9 +1,10 @@
 # TASKS.md
 
 ## En progreso
-- [~] Instalar `1.2.3` en live desde el updater y confirmar permisos de Tatiana/Admin Pilates.
+- [~] Publicar `1.2.4-rc.1` en staging y `1.2.4` en live.
 
 ## Pendientes
+- [ ] Instalar `1.2.4` en live desde el updater y confirmar aviso demo/layout de Configuracion.
 - [ ] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
 - [ ] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [ ] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.

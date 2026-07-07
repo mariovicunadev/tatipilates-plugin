@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-07-07
-**Qué se hizo:** Se promovió `1.2.3` al canal `stable` para live desde el workflow `Promote stable release`. El release final, tag `v1.2.3`, asset `tatipilates-1.2.3.zip`, manifest stable y version interna del ZIP quedaron verificados.
+**Qué se hizo:** Se preparo el patch `1.2.4` para publicar directo a staging y live: aviso persistente de cuentas demo autolimpiable/ocultable y Configuracion en dos columnas fluidas.
 
 ## Próximo paso inmediato
-- En WordPress live, forzar comprobacion de updates, instalar `1.2.3` y confirmar que el rol Tatiana ve datos medicos mientras Admin Pilates no.
+- Publicar `1.2.4-rc.1` en staging y promover `1.2.4` a stable/live.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.
