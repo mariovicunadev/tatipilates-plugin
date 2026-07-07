@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-07-07
-**Qué se hizo:** Se preparo el patch `1.2.4` para publicar directo a staging y live: aviso persistente de cuentas demo autolimpiable/ocultable y Configuracion en dos columnas fluidas.
+**Qué se hizo:** Se publico `1.2.4-rc.1` en staging y `1.2.4` en stable/live. Se verificaron workflows, releases, tags, manifests, hashes y version interna del ZIP.
 
 ## Próximo paso inmediato
-- Publicar `1.2.4-rc.1` en staging y promover `1.2.4` a stable/live.
+- Instalar `1.2.4` desde el updater de WordPress live y confirmar que desaparece/puede ocultarse el aviso demo y que Configuracion queda sin huecos en la columna derecha.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.
@@ -13,6 +13,7 @@
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)
 
+- [2026-07-07, 1.2.4] - Se corrigio el aviso persistente de cuentas demo en live y el layout de Configuracion en dos columnas fluidas.
 - [2026-07-07, 1.2.3] - Se publico stable con backups privados, importacion estricta, PAT del updater en servidor, demo seed restringido, capability medica separada y rol Tatiana con acceso medico.
 - [2026-07-03, 1.2.3-rc.3] - Se preparo y valido el rol Tatiana con gestion operativa y acceso medico explicito.
 - [2026-07-02, 1.2.3] - Los campos medicos quedaron bajo una capability separada y dejaron de recuperarse en listados o perfiles operativos.

@@ -1,10 +1,9 @@
 # TASKS.md
 
 ## En progreso
-- [~] Publicar `1.2.4-rc.1` en staging y `1.2.4` en live.
+- [~] Instalar `1.2.4` en live desde el updater y confirmar aviso demo/layout de Configuracion.
 
 ## Pendientes
-- [ ] Instalar `1.2.4` en live desde el updater y confirmar aviso demo/layout de Configuracion.
 - [ ] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
 - [ ] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [ ] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
@@ -13,6 +12,7 @@
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Publicar `1.2.4-rc.1` en staging y `1.2.4` en live con release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Promover `1.2.3` a stable/live con el workflow de GitHub y verificar release, manifest, tag, hash y version interna del ZIP.
 - [x] Instalar y validar `1.2.3-rc.3` en staging mediante el updater nuevo.
 - [x] Crear el rol Tatiana con gestión operativa y acceso médico, manteniendo Admin Pilates sin acceso médico.
