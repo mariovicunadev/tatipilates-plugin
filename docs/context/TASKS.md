@@ -1,10 +1,9 @@
 # TASKS.md
 
 ## En progreso
-- [~] Instalar y validar `1.2.3-rc.3` en staging mediante el updater nuevo.
+- [~] Instalar `1.2.3` en live desde el updater y confirmar permisos de Tatiana/Admin Pilates.
 
 ## Pendientes
-- [ ] Promover el patch a stable solo después de confirmar detección, descarga e instalación en staging.
 - [ ] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
 - [ ] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [ ] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
@@ -13,6 +12,8 @@
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Promover `1.2.3` a stable/live con el workflow de GitHub y verificar release, manifest, tag, hash y version interna del ZIP.
+- [x] Instalar y validar `1.2.3-rc.3` en staging mediante el updater nuevo.
 - [x] Crear el rol Tatiana con gestión operativa y acceso médico, manteniendo Admin Pilates sin acceso médico.
 - [x] Automatizar la metadata `tested` desde la versión WordPress validada por el pre-release local.
 - [x] Validar que el updater nuevo detecta `1.2.3-rc.2` con `TP_GITHUB_TOKEN`.

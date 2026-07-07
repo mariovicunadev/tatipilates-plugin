@@ -10,6 +10,8 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.3] - 2026-07-07
+
 ### Fixed
 
 - Invalida el manifiesto privado cuando WordPress fuerza una nueva comprobacion de plugins, evitando esperar 30 minutos para ver un release reciente.
