@@ -12,13 +12,13 @@
       "notes": "Corrige el aviso persistente de cuentas demo y mejora el layout de Configuracion."
     },
     "stable": {
-      "version": "1.2.3",
-      "tag": "v1.2.3",
-      "asset": "tatipilates-1.2.3.zip",
+      "version": "1.2.4",
+      "tag": "v1.2.4",
+      "asset": "tatipilates-1.2.4.zip",
       "requires": "6.0",
       "tested": "7.0",
       "requires_php": "8.0",
-      "notes": "Agrega el rol Tatiana con gestion operativa y acceso medico, manteniendo Admin Pilates sin acceso medico."
+      "notes": "Corrige el aviso persistente de cuentas demo y mejora el layout de Configuracion."
     }
   }
 }
