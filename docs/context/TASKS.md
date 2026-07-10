@@ -1,14 +1,16 @@
 # TASKS.md
 
 ## En progreso
-- [~] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
+- [~] Configurar `TP_DATA_ENCRYPTION_KEY` por ambiente y validar cifrado medico en un RC.
 
 ## Pendientes
+- [ ] Agregar lint de JS/CSS/YAML en pre-release sin minificar assets mientras SiteGround Optimizer gestione frontend.
 - [ ] Añadir smoke tests de portal y PWA en mobile.
 - [ ] Mejorar emails y logs administrativos de fallos de envío.
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Implementar localmente AUD-02 Entrega 2 con cifrado Sodium, migracion idempotente, diagnostico admin y pruebas CLI.
 - [x] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live con release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [x] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
@@ -32,4 +34,4 @@
 - [x] Publicar `1.2.2` stable con la corrección visual de Recordatorios.
 
 ## Bloqueadas
-- [ ] Implementar AUD-02 Entrega 2 (razón del bloqueo: falta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`).
+- [ ] Promover cifrado medico a live (razón del bloqueo: falta configurar `TP_DATA_ENCRYPTION_KEY` en staging/live y validar migracion con backup previo).

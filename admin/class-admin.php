@@ -854,7 +854,7 @@ class TP_Admin {
 
         $alumna_id                  = isset($_POST['alumna_id']) ? absint($_POST['alumna_id']) : 0;
         $campos_medicos             = array('historia_medica', 'alergias', 'motivo_pilates');
-        $puede_editar_datos_medicos = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
+        $puede_editar_datos_medicos = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA) && TP_Data_Encryption::is_ready();
 
         foreach ($campos_medicos as $campo_medico) {
             if (array_key_exists($campo_medico, $_POST) && !$puede_editar_datos_medicos) {

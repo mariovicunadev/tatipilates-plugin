@@ -21,6 +21,7 @@ $demo_disponible = class_exists('TP_Test_Data') && TP_Test_Data::is_available();
 $credenciales_demo = $demo_disponible ? get_transient('tp_demo_credentials_' . get_current_user_id()) : null;
 $aviso_demo_produccion = class_exists('TP_Test_Data') ? TP_Test_Data::hardening_notice() : array();
 $backup_max_upload = class_exists('TP_Backups') ? TP_Backups::max_upload_bytes() : 0;
+$encryption_status = class_exists('TP_Data_Encryption') ? TP_Data_Encryption::status() : array();
 
 if ($credenciales_demo) {
     delete_transient('tp_demo_credentials_' . get_current_user_id());
@@ -86,6 +87,12 @@ $tp_formatear_fecha_estado = static function ($valor) {
     <?php elseif ($updater_config && !empty($updater_config['enabled']) && 'none' === $updater_config['token_source']) : ?>
         <div class="notice notice-error">
             <p><strong><?php echo esc_html__('Updater privado:', 'tatipilates'); ?></strong> <?php echo esc_html__('Esta activado, pero TP_GITHUB_TOKEN no esta configurado. WordPress no podra consultar ni descargar actualizaciones privadas.', 'tatipilates'); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($encryption_status && empty($encryption_status['ready'])) : ?>
+        <div class="notice notice-warning">
+            <p><strong><?php echo esc_html__('Datos medicos:', 'tatipilates'); ?></strong> <?php echo esc_html__('TP_DATA_ENCRYPTION_KEY no esta listo. Los campos medicos no se podran ver ni editar hasta configurarlo en el servidor.', 'tatipilates'); ?></p>
         </div>
     <?php endif; ?>
 
@@ -317,6 +324,53 @@ $tp_formatear_fecha_estado = static function ($valor) {
                     </p>
                     <p><a href="<?php echo esc_url($credenciales_demo['portal']); ?>" target="_blank" rel="noreferrer"><?php echo esc_html($credenciales_demo['portal']); ?></a></p>
                 <?php endif; ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if ($encryption_status) : ?>
+        <div class="tp-window tp-admin-side">
+            <div class="tp-window-bar">
+                <span></span>
+                <span></span>
+                <strong><?php echo esc_html__('Datos medicos', 'tatipilates'); ?></strong>
+            </div>
+
+            <div class="tp-window-body">
+                <p><?php echo esc_html__('Protege historia medica, alergias y motivo de Pilates con una clave del servidor.', 'tatipilates'); ?></p>
+
+                <div class="tp-updater-diagnostics">
+                    <div class="tp-updater-diagnostics-head">
+                        <strong><?php echo esc_html__('Cifrado', 'tatipilates'); ?></strong>
+                        <span class="tp-status <?php echo !empty($encryption_status['ready']) ? 'tp-updater-state-current' : 'tp-updater-state-error'; ?>">
+                            <?php echo !empty($encryption_status['ready']) ? esc_html__('Activo', 'tatipilates') : esc_html__('Revisar', 'tatipilates'); ?>
+                        </span>
+                    </div>
+
+                    <dl>
+                        <div>
+                            <dt><?php echo esc_html__('Sodium', 'tatipilates'); ?></dt>
+                            <dd><?php echo !empty($encryption_status['sodium_available']) ? esc_html__('Disponible', 'tatipilates') : esc_html__('No disponible', 'tatipilates'); ?></dd>
+                        </div>
+                        <div>
+                            <dt><?php echo esc_html__('Clave', 'tatipilates'); ?></dt>
+                            <dd>
+                                <?php
+                                if (!empty($encryption_status['key_valid'])) {
+                                    echo esc_html__('Configurada', 'tatipilates');
+                                } elseif (!empty($encryption_status['key_defined'])) {
+                                    echo esc_html__('Formato invalido', 'tatipilates');
+                                } else {
+                                    echo esc_html__('No configurada', 'tatipilates');
+                                }
+                                ?>
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <code class="tp-updater-token-example"><?php echo esc_html(TP_Data_Encryption::setup_hint()); ?></code>
+                    <small><?php echo esc_html__('Genera una clave hex de 64 caracteres y agregala en wp-config.php. Guarda una copia segura fuera de WordPress; sin esta clave no se recuperan los datos cifrados.', 'tatipilates'); ?></small>
+                </div>
             </div>
         </div>
         <?php endif; ?>

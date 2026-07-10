@@ -103,8 +103,12 @@ Checklist para probar una version antes de publicarla a `stable`.
 ## Tatiana
 
 - Puede acceder a las mismas pantallas operativas que Admin Pilates.
-- Puede ver Historia medica, Alergias y Motivo en la ficha.
-- Puede editar los tres campos y guardar cambios.
+- Con `TP_DATA_ENCRYPTION_KEY` configurado, puede ver Historia medica, Alergias
+  y Motivo en la ficha.
+- Con `TP_DATA_ENCRYPTION_KEY` configurado, puede editar los tres campos y
+  guardar cambios.
+- Sin `TP_DATA_ENCRYPTION_KEY`, la pantalla muestra aviso y no permite ver ni
+  editar campos medicos.
 - No recibe menus ni capacidades nativas adicionales de WordPress.
 
 ## Emails
@@ -139,6 +143,10 @@ Checklist para probar una version antes de publicarla a `stable`.
 
 - Un backup nuevo declara `format_version: 2`.
 - Un backup legacy v1 sigue validando e importando.
+- Si el backup trae campos medicos en texto plano, la importacion los cifra con
+  la clave actual antes de escribirlos.
+- Si el backup trae campos medicos cifrados con otra clave, la importacion se
+  rechaza con mensaje claro y sin cambios parciales.
 - Archivos mayores al límite, JSON truncado, tablas/campos desconocidos, tipos,
   longitudes, enums y referencias inválidas se rechazan antes de importar.
 - Un `format_version` futuro se rechaza con mensaje claro y sin cambios parciales.
@@ -152,6 +160,7 @@ TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php
 php tests/core-rules.php
 php tests/updater-token-configuration.php
 php tests/medical-data-access.php
+php tests/medical-data-encryption.php
 ```
 
 El check de reglas centrales usa stubs y no toca datos reales: valida helpers de
@@ -165,6 +174,10 @@ sin token y la limpieza de cache al forzar una comprobacion.
 
 El check de datos medicos valida la separacion de roles, SQL de listados,
 lectura autorizada/rechazada y preservacion de columnas en ediciones operativas.
+
+El check de cifrado medico valida Sodium, envelope `tpenc:v1`, descifrado,
+migracion de texto plano, importacion de backups legacy y rechazo de backups
+cifrados con otra clave.
 
 ## Pre-release local
 

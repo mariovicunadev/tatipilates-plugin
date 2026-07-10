@@ -11,7 +11,9 @@ if (!defined('ABSPATH')) {
 
 $planes   = TP_Alumnas::planes();
 $alumnas  = TP_Alumnas::obtener_todas();
-$puede_ver_datos_medicos = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
+$puede_ver_datos_medicos_cap = current_user_can(TP_Roles::CAP_VIEW_MEDICAL_DATA);
+$cifrado_datos_medicos_listo = class_exists('TP_Data_Encryption') && TP_Data_Encryption::is_ready();
+$puede_ver_datos_medicos = $puede_ver_datos_medicos_cap && $cifrado_datos_medicos_listo;
 $edit_id  = isset($_GET['editar']) ? absint($_GET['editar']) : 0;
 $editando = $edit_id
     ? ($puede_ver_datos_medicos ? TP_Alumnas::obtener_con_datos_medicos($edit_id) : TP_Alumnas::obtener($edit_id))
@@ -142,6 +144,15 @@ if ($ficha) {
     <?php if ($error) : ?>
         <div class="notice notice-error is-dismissible">
             <p><?php echo esc_html(rawurldecode($error)); ?></p>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($puede_ver_datos_medicos_cap && !$cifrado_datos_medicos_listo) : ?>
+        <div class="notice notice-warning">
+            <p>
+                <strong><?php echo esc_html__('Datos medicos protegidos:', 'tatipilates'); ?></strong>
+                <?php echo esc_html__('configura TP_DATA_ENCRYPTION_KEY en el servidor para ver o editar historia medica, alergias y motivo de Pilates.', 'tatipilates'); ?>
+            </p>
         </div>
     <?php endif; ?>
 

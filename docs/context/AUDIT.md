@@ -689,6 +689,10 @@ legacy en uploads y que el directorio conserva `.htaccess` e `index.php`.
 
 ### AUD-02 - Cifrado de campos medicos y acceso minimo
 
+**Estado de aprobacion:** Entrega 1 cerrada el 2026-07-02. Entrega 2 aprobada
+el 2026-07-10 con custodia de `TP_DATA_ENCRYPTION_KEY` fuera de WordPress.
+Implementacion local en curso.
+
 **Objetivo**
 
 Guardar `historia_medica`, `alergias` y `motivo_pilates` con cifrado autenticado
@@ -697,18 +701,18 @@ transicion legible para datos existentes.
 
 **Cambio exacto**
 
-- Crear `includes/class-sensitive-data.php` con una clase
-  `TP_Sensitive_Data` responsable de:
+- Crear `includes/class-data-encryption.php` con una clase
+  `TP_Data_Encryption` responsable de:
   - obtener una clave de 32 bytes desde `TP_DATA_ENCRYPTION_KEY` en
     `wp-config.php` o una variable de entorno;
   - cifrar con un formato versionado, por ejemplo
     `tpenc:v1:<nonce+ciphertext>`;
-  - usar cifrado autenticado XChaCha20-Poly1305 mediante libsodium;
+  - usar cifrado autenticado mediante libsodium;
   - distinguir de forma segura valores legacy en texto plano;
   - descifrar solo formatos conocidos y fallar de forma cerrada ante clave
     ausente, ciphertext alterado o version desconocida;
   - no registrar nunca plaintext, clave, nonce o ciphertext completo.
-- Cargar la nueva clase desde `tatipilates.php`.
+- Cargar la nueva clase mediante el autoloader `TP_*`.
 - Modificar `TP_Alumnas::crear()` y `TP_Alumnas::actualizar()` en
   `includes/class-alumnas.php` para cifrar los tres campos antes de persistirlos.
 - Modificar `TP_Alumnas::obtener()` y cualquier funcion que entregue la ficha
@@ -731,11 +735,11 @@ transicion legible para datos existentes.
   clave y libsodium estan disponibles.
 - Actualizar `TP_Backups::exportar()` e `importar_archivo()` en
   `includes/class-backups.php`:
-  - exportar los valores logicos descifrados dentro del backup privado para
-    conservar portabilidad;
+  - exportar los valores ya cifrados para no reintroducir texto plano en JSON;
   - aceptar backups legacy con plaintext;
   - cifrar con la clave del destino antes de insertar;
-  - no copiar ciphertext de una instalacion a otra.
+  - aceptar ciphertext solo si la clave actual puede descifrarlo;
+  - rechazar backups cifrados con una clave incompatible antes de escribir.
 - Exigir que AUD-01 este implementado y verificado antes de comenzar esta
   migracion, porque el backup portable seguira conteniendo valores sensibles.
 
@@ -758,14 +762,23 @@ transicion legible para datos existentes.
   operar antes y durante la migracion.
 - Backups JSON actuales seguiran importandose como formato legacy y se cifraran
   al persistir.
-- Backups nuevos conservaran el valor logico y podran restaurarse con una clave
-  distinta en el destino, siempre bajo el almacenamiento privado de AUD-01.
+- Backups nuevos conservaran ciphertext. Para restaurar y leer campos medicos
+  cifrados se requiere la misma clave del ambiente origen o un proceso de
+  rotacion/exportacion controlado previo.
 - Una instalacion sin libsodium o sin clave no podra escribir/editar campos
   medicos; el resto del plugin debe continuar operativo con una alerta
   administrativa.
 - Introducir `tp_view_medical_data` cambia quien puede ver la ficha medica. Es
   una restriccion intencional, pero requiere asignar la capability a las personas
   autorizadas antes de desplegar.
+
+**Validacion agregada en la implementacion local**
+
+- `php tests/medical-data-encryption.php` valida envelope `tpenc:v1`,
+  descifrado, migracion de filas legacy, cifrado de backups legacy y rechazo de
+  backups cifrados con otra clave.
+- `php tests/medical-data-access.php` conserva la separacion de roles y lecturas
+  explicitas.
 
 **Riesgo estimado:** alto.
 

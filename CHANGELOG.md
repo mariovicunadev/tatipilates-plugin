@@ -10,6 +10,16 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.6] - 2026-07-10
+
+### Added
+
+- Cifra `historia_medica`, `alergias` y `motivo_pilates` con Sodium usando `TP_DATA_ENCRYPTION_KEY` configurado fuera de WordPress.
+- Agrega migracion idempotente para convertir campos medicos legacy en texto plano al nuevo envelope cifrado `tpenc:v1`.
+- Agrega diagnostico de cifrado en Configuracion y bloqueo de lectura/escritura medica cuando falta la clave o Sodium.
+- Endurece la importacion de backups para cifrar campos medicos legacy y rechazar backups cifrados con una clave incompatible.
+- Agrega pruebas CLI para cifrado, migracion y validacion de backups con datos medicos.
+
 ## [1.2.5] - 2026-07-09
 
 ### Added

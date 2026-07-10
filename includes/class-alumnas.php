@@ -101,13 +101,17 @@ class TP_Alumnas {
             return new WP_Error('tp_datos_medicos_prohibidos', 'No tienes permisos para ver los datos medicos.');
         }
 
+        if (!TP_Data_Encryption::is_ready()) {
+            return new WP_Error('tp_encryption_unavailable', 'Configura TP_DATA_ENCRYPTION_KEY para ver los datos medicos.');
+        }
+
         $alumna_id = absint($alumna_id);
 
         if (!$alumna_id) {
             return null;
         }
 
-        return $wpdb->get_row(
+        $alumna = $wpdb->get_row(
             $wpdb->prepare(
                 "SELECT a.id, a.wp_user_id, a.plan, a.activa, a.notas,
                     a.historia_medica, a.alergias, a.motivo_pilates,
@@ -119,6 +123,8 @@ class TP_Alumnas {
                 $alumna_id
             )
         );
+
+        return $alumna ? self::descifrar_datos_medicos($alumna) : null;
     }
 
     /**
@@ -164,6 +170,12 @@ class TP_Alumnas {
         }
 
         $validado = self::validar_datos_creacion($datos);
+
+        if (is_wp_error($validado)) {
+            return $validado;
+        }
+
+        $validado = self::cifrar_datos_medicos($validado);
 
         if (is_wp_error($validado)) {
             return $validado;
@@ -249,6 +261,12 @@ class TP_Alumnas {
         if (is_wp_error($acceso_medico)) {
             return $acceso_medico;
         }
+
+        if (is_wp_error($validado)) {
+            return $validado;
+        }
+
+        $validado = self::cifrar_datos_medicos($validado);
 
         if (is_wp_error($validado)) {
             return $validado;
@@ -787,6 +805,176 @@ class TP_Alumnas {
         }
 
         return $validado;
+    }
+
+    /**
+     * Prepares one imported student row so medical fields are encrypted at rest.
+     *
+     * @param array<string,mixed> $fila Validated backup row.
+     * @return array<string,mixed>|WP_Error
+     */
+    public static function preparar_fila_backup($fila) {
+        foreach (self::campos_medicos() as $campo) {
+            if (!array_key_exists($campo, $fila) || null === $fila[$campo] || '' === $fila[$campo]) {
+                continue;
+            }
+
+            if (TP_Data_Encryption::is_encrypted($fila[$campo])) {
+                $verificado = TP_Data_Encryption::decrypt($fila[$campo]);
+
+                if (is_wp_error($verificado)) {
+                    return new WP_Error(
+                        'tp_backup_medical_key_mismatch',
+                        'El backup contiene datos medicos cifrados que no se pueden leer con la clave actual.'
+                    );
+                }
+
+                continue;
+            }
+        }
+
+        return self::cifrar_datos_medicos($fila);
+    }
+
+    /**
+     * Migrates plaintext medical fields to the encrypted envelope.
+     *
+     * @param int $limite Maximum rows to inspect in one run.
+     * @return array<string,int>|WP_Error
+     */
+    public static function migrar_datos_medicos_cifrados($limite = 500) {
+        global $wpdb;
+
+        if (!TP_Data_Encryption::is_ready()) {
+            return new WP_Error('tp_encryption_unavailable', 'Configura TP_DATA_ENCRYPTION_KEY para migrar datos medicos.');
+        }
+
+        $limite = max(1, min(1000, absint($limite)));
+        $filas  = $wpdb->get_results(
+            $wpdb->prepare(
+                "SELECT id, historia_medica, alergias, motivo_pilates
+                FROM {$wpdb->prefix}tp_alumnas
+                WHERE (historia_medica IS NOT NULL AND historia_medica != '' AND historia_medica NOT LIKE %s)
+                    OR (alergias IS NOT NULL AND alergias != '' AND alergias NOT LIKE %s)
+                    OR (motivo_pilates IS NOT NULL AND motivo_pilates != '' AND motivo_pilates NOT LIKE %s)
+                ORDER BY id ASC
+                LIMIT %d",
+                TP_Data_Encryption::PREFIX . '%',
+                TP_Data_Encryption::PREFIX . '%',
+                TP_Data_Encryption::PREFIX . '%',
+                $limite
+            ),
+            ARRAY_A
+        );
+
+        if (!$filas) {
+            update_option('tp_medical_encryption_migrated', TP_VERSION, false);
+
+            return array(
+                'inspeccionadas' => 0,
+                'migradas'       => 0,
+            );
+        }
+
+        $migradas = 0;
+
+        foreach ($filas as $fila) {
+            $datos_actualizar = array();
+            $formatos         = array();
+
+            foreach (self::campos_medicos() as $campo) {
+                $valor = isset($fila[$campo]) ? (string) $fila[$campo] : '';
+
+                if ('' === $valor || TP_Data_Encryption::is_encrypted($valor)) {
+                    continue;
+                }
+
+                $cifrado = TP_Data_Encryption::encrypt($valor);
+
+                if (is_wp_error($cifrado)) {
+                    return $cifrado;
+                }
+
+                $datos_actualizar[$campo] = $cifrado;
+                $formatos[]               = '%s';
+            }
+
+            if (!$datos_actualizar) {
+                continue;
+            }
+
+            $actualizado = $wpdb->update(
+                $wpdb->prefix . 'tp_alumnas',
+                $datos_actualizar,
+                array('id' => absint($fila['id'])),
+                $formatos,
+                array('%d')
+            );
+
+            if (false === $actualizado) {
+                TP_Helpers::log_db_error('TP_Alumnas::migrar_datos_medicos_cifrados');
+
+                return new WP_Error('tp_medical_migration_failed', 'No se pudieron cifrar los datos medicos existentes.');
+            }
+
+            $migradas++;
+        }
+
+        return array(
+            'inspeccionadas' => count($filas),
+            'migradas'       => $migradas,
+        );
+    }
+
+    /**
+     * Encrypts medical fields present in one data array.
+     *
+     * @param array<string,mixed> $datos Profile data.
+     * @return array<string,mixed>|WP_Error
+     */
+    private static function cifrar_datos_medicos($datos) {
+        foreach (self::campos_medicos() as $campo) {
+            if (!array_key_exists($campo, $datos)) {
+                continue;
+            }
+
+            $valor = null === $datos[$campo] ? '' : (string) $datos[$campo];
+
+            if ('' === $valor) {
+                $datos[$campo] = '';
+                continue;
+            }
+
+            $cifrado = TP_Data_Encryption::encrypt($valor);
+
+            if (is_wp_error($cifrado)) {
+                return $cifrado;
+            }
+
+            $datos[$campo] = $cifrado;
+        }
+
+        return $datos;
+    }
+
+    /**
+     * Decrypts medical fields on one loaded profile object.
+     *
+     * @param object $alumna Student row.
+     * @return object|WP_Error
+     */
+    private static function descifrar_datos_medicos($alumna) {
+        foreach (self::campos_medicos() as $campo) {
+            $descifrado = TP_Data_Encryption::decrypt($alumna->{$campo} ?? '');
+
+            if (is_wp_error($descifrado)) {
+                return $descifrado;
+            }
+
+            $alumna->{$campo} = $descifrado;
+        }
+
+        return $alumna;
     }
 
     /**

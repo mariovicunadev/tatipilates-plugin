@@ -76,8 +76,16 @@ Checklist recurrente antes de publicar cambios sensibles.
 - Para autorizar a una persona concreta usar una capability individual, por
   ejemplo `wp user add-cap ID tp_view_medical_data`, y retirarla cuando deje de
   necesitarla.
-- Los campos medicos aun permanecen en texto plano hasta implementar AUD-02
-  Entrega 2.
+- `historia_medica`, `alergias` y `motivo_pilates` se guardan cifrados con
+  Sodium usando `TP_DATA_ENCRYPTION_KEY`.
+- La clave vive en `wp-config.php` o variable de entorno, nunca en `wp_options`,
+  GitHub, capturas ni chats.
+- Usar una clave distinta para local, staging y live. Guardar la clave live en
+  un gestor de secretos; si se pierde, los datos cifrados no se recuperan.
+- Generar claves con:
+  `php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"`
+- Si `TP_DATA_ENCRYPTION_KEY` falta o tiene formato invalido, no se pueden ver
+  ni editar campos medicos hasta corregirla.
 - `CONTEXTO.md` no se sube.
 - `guia-rapida-tatiana.*` no se sube.
 - `checklist-pruebas-tati-pilates.*` no se sube.

@@ -8,6 +8,7 @@
  */
 
 define('ABSPATH', __DIR__ . '/');
+define('TP_DATA_ENCRYPTION_KEY', '000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f');
 
 /**
  * Minimal WP_Error implementation.
@@ -198,6 +199,10 @@ function is_wp_error($value) {
     return $value instanceof WP_Error;
 }
 
+function tp_log($message, $context = array(), $level = 'info') {
+    return true;
+}
+
 function tp_medical_test_assert($condition, $message) {
     if (!$condition) {
         throw new RuntimeException($message);
@@ -213,6 +218,7 @@ function tp_medical_test_query_excludes_sensitive($query, $context) {
 }
 
 require_once dirname(__DIR__) . '/includes/class-roles.php';
+require_once dirname(__DIR__) . '/includes/class-data-encryption.php';
 require_once dirname(__DIR__) . '/includes/class-alumnas.php';
 
 $checks = array();
@@ -277,7 +283,6 @@ try {
     $checks['medical_write_is_rejected_without_capability'] = function () use (&$tp_medical_test_can_view) {
         $tp_medical_test_can_view = false;
         $method = new ReflectionMethod('TP_Alumnas', 'validar_acceso_datos_medicos');
-        $method->setAccessible(true);
         $result = $method->invoke(null, array('historia_medica' => 'dato'));
 
         tp_medical_test_assert(is_wp_error($result), 'La escritura medica sin permiso no fue rechazada.');
@@ -286,7 +291,6 @@ try {
     $checks['non_medical_edit_preserves_sensitive_columns'] = function () use (&$tp_medical_test_can_view) {
         $tp_medical_test_can_view = false;
         $method = new ReflectionMethod('TP_Alumnas', 'validar_datos_edicion');
-        $method->setAccessible(true);
         $result = $method->invoke(
             null,
             array(

@@ -356,6 +356,14 @@ class TP_Backups {
                 $old_id = (int) $fila['id'];
                 $fila   = self::remapear_relaciones($nombre, $fila, $user_map, $id_maps);
 
+                if ('alumnas' === $nombre) {
+                    $fila = TP_Alumnas::preparar_fila_backup($fila);
+
+                    if (is_wp_error($fila)) {
+                        return $fila;
+                    }
+                }
+
                 $resultado = self::upsert_fila($tablas[$nombre], $nombre, $fila);
 
                 if (is_wp_error($resultado)) {

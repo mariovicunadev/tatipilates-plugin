@@ -497,6 +497,28 @@ class TP_Test_Data {
             $extras
         );
 
+        if (class_exists('TP_Data_Encryption') && TP_Data_Encryption::is_ready()) {
+            $data = TP_Alumnas::preparar_fila_backup($data);
+        } else {
+            $data['historia_medica'] = '';
+            $data['alergias']        = '';
+            $data['motivo_pilates']  = '';
+        }
+
+        if (is_wp_error($data)) {
+            $data = array(
+                'wp_user_id'             => $user_id,
+                'plan'                   => $plan,
+                'activa'                 => $activa,
+                'notas'                  => 'Dato demo para pruebas locales.',
+                'historia_medica'        => '',
+                'alergias'               => '',
+                'motivo_pilates'         => '',
+                'fecha_nacimiento'       => '1990-05-15',
+                'fecha_inicio_pilates'   => gmdate('Y-m-d', strtotime('-6 months')),
+            );
+        }
+
         if ($alumna) {
             $wpdb->update(
                 $table,

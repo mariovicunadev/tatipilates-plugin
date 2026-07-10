@@ -43,6 +43,23 @@ class TP_Activator {
             TP_Test_Data::harden_production_accounts();
         }
 
+        if (
+            class_exists('TP_Alumnas') &&
+            class_exists('TP_Data_Encryption') &&
+            TP_Data_Encryption::is_ready() &&
+            get_option('tp_medical_encryption_migrated') !== TP_VERSION
+        ) {
+            $resultado_migracion = TP_Alumnas::migrar_datos_medicos_cifrados();
+
+            if (is_wp_error($resultado_migracion)) {
+                tp_log(
+                    'No se pudo migrar el cifrado de datos medicos.',
+                    array('message' => $resultado_migracion->get_error_message()),
+                    'error'
+                );
+            }
+        }
+
         if (get_option('tp_schema_version') === $schema_version) {
             return;
         }

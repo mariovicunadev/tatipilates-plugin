@@ -74,6 +74,10 @@ Reglas:
 - Desactivar alumna cancela reservas futuras y devuelve recuperaciones si aplica.
 - Eliminar alumna requiere no tener historial relevante.
 - La eliminacion incluye validacion de `tp_milestones`.
+- `historia_medica`, `alergias` y `motivo_pilates` se almacenan con envelope
+  cifrado `tpenc:v1:` cuando `TP_DATA_ENCRYPTION_KEY` esta configurado.
+- Backups nuevos exportan esos campos ya cifrados; backups legacy en texto plano
+  se cifran durante la importacion.
 
 ## `tp_reservas`
 

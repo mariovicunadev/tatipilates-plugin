@@ -1,14 +1,14 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-07-09
-**Qué se hizo:** Se publico `1.2.5-rc.1` en staging y `1.2.5` en stable/live con diagnostico del updater privado y pruebas CLI de helpers, reservas y rollbacks transaccionales. Se verificaron workflows, releases, manifest, tag, hash del ZIP y version interna del plugin.
+**Fecha:** 2026-07-10
+**Qué se hizo:** Se implemento localmente AUD-02 Entrega 2 con cifrado Sodium para `historia_medica`, `alergias` y `motivo_pilates`, migracion idempotente de texto plano, diagnostico de clave en Configuracion y pruebas CLI de cifrado/importacion. Pasaron lint, pruebas CLI y `./pre-release-check.sh --yes`.
 
 ## Próximo paso inmediato
-- Instalar/verificar `1.2.5` desde el updater en staging/live y luego avanzar con automatizacion de minificacion CSS y lint JS/CSS/YAML en pre-release.
+- Configurar `TP_DATA_ENCRYPTION_KEY` en local/staging/live, ejecutar pruebas completas y publicar primero un RC para validar migracion con backup previo.
 
 ## Dudas / bloqueos abiertos
-- AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.
+- Antes de staging/live: generar y custodiar claves distintas por ambiente. Sin la clave correcta, los campos medicos cifrados no son recuperables.
 
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)

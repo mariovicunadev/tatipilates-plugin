@@ -120,3 +120,11 @@
 **Estado:** Vigente en local; pendiente de publicación
 
 ---
+
+## [2026-07-10] Cifrar datos medicos con clave de servidor
+**Decisión:** Guardar `historia_medica`, `alergias` y `motivo_pilates` con Sodium usando `TP_DATA_ENCRYPTION_KEY` definida en `wp-config.php` o variable de entorno. La clave no se guarda en `wp_options` ni en el repositorio.
+**Alternativas consideradas:** Mantener texto plano con capability separada; guardar la clave en la configuracion de WordPress; cifrar backups solamente.
+**Por qué se eligió esta:** Protege ante volcados de base de datos y backups, mantiene menor privilegio y separa la custodia del secreto del almacenamiento de datos.
+**Estado:** Vigente en local; pendiente de publicación
+
+---
