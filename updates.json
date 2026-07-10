@@ -12,13 +12,13 @@
       "notes": "Agrega diagnostico del updater privado y pruebas CLI de reglas centrales."
     },
     "stable": {
-      "version": "1.2.4",
-      "tag": "v1.2.4",
-      "asset": "tatipilates-1.2.4.zip",
+      "version": "1.2.5",
+      "tag": "v1.2.5",
+      "asset": "tatipilates-1.2.5.zip",
       "requires": "6.0",
       "tested": "7.0",
       "requires_php": "8.0",
-      "notes": "Corrige el aviso persistente de cuentas demo y mejora el layout de Configuracion."
+      "notes": "Agrega diagnostico del updater privado y pruebas CLI de reglas centrales."
     }
   }
 }
