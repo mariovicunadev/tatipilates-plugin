@@ -13,6 +13,7 @@ $mensaje = isset($_GET['tp_mensaje']) ? sanitize_text_field(wp_unslash($_GET['tp
 $error   = isset($_GET['tp_error']) ? sanitize_text_field(wp_unslash($_GET['tp_error'])) : '';
 $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::configuracion() : array();
 $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : array();
+$updater_diagnostico = class_exists('TP_Updater') ? TP_Updater::diagnostico() : array();
 $ultimo_backup = class_exists('TP_Backups') ? TP_Backups::ultimo_backup() : null;
 $aviso_backup = class_exists('TP_Backups') ? TP_Backups::aviso_almacenamiento() : null;
 $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_datos_al_desinstalar() : false;
@@ -24,6 +25,16 @@ $backup_max_upload = class_exists('TP_Backups') ? TP_Backups::max_upload_bytes()
 if ($credenciales_demo) {
     delete_transient('tp_demo_credentials_' . get_current_user_id());
 }
+
+$tp_formatear_fecha_estado = static function ($valor) {
+    if (!$valor) {
+        return __('Nunca', 'tatipilates');
+    }
+
+    $timestamp = strtotime((string) $valor);
+
+    return $timestamp ? date_i18n('d/m/Y H:i', $timestamp) : (string) $valor;
+};
 ?>
 
 <div class="wrap tp-admin tp-configuracion-page">
@@ -320,6 +331,66 @@ if ($credenciales_demo) {
             <div class="tp-window-body">
                 <?php if ($updater_config) : ?>
                     <p><?php echo esc_html__('Permite que WordPress detecte versiones publicadas en GitHub segun el canal configurado para este sitio.', 'tatipilates'); ?></p>
+
+                    <?php if ($updater_diagnostico) : ?>
+                        <?php
+                        $estado_updater = isset($updater_diagnostico['state']) ? (string) $updater_diagnostico['state'] : 'ok';
+                        $estado_label   = array(
+                            'ok'       => __('Update disponible', 'tatipilates'),
+                            'current'  => __('Al dia', 'tatipilates'),
+                            'disabled' => __('Desactivado', 'tatipilates'),
+                            'error'    => __('Revisar', 'tatipilates'),
+                        );
+                        $token_label = array(
+                            'server' => __('Servidor', 'tatipilates'),
+                            'legacy' => __('Legacy', 'tatipilates'),
+                            'none'   => __('No configurado', 'tatipilates'),
+                        );
+                        ?>
+                        <div class="tp-updater-diagnostics">
+                            <div class="tp-updater-diagnostics-head">
+                                <strong><?php echo esc_html__('Diagnostico', 'tatipilates'); ?></strong>
+                                <span class="tp-status tp-updater-state-<?php echo esc_attr($estado_updater); ?>">
+                                    <?php echo esc_html($estado_label[$estado_updater] ?? __('Estado', 'tatipilates')); ?>
+                                </span>
+                            </div>
+
+                            <dl>
+                                <div>
+                                    <dt><?php echo esc_html__('Instalada', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($updater_diagnostico['installed_version']); ?></dd>
+                                </div>
+                                <div>
+                                    <dt><?php echo esc_html__('Disponible', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($updater_diagnostico['available_version'] ?: __('Sin version nueva', 'tatipilates')); ?></dd>
+                                </div>
+                                <div>
+                                    <dt><?php echo esc_html__('Canal', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($updater_diagnostico['channel']); ?></dd>
+                                </div>
+                                <div>
+                                    <dt><?php echo esc_html__('Token', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($token_label[$updater_diagnostico['token_source']] ?? $updater_diagnostico['token_source']); ?></dd>
+                                </div>
+                                <div>
+                                    <dt><?php echo esc_html__('Ultima comprobacion', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($tp_formatear_fecha_estado($updater_diagnostico['last_checked'])); ?></dd>
+                                </div>
+                                <div>
+                                    <dt><?php echo esc_html__('Ultimo error', 'tatipilates'); ?></dt>
+                                    <dd><?php echo esc_html($updater_diagnostico['last_error_message'] ?: __('Sin errores registrados', 'tatipilates')); ?></dd>
+                                </div>
+                            </dl>
+
+                            <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                                <?php wp_nonce_field('tp_updater_comprobar'); ?>
+                                <input type="hidden" name="action" value="tp_updater_comprobar">
+                                <button type="submit" class="button">
+                                    <?php echo esc_html__('Comprobar ahora', 'tatipilates'); ?>
+                                </button>
+                            </form>
+                        </div>
+                    <?php endif; ?>
 
                     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="tp-updater-form">
                         <?php wp_nonce_field('tp_guardar_updater_config'); ?>

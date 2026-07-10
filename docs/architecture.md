@@ -213,6 +213,8 @@ Responsabilidades:
 - Respetar canal `staging` o `stable`.
 - Inyectar updates privados en WordPress.
 - Autorizar descargas de assets privados con token guardado.
+- Exponer diagnostico no sensible en Configuracion y forzar comprobaciones
+  manuales sin revelar secretos.
 
 ### `TP_Helpers`
 

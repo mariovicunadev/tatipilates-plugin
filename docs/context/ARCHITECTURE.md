@@ -57,7 +57,8 @@ Se mantiene esta separación para reducir lógica duplicada, conservar las APIs 
 - `tp_pagos`: confirmación mensual de pago, sin montos.
 - `tp_milestones`: logros de alumnas.
 - `tp_notificaciones`: avisos con visibilidad, visto y soft-delete por contexto.
-- Opciones WordPress: versiones de schema, configuración de notificaciones, updater y política de desinstalación.
+- Opciones WordPress: versiones de schema, configuración de notificaciones,
+  updater, diagnostico no sensible del updater y política de desinstalación.
 
 Reglas estructurales:
 

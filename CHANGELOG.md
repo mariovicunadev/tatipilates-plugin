@@ -10,6 +10,13 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+## [1.2.5] - 2026-07-09
+
+### Added
+
+- Agrega diagnostico visible del updater privado con canal, version instalada, version disponible, fuente del token, ultima comprobacion, ultimo error y boton para comprobar updates inmediatamente.
+- Agrega pruebas CLI para helpers, reglas de reservas y rollbacks transaccionales de reservas/recuperaciones.
+
 ## [1.2.4] - 2026-07-07
 
 ### Fixed

@@ -15,6 +15,7 @@ if (!defined('ABSPATH')) {
 class TP_Updater {
 
     const OPTION_CONFIG  = 'tp_updater_config';
+    const OPTION_STATUS  = 'tp_updater_status';
     const OWNER          = 'mariovicunadev';
     const REPO           = 'tatipilates-plugin';
     const MANIFEST_PATH  = 'updates.json';
@@ -56,6 +57,72 @@ class TP_Updater {
             'token_configured' => 'none' !== $fuente,
             'token_source'     => $fuente,
         );
+    }
+
+    /**
+     * Returns a safe diagnostic snapshot for the configuration screen.
+     *
+     * @param bool $force Whether to bypass updater caches.
+     * @return array<string,mixed>
+     */
+    public static function diagnostico($force = false) {
+        $config = self::configuracion();
+        $status = self::estado_guardado();
+        $release = null;
+
+        if (!empty($config['enabled']) && !empty($config['token_configured'])) {
+            $release = self::release_para_canal($config['channel'], (bool) $force);
+        }
+
+        $available_version = is_array($release) && !empty($release['version']) ? (string) $release['version'] : '';
+        $update_available  = '' !== $available_version && version_compare($available_version, TP_VERSION, '>');
+        $state             = 'ok';
+        $last_error_message = isset($status['last_error_message']) ? (string) $status['last_error_message'] : '';
+
+        if (empty($config['enabled'])) {
+            $state = 'disabled';
+        } elseif (empty($config['token_configured'])) {
+            $state = 'error';
+            $last_error_message = 'TP_GITHUB_TOKEN no esta configurado para consultar GitHub.';
+        } elseif (!empty($status['last_error_message']) && !$release) {
+            $state = 'error';
+        } elseif (!$update_available) {
+            $state = 'current';
+        }
+
+        return array(
+            'enabled'            => (int) $config['enabled'],
+            'channel'            => $config['channel'],
+            'installed_version'  => TP_VERSION,
+            'available_version'  => $available_version,
+            'update_available'   => $update_available,
+            'token_source'       => $config['token_source'],
+            'token_configured'   => (bool) $config['token_configured'],
+            'state'              => $state,
+            'last_checked'       => isset($status['last_checked']) ? (string) $status['last_checked'] : '',
+            'last_success'       => isset($status['last_success']) ? (string) $status['last_success'] : '',
+            'last_error_code'    => isset($status['last_error_code']) ? (string) $status['last_error_code'] : '',
+            'last_error_message' => $last_error_message,
+            'notes'              => is_array($release) && !empty($release['notes']) ? (string) $release['notes'] : '',
+        );
+    }
+
+    /**
+     * Forces a fresh update check from the configuration screen.
+     *
+     * @return array<string,mixed>
+     */
+    public static function comprobar_ahora() {
+        self::limpiar_cache();
+        $diagnostico = self::diagnostico(true);
+
+        delete_site_transient('update_plugins');
+
+        if (function_exists('wp_update_plugins')) {
+            wp_update_plugins();
+        }
+
+        return $diagnostico;
     }
 
     /**
@@ -194,13 +261,13 @@ class TP_Updater {
             return $transient;
         }
 
-        $release = $this->release_para_canal($config['channel']);
+        $release = self::release_para_canal($config['channel']);
 
         if (!$release || empty($release['version']) || !version_compare($release['version'], TP_VERSION, '>')) {
             return $transient;
         }
 
-        $package = $this->url_asset_release($release);
+        $package = self::url_asset_release($release);
 
         if (!$package) {
             return $transient;
@@ -237,7 +304,7 @@ class TP_Updater {
         }
 
         $config  = self::configuracion();
-        $release = $this->release_para_canal($config['channel']);
+        $release = self::release_para_canal($config['channel']);
 
         if (!$release) {
             return $result;
@@ -256,7 +323,7 @@ class TP_Updater {
                 'description' => 'Plugin privado de gestion para Tati Pilates.',
                 'changelog'   => isset($release['notes']) && $release['notes'] ? esc_html($release['notes']) : 'Sin notas publicadas.',
             ),
-            'download_link' => $this->url_asset_release($release),
+            'download_link' => self::url_asset_release($release),
         );
     }
 
@@ -305,10 +372,17 @@ class TP_Updater {
      * @param string $canal stable|staging.
      * @return array<string,mixed>|null
      */
-    private function release_para_canal($canal) {
-        $manifest = $this->manifest();
+    private static function release_para_canal($canal, $force = false) {
+        $manifest = self::manifest((bool) $force);
 
         if (!$manifest || empty($manifest['channels'][$canal]) || !is_array($manifest['channels'][$canal])) {
+            if ($manifest) {
+                self::registrar_error(
+                    'channel_missing',
+                    sprintf('El manifiesto no contiene el canal %s.', $canal)
+                );
+            }
+
             return null;
         }
 
@@ -320,14 +394,22 @@ class TP_Updater {
      *
      * @return array<string,mixed>|null
      */
-    private function manifest() {
+    private static function manifest($force = false) {
+        if ($force) {
+            self::limpiar_cache();
+        }
+
         $cached = get_transient(self::CACHE_MANIFEST);
 
-        if (is_array($cached)) {
+        if (!$force && is_array($cached)) {
             return $cached;
         }
 
         if ('' === self::token()) {
+            self::registrar_error(
+                'missing_token',
+                'TP_GITHUB_TOKEN no esta configurado para consultar GitHub.'
+            );
             return null;
         }
 
@@ -343,17 +425,29 @@ class TP_Updater {
             $url,
             array(
                 'timeout' => 15,
-                'headers' => $this->github_headers('application/vnd.github+json'),
+                'headers' => self::github_headers('application/vnd.github+json'),
             )
         );
 
-        if (is_wp_error($response) || 200 !== (int) wp_remote_retrieve_response_code($response)) {
+        if (is_wp_error($response)) {
+            self::registrar_error('github_request_failed', $response->get_error_message());
+            return null;
+        }
+
+        $response_code = (int) wp_remote_retrieve_response_code($response);
+
+        if (200 !== $response_code) {
+            self::registrar_error(
+                'github_http_' . $response_code,
+                sprintf('GitHub respondio HTTP %d al consultar updates.json.', $response_code)
+            );
             return null;
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
 
         if (!$body || empty($body['content'])) {
+            self::registrar_error('manifest_content_missing', 'GitHub no devolvio contenido para updates.json.');
             return null;
         }
 
@@ -361,10 +455,12 @@ class TP_Updater {
         $manifest = $json ? json_decode($json, true) : null;
 
         if (!is_array($manifest)) {
+            self::registrar_error('manifest_invalid_json', 'updates.json no pudo interpretarse como JSON valido.');
             return null;
         }
 
         set_transient(self::CACHE_MANIFEST, $manifest, 30 * MINUTE_IN_SECONDS);
+        self::registrar_exito($manifest);
 
         return $manifest;
     }
@@ -375,7 +471,7 @@ class TP_Updater {
      * @param array<string,mixed> $release Manifest release entry.
      * @return string
      */
-    private function url_asset_release($release) {
+    private static function url_asset_release($release) {
         if (empty($release['tag']) || empty($release['asset'])) {
             return '';
         }
@@ -400,7 +496,7 @@ class TP_Updater {
             $url,
             array(
                 'timeout' => 15,
-                'headers' => $this->github_headers('application/vnd.github+json'),
+                'headers' => self::github_headers('application/vnd.github+json'),
             )
         );
 
@@ -430,7 +526,7 @@ class TP_Updater {
      * @param string $accept Accept header.
      * @return array<string,string>
      */
-    private function github_headers($accept) {
+    private static function github_headers($accept) {
         $token = self::token();
 
         $headers = array(
@@ -443,5 +539,66 @@ class TP_Updater {
         }
 
         return $headers;
+    }
+
+    /**
+     * Returns the last persisted diagnostic state.
+     *
+     * @return array<string,mixed>
+     */
+    private static function estado_guardado() {
+        $status = get_option(self::OPTION_STATUS, array());
+
+        return is_array($status) ? $status : array();
+    }
+
+    /**
+     * Persists a successful manifest check.
+     *
+     * @param array<string,mixed> $manifest Parsed manifest.
+     * @return void
+     */
+    private static function registrar_exito($manifest) {
+        self::guardar_estado(
+            array(
+                'last_checked'       => gmdate('c'),
+                'last_success'       => gmdate('c'),
+                'last_error_code'    => '',
+                'last_error_message' => '',
+                'manifest_channels'  => !empty($manifest['channels']) && is_array($manifest['channels'])
+                    ? implode(', ', array_keys($manifest['channels']))
+                    : '',
+            )
+        );
+    }
+
+    /**
+     * Persists a safe diagnostic error.
+     *
+     * @param string $code    Machine-readable error code.
+     * @param string $message Human-readable safe message.
+     * @return void
+     */
+    private static function registrar_error($code, $message) {
+        self::guardar_estado(
+            array(
+                'last_checked'       => gmdate('c'),
+                'last_error_code'    => sanitize_key($code),
+                'last_error_message' => sanitize_text_field($message),
+            )
+        );
+    }
+
+    /**
+     * Merges and persists updater status without secrets.
+     *
+     * @param array<string,mixed> $datos Status fields.
+     * @return void
+     */
+    private static function guardar_estado($datos) {
+        $actual = self::estado_guardado();
+        $nuevo  = array_merge($actual, $datos);
+
+        update_option(self::OPTION_STATUS, $nuevo, false);
     }
 }

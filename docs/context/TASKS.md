@@ -1,17 +1,17 @@
 # TASKS.md
 
 ## En progreso
-- [~] Instalar `1.2.4` en live desde el updater y confirmar aviso demo/layout de Configuracion.
+- [~] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live.
 
 ## Pendientes
-- [ ] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
-- [ ] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [ ] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
 - [ ] Añadir smoke tests de portal y PWA en mobile.
 - [ ] Mejorar emails y logs administrativos de fallos de envío.
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
+- [x] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
 - [x] Publicar `1.2.4-rc.1` en staging y `1.2.4` en live con release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Promover `1.2.3` a stable/live con el workflow de GitHub y verificar release, manifest, tag, hash y version interna del ZIP.
 - [x] Instalar y validar `1.2.3-rc.3` en staging mediante el updater nuevo.

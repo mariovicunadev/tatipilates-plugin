@@ -1,11 +1,11 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-07-07
-**Qué se hizo:** Se publico `1.2.4-rc.1` en staging y `1.2.4` en stable/live. Se verificaron workflows, releases, tags, manifests, hashes y version interna del ZIP.
+**Fecha:** 2026-07-09
+**Qué se hizo:** Se preparo `1.2.5` para publicar a staging/live con diagnostico del updater privado y pruebas CLI de helpers, reservas y rollbacks transaccionales.
 
 ## Próximo paso inmediato
-- Instalar `1.2.4` desde el updater de WordPress live y confirmar que desaparece/puede ocultarse el aviso demo y que Configuracion queda sin huecos en la columna derecha.
+- Publicar `1.2.5-rc.1` en staging y promover `1.2.5` a stable/live.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.
@@ -13,6 +13,8 @@
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)
 
+- [2026-07-09, 1.2.5] - Se agrego diagnostico visible del updater privado y comprobacion manual desde Configuracion.
+- [2026-07-09, 1.2.5] - Se agregaron pruebas CLI para helpers, reservas y rollbacks transaccionales.
 - [2026-07-07, 1.2.4] - Se corrigio el aviso persistente de cuentas demo en live y el layout de Configuracion en dos columnas fluidas.
 - [2026-07-07, 1.2.3] - Se publico stable con backups privados, importacion estricta, PAT del updater en servidor, demo seed restringido, capability medica separada y rol Tatiana con acceso medico.
 - [2026-07-03, 1.2.3-rc.3] - Se preparo y valido el rol Tatiana con gestion operativa y acceso medico explicito.

@@ -12,6 +12,9 @@ define('ABSPATH', __DIR__ . '/');
 define('TP_VERSION', 'test');
 
 $tp_updater_test_options = array();
+$tp_updater_test_transients = array();
+$tp_updater_test_site_transients_deleted = array();
+$tp_updater_test_wp_update_plugins_calls = 0;
 $tp_updater_test_env = getenv('TP_GITHUB_TOKEN');
 
 /**
@@ -45,13 +48,70 @@ function update_option($name, $value, $autoload = true) {
 }
 
 /**
+ * Reads a transient in the isolated test runtime.
+ *
+ * @param string $name Transient name.
+ * @return mixed
+ */
+function get_transient($name) {
+    global $tp_updater_test_transients;
+
+    return array_key_exists($name, $tp_updater_test_transients) ? $tp_updater_test_transients[$name] : false;
+}
+
+/**
+ * Writes a transient in the isolated test runtime.
+ *
+ * @param string $name       Transient name.
+ * @param mixed  $value      Transient value.
+ * @param int    $expiration Ignored expiration.
+ * @return bool
+ */
+function set_transient($name, $value, $expiration = 0) {
+    global $tp_updater_test_transients;
+
+    $tp_updater_test_transients[$name] = $value;
+
+    return true;
+}
+
+/**
  * Deletes a transient in the isolated test runtime.
  *
  * @param string $name Transient name.
  * @return bool
  */
 function delete_transient($name) {
+    global $tp_updater_test_transients;
+
+    unset($tp_updater_test_transients[$name]);
+
     return true;
+}
+
+/**
+ * Deletes a site transient in the isolated test runtime.
+ *
+ * @param string $name Site transient name.
+ * @return bool
+ */
+function delete_site_transient($name) {
+    global $tp_updater_test_site_transients_deleted;
+
+    $tp_updater_test_site_transients_deleted[] = $name;
+
+    return true;
+}
+
+/**
+ * Counts forced WordPress plugin update checks in the isolated test runtime.
+ *
+ * @return void
+ */
+function wp_update_plugins() {
+    global $tp_updater_test_wp_update_plugins_calls;
+
+    $tp_updater_test_wp_update_plugins_calls++;
 }
 
 /**
@@ -98,6 +158,16 @@ function sanitize_key($key) {
  */
 function wp_unslash($value) {
     return $value;
+}
+
+/**
+ * Minimal sanitize_text_field implementation for these checks.
+ *
+ * @param mixed $value Raw value.
+ * @return string
+ */
+function sanitize_text_field($value) {
+    return trim((string) $value);
 }
 
 /**
@@ -185,6 +255,40 @@ try {
         tp_updater_test_assert(!array_key_exists('token', $stored), 'No se elimino la copia legacy.');
         tp_updater_test_assert(1 === $stored['enabled'] && 'staging' === $stored['channel'], 'La limpieza altero la configuracion operativa.');
         tp_updater_test_assert('Bearer environment-test-token' === $args['headers']['Authorization'], 'No se uso el token de entorno.');
+    };
+
+    $checks['diagnostic_reports_missing_token'] = function () use (&$tp_updater_test_options) {
+        putenv('TP_GITHUB_TOKEN');
+        $tp_updater_test_options[TP_Updater::OPTION_CONFIG] = array(
+            'enabled' => 1,
+            'channel' => 'stable',
+        );
+
+        $diagnostic = TP_Updater::diagnostico();
+
+        tp_updater_test_assert('error' === $diagnostic['state'], 'El diagnostico sin token debe quedar en error.');
+        tp_updater_test_assert('none' === $diagnostic['token_source'], 'El diagnostico sin token debe reportar fuente none.');
+        tp_updater_test_assert('test' === $diagnostic['installed_version'], 'El diagnostico no reporto la version instalada.');
+        tp_updater_test_assert(false === $diagnostic['token_configured'], 'El diagnostico sin token no debe marcar token configurado.');
+        tp_updater_test_assert(false !== strpos($diagnostic['last_error_message'], 'TP_GITHUB_TOKEN'), 'El diagnostico no explico el token faltante.');
+    };
+
+    $checks['force_check_clears_wordpress_cache'] = function () use (&$tp_updater_test_options) {
+        global $tp_updater_test_site_transients_deleted, $tp_updater_test_wp_update_plugins_calls;
+
+        putenv('TP_GITHUB_TOKEN');
+        $tp_updater_test_site_transients_deleted = array();
+        $tp_updater_test_wp_update_plugins_calls = 0;
+        $tp_updater_test_options[TP_Updater::OPTION_CONFIG] = array(
+            'enabled' => 0,
+            'channel' => 'stable',
+        );
+
+        $diagnostic = TP_Updater::comprobar_ahora();
+
+        tp_updater_test_assert('disabled' === $diagnostic['state'], 'La comprobacion forzada debe respetar updater desactivado.');
+        tp_updater_test_assert(in_array('update_plugins', $tp_updater_test_site_transients_deleted, true), 'No se limpio el transient nativo de updates.');
+        tp_updater_test_assert(1 === $tp_updater_test_wp_update_plugins_calls, 'No se forzo wp_update_plugins().');
     };
 
     $checks['constant_precedes_environment'] = function () use (&$tp_updater_test_options, $updater, $asset_url) {

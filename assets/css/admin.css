@@ -281,6 +281,71 @@ body.wp-admin {
     width: 100%;
 }
 
+.tp-updater-diagnostics {
+    display: grid;
+    gap: 12px;
+    margin: 16px 0;
+    padding: 14px;
+    border: 1px solid rgba(127, 163, 121, 0.24);
+    border-radius: var(--tp-radius);
+    background: linear-gradient(180deg, #fbfefa, #f7f4ed);
+}
+
+.tp-updater-diagnostics-head {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tp-updater-diagnostics dl {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+}
+
+.tp-updater-diagnostics dl > div {
+    display: grid;
+    grid-template-columns: minmax(110px, 0.85fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+.tp-updater-diagnostics dt {
+    color: var(--tp-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tp-updater-diagnostics dd {
+    margin: 0;
+    color: var(--tp-ink);
+    font-weight: 650;
+    overflow-wrap: anywhere;
+}
+
+.tp-updater-diagnostics form {
+    margin: 0;
+}
+
+.tp-updater-state-current,
+.tp-updater-state-ok {
+    border-color: rgba(127, 163, 121, 0.28);
+    color: var(--tp-sage-dark);
+}
+
+.tp-updater-state-error {
+    border-color: rgba(197, 77, 56, 0.28);
+    color: var(--tp-danger);
+}
+
+.tp-updater-state-disabled {
+    border-color: rgba(109, 102, 112, 0.24);
+    color: var(--tp-muted);
+}
+
 .tp-dashboard-page {
     --tp-dashboard-width: var(--tp-content-width);
 }

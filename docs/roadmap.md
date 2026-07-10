@@ -6,12 +6,6 @@ Lista viva de mejoras futuras. Cada item deberia convertirse en una tanda separa
 
 - Mejorar experiencia mobile del portal segun pruebas reales.
 - Crear `docs/testing-checklist.md` mas detallado con capturas esperadas.
-- Agregar pantalla de diagnostico del updater:
-  - canal actual;
-  - version instalada;
-  - version disponible;
-  - ultimo error de GitHub;
-  - boton "comprobar ahora".
 - Mejorar emails de credenciales y reset con template HTML simple.
 - Agregar logs visibles solo para admin de errores de envio de email.
 

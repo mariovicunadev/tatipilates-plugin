@@ -253,12 +253,17 @@ Reglas:
 - `tp_rewrite_version`
 - `tp_notificaciones_config`
 - `tp_updater_config`
+- `tp_updater_status`
 - `tp_delete_data_on_uninstall`
 
 `tp_updater_config` conserva solo el estado habilitado y el canal. Durante una
 version de transicion puede contener una clave `token` legacy; se elimina
 automaticamente cuando el plugin detecta `TP_GITHUB_TOKEN` en `wp-config.php` o
 en el entorno.
+
+`tp_updater_status` conserva diagnostico no sensible del updater: ultima
+comprobacion, ultimo exito, ultimo codigo/mensaje de error y canales detectados.
+No guarda tokens ni URLs firmadas.
 
 ## Uninstall
 

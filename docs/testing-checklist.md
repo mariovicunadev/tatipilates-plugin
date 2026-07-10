@@ -129,6 +129,10 @@ Checklist para probar una version antes de publicarla a `stable`.
 - Live no detecta versiones `rc`.
 - Token incorrecto no expone errores sensibles al usuario.
 - Guardar updater limpia cache de manifest.
+- Configuracion muestra canal, version instalada/disponible, fuente del token,
+  ultima comprobacion y ultimo error.
+- El boton "Comprobar ahora" refresca el cache privado y fuerza el transient
+  nativo `update_plugins`.
 - `Escritorio > Actualizaciones > Comprobar de nuevo` refresca updates.
 
 ## Backups
@@ -145,13 +149,19 @@ Checks automatizados:
 
 ```zsh
 TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php
+php tests/core-rules.php
 php tests/updater-token-configuration.php
 php tests/medical-data-access.php
 ```
 
+El check de reglas centrales usa stubs y no toca datos reales: valida helpers de
+fecha/plan, cupo semanal, reservas exitosas, bloqueos por cupo/duplicado y
+rollbacks cuando falla una recuperacion.
+
 El check del updater usa stubs y tokens ficticios: valida fallback legacy,
 ausencia de token, precedencia constante/entorno, limpieza de `wp_options` y
-que el formulario no pueda modificar el secreto.
+que el formulario no pueda modificar el secreto. Tambien valida el diagnostico
+sin token y la limpieza de cache al forzar una comprobacion.
 
 El check de datos medicos valida la separacion de roles, SQL de listados,
 lectura autorizada/rechazada y preservacion de columnas en ediciones operativas.
