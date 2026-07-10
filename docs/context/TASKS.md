@@ -1,7 +1,7 @@
 # TASKS.md
 
 ## En progreso
-- [~] Configurar `TP_DATA_ENCRYPTION_KEY` por ambiente y validar cifrado medico en un RC.
+- [~] Verificar `1.2.6` instalado desde el updater en staging/live.
 
 ## Pendientes
 - [ ] Agregar lint de JS/CSS/YAML en pre-release sin minificar assets mientras SiteGround Optimizer gestione frontend.
@@ -10,6 +10,7 @@
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Publicar `1.2.6-rc.1` en staging y `1.2.6` en live con cifrado medico, release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Implementar localmente AUD-02 Entrega 2 con cifrado Sodium, migracion idempotente, diagnostico admin y pruebas CLI.
 - [x] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live con release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
@@ -34,4 +35,4 @@
 - [x] Publicar `1.2.2` stable con la corrección visual de Recordatorios.
 
 ## Bloqueadas
-- [ ] Promover cifrado medico a live (razón del bloqueo: falta configurar `TP_DATA_ENCRYPTION_KEY` en staging/live y validar migracion con backup previo).
+- [ ] Implementar rotacion/exportacion controlada de `TP_DATA_ENCRYPTION_KEY` (razón del bloqueo: no es necesaria para operar ahora; requiere runbook operativo aparte).

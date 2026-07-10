@@ -2,17 +2,18 @@
 
 ## Última sesión
 **Fecha:** 2026-07-10
-**Qué se hizo:** Se implemento localmente AUD-02 Entrega 2 con cifrado Sodium para `historia_medica`, `alergias` y `motivo_pilates`, migracion idempotente de texto plano, diagnostico de clave en Configuracion y pruebas CLI de cifrado/importacion. Pasaron lint, pruebas CLI y `./pre-release-check.sh --yes`.
+**Qué se hizo:** Se publico `1.2.6-rc.1` en staging y `1.2.6` en stable/live con cifrado Sodium para `historia_medica`, `alergias` y `motivo_pilates`, migracion idempotente de texto plano, diagnostico de clave en Configuracion y pruebas CLI de cifrado/importacion. Se verificaron workflows, releases, manifest, tag, hash del ZIP y version interna del plugin.
 
 ## Próximo paso inmediato
-- Configurar `TP_DATA_ENCRYPTION_KEY` en local/staging/live, ejecutar pruebas completas y publicar primero un RC para validar migracion con backup previo.
+- Instalar/verificar `1.2.6` desde el updater en staging/live, confirmar que Datos medicos muestre cifrado activo y revisar una ficha Tatiana con datos medicos.
 
 ## Dudas / bloqueos abiertos
-- Antes de staging/live: generar y custodiar claves distintas por ambiente. Sin la clave correcta, los campos medicos cifrados no son recuperables.
+- Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.
 
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)
 
+- [2026-07-10, 1.2.6] - Se cifraron los campos medicos en reposo con clave de servidor, migracion idempotente y diagnostico administrativo.
 - [2026-07-09, 1.2.5] - Se agrego diagnostico visible del updater privado y comprobacion manual desde Configuracion.
 - [2026-07-09, 1.2.5] - Se agregaron pruebas CLI para helpers, reservas y rollbacks transaccionales.
 - [2026-07-07, 1.2.4] - Se corrigio el aviso persistente de cuentas demo en live y el layout de Configuracion en dos columnas fluidas.
