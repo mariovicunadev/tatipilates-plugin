@@ -1,15 +1,15 @@
 # TASKS.md
 
 ## En progreso
-- [~] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live.
+- [~] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
 
 ## Pendientes
-- [ ] Automatizar minificación de CSS y lint de JS/CSS/YAML en pre-release.
 - [ ] Añadir smoke tests de portal y PWA en mobile.
 - [ ] Mejorar emails y logs administrativos de fallos de envío.
 - [ ] Mejorar historial y restauración selectiva de backups.
 
 ## Hechas
+- [x] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live con release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Crear pruebas automatizadas básicas para helpers, reservas y reglas transaccionales.
 - [x] Agregar diagnóstico del updater: canal, versión instalada/disponible, último error y “Comprobar ahora”.
 - [x] Publicar `1.2.4-rc.1` en staging y `1.2.4` en live con release, manifest, tag, hash y version interna del ZIP verificados.

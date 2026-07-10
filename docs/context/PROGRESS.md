@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-07-09
-**Qué se hizo:** Se preparo `1.2.5` para publicar a staging/live con diagnostico del updater privado y pruebas CLI de helpers, reservas y rollbacks transaccionales.
+**Qué se hizo:** Se publico `1.2.5-rc.1` en staging y `1.2.5` en stable/live con diagnostico del updater privado y pruebas CLI de helpers, reservas y rollbacks transaccionales. Se verificaron workflows, releases, manifest, tag, hash del ZIP y version interna del plugin.
 
 ## Próximo paso inmediato
-- Publicar `1.2.5-rc.1` en staging y promover `1.2.5` a stable/live.
+- Instalar/verificar `1.2.5` desde el updater en staging/live y luego avanzar con automatizacion de minificacion CSS y lint JS/CSS/YAML en pre-release.
 
 ## Dudas / bloqueos abiertos
 - AUD-02 Entrega 2 permanece bloqueada hasta definir la gestión y custodia de `TP_DATA_ENCRYPTION_KEY`.

@@ -18,4 +18,4 @@ Permite que el equipo administrativo gestione clases y seguimiento desde WordPre
 - Compatibilidad: WordPress 6.0+, PHP 8.0+, Safari iOS y Chrome mobile; preservar datos existentes y el flujo PWA.
 
 ## Estado general
-En producción. Versión estable actual: `1.2.4`; el canal staging apunta a `1.2.4-rc.1`. El updater privado distribuye releases desde GitHub con token configurado en `wp-config.php` o variables de entorno.
+En producción. Versión estable actual: `1.2.5`; el canal staging apunta a `1.2.5-rc.1`. El updater privado distribuye releases desde GitHub con token configurado en `wp-config.php` o variables de entorno.
