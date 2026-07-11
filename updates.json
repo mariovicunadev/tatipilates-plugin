@@ -12,13 +12,13 @@
       "notes": "Herramientas operativas: lint, smoke PWA, eventos de email e historial/restauracion selectiva de backups."
     },
     "stable": {
-      "version": "1.2.6",
-      "tag": "v1.2.6",
-      "asset": "tatipilates-1.2.6.zip",
+      "version": "1.2.7",
+      "tag": "v1.2.7",
+      "asset": "tatipilates-1.2.7.zip",
       "requires": "6.0",
       "tested": "7.0",
       "requires_php": "8.0",
-      "notes": "Cifra datos medicos en reposo con TP_DATA_ENCRYPTION_KEY, migracion idempotente y diagnostico en Configuracion."
+      "notes": "Herramientas operativas: lint, smoke PWA, eventos de email e historial/restauracion selectiva de backups."
     }
   }
 }
