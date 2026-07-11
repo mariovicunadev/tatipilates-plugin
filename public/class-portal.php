@@ -937,21 +937,28 @@ class TP_Portal {
         $message .= "Crea una nueva contraseña aquí:\n{$reset_url}\n\n";
         $message .= "Si no solicitaste este cambio, puedes ignorar este correo.\n";
 
+        $mail_error = '';
+        $capturar_error = function ($wp_error) use (&$mail_error) {
+            if ($wp_error instanceof WP_Error) {
+                $mail_error = $wp_error->get_error_message();
+            }
+        };
+
+        add_action('wp_mail_failed', $capturar_error);
         $sent = wp_mail(
             $user->user_email,
             $subject,
             $message,
             array('Content-Type: text/plain; charset=UTF-8')
         );
+        remove_action('wp_mail_failed', $capturar_error);
 
         if (!$sent) {
-            tp_log(
-                'WordPress no pudo enviar el correo de recuperacion de contraseña.',
-                array(
-                    'contexto' => 'TP_Portal::lostpassword',
-                    'user_id'  => (int) $user->ID,
-                ),
-                'error'
+            TP_Helpers::registrar_fallo_email(
+                'recuperacion_password_portal',
+                $user->user_email,
+                $mail_error,
+                array('user_id' => (int) $user->ID)
             );
             wp_safe_redirect(add_query_arg('tp_mensaje', rawurlencode($reset_message), $redirect));
             exit;

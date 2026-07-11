@@ -48,6 +48,7 @@ class TP_Admin {
         add_action('admin_post_tp_descartar_demo_notice', array($this, 'descartar_aviso_demo'));
         add_action('admin_post_tp_backup_descargar', array($this, 'descargar_backup'));
         add_action('admin_post_tp_backup_archivo_descargar', array($this, 'descargar_backup_guardado'));
+        add_action('admin_post_tp_backup_archivo_restaurar', array($this, 'restaurar_backup_guardado'));
         add_action('admin_post_tp_backup_generar', array($this, 'generar_backup'));
         add_action('admin_post_tp_backup_importar', array($this, 'importar_backup'));
         add_action('admin_post_tp_guardar_uninstall_config', array($this, 'guardar_uninstall_config'));
@@ -1715,6 +1716,41 @@ class TP_Admin {
     }
 
     /**
+     * Restores a saved private backup, optionally limited to selected tables.
+     *
+     * @return void
+     */
+    public function restaurar_backup_guardado() {
+        $this->require_admin();
+        check_admin_referer('tp_backup_archivo_restaurar');
+
+        $args = array('page' => 'tatipilates-configuracion');
+
+        if (!class_exists('TP_Backups')) {
+            $resultado = new WP_Error('tp_backup_unavailable', 'El modulo de backups no esta disponible.');
+        } else {
+            $nombre = isset($_POST['backup']) ? sanitize_file_name(wp_unslash($_POST['backup'])) : '';
+            $tablas = isset($_POST['tablas']) ? array_map('sanitize_key', (array) wp_unslash($_POST['tablas'])) : array();
+            $resultado = TP_Backups::importar_archivo_guardado($nombre, $tablas);
+        }
+
+        if (is_wp_error($resultado)) {
+            $args['tp_error'] = rawurlencode($resultado->get_error_message());
+        } else {
+            $args['tp_mensaje'] = rawurlencode(
+                sprintf(
+                    'Backup restaurado: %d usuarios revisados y %d filas sincronizadas.',
+                    (int) ($resultado['usuarios'] ?? 0),
+                    (int) ($resultado['filas'] ?? 0)
+                )
+            );
+        }
+
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
      * Generates an on-demand backup file.
      *
      * @return void
@@ -1760,7 +1796,8 @@ class TP_Admin {
             if (is_wp_error($archivo)) {
                 $resultado = $archivo;
             } else {
-                $resultado = TP_Backups::importar_archivo($archivo);
+                $tablas = isset($_POST['tablas']) ? array_map('sanitize_key', (array) wp_unslash($_POST['tablas'])) : array();
+                $resultado = TP_Backups::importar_archivo($archivo, $tablas);
             }
 
             if (is_wp_error($resultado)) {

@@ -735,6 +735,15 @@ class TP_Alumnas {
         $sent = wp_mail($email, $asunto, $cuerpo, $headers);
         remove_action('wp_mail_failed', $capturar_error);
 
+        if (!$sent) {
+            TP_Helpers::registrar_fallo_email(
+                'credenciales_alumna',
+                $email,
+                $mail_error,
+                array('from_email' => $from_email)
+            );
+        }
+
         return array(
             'sent'       => (bool) $sent,
             'from_name'  => $from_name,

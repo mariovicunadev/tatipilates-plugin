@@ -330,6 +330,91 @@ body.wp-admin {
     margin: 0;
 }
 
+.tp-backup-history {
+    display: grid;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.tp-backup-history-item {
+    border: 1px solid rgba(142, 124, 104, 0.22);
+    border-radius: var(--tp-radius);
+    padding: 10px;
+    background: #fffefa;
+}
+
+.tp-backup-history-item summary {
+    cursor: pointer;
+}
+
+.tp-backup-history-item summary span,
+.tp-backup-history-item summary small {
+    display: grid;
+    gap: 3px;
+}
+
+.tp-backup-history-item form {
+    margin: 10px 0 0;
+}
+
+.tp-backup-restore-form {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px;
+    border: 1px solid rgba(127, 163, 121, 0.18);
+    border-radius: var(--tp-radius);
+    background: rgba(237, 245, 238, 0.42);
+}
+
+.tp-backup-restore-form legend {
+    padding: 0 4px;
+    color: var(--tp-muted);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.tp-backup-restore-form label {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 0;
+}
+
+.tp-admin-events {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+}
+
+.tp-admin-events li {
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 10px;
+    border: 1px solid rgba(142, 124, 104, 0.2);
+    border-left: 4px solid var(--tp-sage);
+    border-radius: var(--tp-radius);
+    background: #fffefa;
+}
+
+.tp-admin-events .tp-admin-event-error {
+    border-left-color: var(--tp-danger);
+}
+
+.tp-admin-events small,
+.tp-admin-events code {
+    color: var(--tp-muted);
+    font-size: 11px;
+}
+
+.tp-admin-events code {
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 .tp-updater-state-current,
 .tp-updater-state-ok {
     border-color: rgba(127, 163, 121, 0.28);

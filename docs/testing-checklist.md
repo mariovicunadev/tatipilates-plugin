@@ -115,6 +115,8 @@ Checklist para probar una version antes de publicarla a `stable`.
 
 - Crear alumna intenta enviar credenciales.
 - Si falla `wp_mail`, la pantalla muestra credenciales temporales.
+- Si falla un envio, Configuracion muestra un evento operativo sin exponer
+  correos completos ni secretos.
 - Reset de contrasena envia link al portal.
 - Mensajes de reset no revelan si el correo existe.
 
@@ -125,6 +127,8 @@ Checklist para probar una version antes de publicarla a `stable`.
 - Offline page responde.
 - Cache no deja CSS/JS viejos despues de update.
 - Instalacion en iOS/Android no rompe login.
+- Smoke HTTP opcional:
+  `TP_PORTAL_URL=https://sitio.test/mi-pilates php tests/portal-pwa-smoke.php`
 
 ## Updater privado
 
@@ -142,6 +146,9 @@ Checklist para probar una version antes de publicarla a `stable`.
 ## Backups
 
 - Un backup nuevo declara `format_version: 2`.
+- Configuracion muestra historial de backups privados con fecha, tamano y hash corto.
+- Descargar un backup historico usa el handler autenticado, no URL publica.
+- Restauracion selectiva permite elegir tablas; sin seleccion restaura todo.
 - Un backup legacy v1 sigue validando e importando.
 - Si el backup trae campos medicos en texto plano, la importacion los cifra con
   la clave actual antes de escribirlos.
@@ -157,15 +164,21 @@ Checks automatizados:
 
 ```zsh
 TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php
+php tests/backup-selective-restore.php
 php tests/core-rules.php
 php tests/updater-token-configuration.php
 php tests/medical-data-access.php
 php tests/medical-data-encryption.php
+php tests/static-assets-lint.php
 ```
 
 El check de reglas centrales usa stubs y no toca datos reales: valida helpers de
 fecha/plan, cupo semanal, reservas exitosas, bloqueos por cupo/duplicado y
 rollbacks cuando falla una recuperacion.
+
+El check de restauracion selectiva valida que el filtro de tablas conserve el
+payload completo cuando no hay seleccion y que el restore parcial no escriba
+tablas no elegidas.
 
 El check del updater usa stubs y tokens ficticios: valida fallback legacy,
 ausencia de token, precedencia constante/entorno, limpieza de `wp_options` y
@@ -178,6 +191,9 @@ lectura autorizada/rechazada y preservacion de columnas en ediciones operativas.
 El check de cifrado medico valida Sodium, envelope `tpenc:v1`, descifrado,
 migracion de texto plano, importacion de backups legacy y rechazo de backups
 cifrados con otra clave.
+
+El lint estatico valida sintaxis JS con Node, estructura CSS y YAML de workflows
+sin agregar minificacion propia.
 
 ## Pre-release local
 
@@ -194,3 +210,5 @@ Debe pasar:
 - Debug code.
 - Sin `release/tatipilates/`.
 - Version correcta.
+- Lint JS/CSS/YAML.
+- Smoke portal/PWA si `TP_PORTAL_URL` esta definido.

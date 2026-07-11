@@ -22,10 +22,12 @@ CHECK_NAMES=(
   "Release desactualizado"
   "Version del plugin"
   "Compatibilidad WordPress"
+  "Lint JS/CSS/YAML"
+  "Smoke portal/PWA"
 )
 
-CHECK_STATUS=("pending" "pending" "pending" "pending" "pending" "pending")
-CHECK_NOTES=("" "" "" "" "" "")
+CHECK_STATUS=("pending" "pending" "pending" "pending" "pending" "pending" "pending" "pending")
+CHECK_NOTES=("" "" "" "" "" "" "" "")
 
 cd "$ROOT_DIR" || exit 1
 
@@ -72,8 +74,9 @@ print_summary() {
   printf "%-28s | %-8s | %s\n" "Check" "Estado" "Detalle"
   printf "%-28s-+-%-8s-+-%s\n" "----------------------------" "--------" "------------------------------"
 
-  local i check_status symbol color note
-  for i in {1..6}; do
+  local i check_status symbol color note total
+  total=${#CHECK_NAMES[@]}
+  for i in $(seq 1 "$total"); do
     check_status="${CHECK_STATUS[$i]}"
     note="${CHECK_NOTES[$i]}"
 
@@ -302,6 +305,31 @@ case "${wp_answer:l}" in
     exit_with_summary
     ;;
 esac
+
+echo "${BLUE}CHECK 7 — Lint JS/CSS/YAML${RESET}"
+static_lint_output="$("$PHP_BIN" tests/static-assets-lint.php 2>&1)"
+if [[ $? -ne 0 ]]; then
+  echo "$static_lint_output"
+  mark_fail 7 "Lint estatico fallo"
+  exit_with_summary
+fi
+echo "$static_lint_output"
+mark_pass 7 "Assets y workflows validos"
+
+echo "${BLUE}CHECK 8 — Smoke portal/PWA${RESET}"
+if [[ -n "${TP_PORTAL_URL:-}" ]]; then
+  smoke_output="$("$PHP_BIN" tests/portal-pwa-smoke.php 2>&1)"
+  if [[ $? -ne 0 ]]; then
+    echo "$smoke_output"
+    mark_fail 8 "Smoke portal/PWA fallo"
+    exit_with_summary
+  fi
+  echo "$smoke_output"
+  mark_pass 8 "Portal/PWA responde"
+else
+  echo "${YELLOW}TP_PORTAL_URL no definido; se omite smoke HTTP del portal.${RESET}"
+  mark_pass 8 "Omitido sin TP_PORTAL_URL"
+fi
 
 print_summary
 

@@ -202,7 +202,46 @@ class TP_Backups {
      * @param string $tmp_path Uploaded temporary path.
      * @return array<string,int>|WP_Error
      */
-    public static function importar_archivo($tmp_path) {
+    public static function importar_archivo($tmp_path, $tablas_seleccionadas = array()) {
+        $payload = self::leer_payload_archivo($tmp_path);
+
+        if (is_wp_error($payload)) {
+            return $payload;
+        }
+
+        $payload = self::filtrar_payload_tablas($payload, $tablas_seleccionadas);
+
+        if (is_wp_error($payload)) {
+            return $payload;
+        }
+
+        return self::importar_payload_validado($payload);
+    }
+
+    /**
+     * Imports a saved private backup file by name.
+     *
+     * @param string            $nombre Backup filename.
+     * @param array<int,string> $tablas_seleccionadas Optional logical table names.
+     * @return array<string,int>|WP_Error
+     */
+    public static function importar_archivo_guardado($nombre, $tablas_seleccionadas = array()) {
+        $path = self::resolver_archivo_guardado($nombre);
+
+        if (is_wp_error($path)) {
+            return $path;
+        }
+
+        return self::importar_archivo($path, $tablas_seleccionadas);
+    }
+
+    /**
+     * Reads, decodes and validates one backup file.
+     *
+     * @param string $tmp_path Backup file path.
+     * @return array<string,mixed>|WP_Error
+     */
+    private static function leer_payload_archivo($tmp_path) {
         if (!$tmp_path || !is_readable($tmp_path)) {
             return new WP_Error('tp_backup_invalid_file', 'No se pudo leer el archivo de backup.');
         }
@@ -249,7 +288,7 @@ class TP_Backups {
             return $payload;
         }
 
-        return self::importar_payload_validado($payload);
+        return $payload;
     }
 
     /**
@@ -389,6 +428,37 @@ class TP_Backups {
     }
 
     /**
+     * Keeps only selected logical tables after full validation.
+     *
+     * @param array<string,mixed> $payload   Validated payload.
+     * @param array<int,string>   $seleccion Raw selected table names.
+     * @return array<string,mixed>|WP_Error
+     */
+    private static function filtrar_payload_tablas($payload, $seleccion) {
+        $permitidas = array_keys(self::tablas());
+        $seleccion  = array_values(array_intersect($permitidas, array_map('sanitize_key', (array) $seleccion)));
+
+        if (!$seleccion || count($seleccion) === count($permitidas)) {
+            return $payload;
+        }
+
+        foreach ($permitidas as $tabla) {
+            if (!in_array($tabla, $seleccion, true)) {
+                $payload['tables'][$tabla] = array();
+            }
+        }
+
+        if (!in_array('alumnas', $seleccion, true)) {
+            $payload['users'] = array();
+        }
+
+        $payload['options'] = array();
+        $payload['selected_tables'] = $seleccion;
+
+        return $payload;
+    }
+
+    /**
      * Rolls back an import and logs a rollback failure.
      *
      * @return void
@@ -421,30 +491,47 @@ class TP_Backups {
     /**
      * Returns the latest saved backup metadata.
      *
-     * @return array{path:string,name:string,date:string,size:int}|null
+     * @return array{path:string,name:string,date:string,size:int,hash:string}|null
      */
     public static function ultimo_backup() {
+        $backups = self::backups_guardados(1);
+
+        return $backups ? $backups[0] : null;
+    }
+
+    /**
+     * Lists saved private backups, newest first.
+     *
+     * @param int $limite Max files.
+     * @return array<int,array{path:string,name:string,date:string,size:int,hash:string}>
+     */
+    public static function backups_guardados($limite = 5) {
         $directorio = self::preparar_almacenamiento_privado(false);
 
         if (is_wp_error($directorio) || !is_dir($directorio)) {
-            return null;
+            return array();
         }
 
         $archivos = glob(trailingslashit($directorio) . 'tatipilates-backup-*.json');
 
         if (!$archivos) {
-            return null;
+            return array();
         }
 
         rsort($archivos);
-        $path = $archivos[0];
+        $backups = array();
 
-        return array(
-            'path' => $path,
-            'name' => basename($path),
-            'date' => gmdate('Y-m-d H:i:s', filemtime($path)),
-            'size' => (int) filesize($path),
-        );
+        foreach (array_slice($archivos, 0, max(1, min(20, absint($limite)))) as $path) {
+            $backups[] = array(
+                'path' => $path,
+                'name' => basename($path),
+                'date' => gmdate('Y-m-d H:i:s', filemtime($path)),
+                'size' => (int) filesize($path),
+                'hash' => substr((string) hash_file('sha256', $path), 0, 12),
+            );
+        }
+
+        return $backups;
     }
 
     /**
@@ -465,38 +552,35 @@ class TP_Backups {
      * @return void
      */
     public static function descargar_archivo($nombre) {
-        $nombre = sanitize_file_name($nombre);
+        $real_path = self::resolver_archivo_guardado($nombre);
 
-        if (!self::nombre_backup_valido($nombre)) {
-            wp_die(esc_html__('El archivo de backup solicitado no es valido.', 'tatipilates'), '', array('response' => 400));
-        }
-
-        $directorio = self::preparar_almacenamiento_privado(false);
-
-        if (is_wp_error($directorio)) {
-            wp_die(esc_html($directorio->get_error_message()), '', array('response' => 500));
-        }
-
-        $path      = trailingslashit($directorio) . $nombre;
-        $real_path = realpath($path);
-        $real_dir  = realpath($directorio);
-
-        if (
-            !$real_path ||
-            !$real_dir ||
-            dirname(wp_normalize_path($real_path)) !== wp_normalize_path($real_dir) ||
-            !is_file($real_path) ||
-            !is_readable($real_path)
-        ) {
-            wp_die(esc_html__('El archivo de backup no existe o no se puede leer.', 'tatipilates'), '', array('response' => 404));
+        if (is_wp_error($real_path)) {
+            wp_die(esc_html($real_path->get_error_message()), '', array('response' => 404));
         }
 
         nocache_headers();
         header('Content-Type: application/json; charset=utf-8');
-        header('Content-Disposition: attachment; filename="' . $nombre . '"');
+        header('Content-Disposition: attachment; filename="' . basename($real_path) . '"');
         header('Content-Length: ' . (string) filesize($real_path));
         readfile($real_path);
         exit;
+    }
+
+    /**
+     * Returns user-facing logical table labels.
+     *
+     * @return array<string,string>
+     */
+    public static function etiquetas_tablas() {
+        return array(
+            'horarios'       => 'Horarios',
+            'alumnas'        => 'Alumnas y usuarios',
+            'reservas'       => 'Reservas',
+            'recuperaciones' => 'Recuperaciones',
+            'pagos'          => 'Pagos',
+            'milestones'     => 'Logros',
+            'notificaciones' => 'Notificaciones',
+        );
     }
 
     /**
@@ -988,6 +1072,42 @@ class TP_Backups {
     }
 
     /**
+     * Resolves one saved private backup path after validating name and location.
+     *
+     * @param string $nombre Backup filename.
+     * @return string|WP_Error
+     */
+    private static function resolver_archivo_guardado($nombre) {
+        $nombre = sanitize_file_name($nombre);
+
+        if (!self::nombre_backup_valido($nombre)) {
+            return new WP_Error('tp_backup_invalid_name', 'El archivo de backup solicitado no es valido.');
+        }
+
+        $directorio = self::preparar_almacenamiento_privado(false);
+
+        if (is_wp_error($directorio)) {
+            return $directorio;
+        }
+
+        $path      = trailingslashit($directorio) . $nombre;
+        $real_path = realpath($path);
+        $real_dir  = realpath($directorio);
+
+        if (
+            !$real_path ||
+            !$real_dir ||
+            dirname(wp_normalize_path($real_path)) !== wp_normalize_path($real_dir) ||
+            !is_file($real_path) ||
+            !is_readable($real_path)
+        ) {
+            return new WP_Error('tp_backup_not_found', 'El archivo de backup no existe o no se puede leer.');
+        }
+
+        return $real_path;
+    }
+
+    /**
      * Whether a path is absolute.
      *
      * @param string $path Filesystem path.
@@ -1099,8 +1219,19 @@ class TP_Backups {
             $cuerpo .= 'Sitio: ' . home_url('/') . "\n";
             $cuerpo .= 'Fecha: ' . gmdate('Y-m-d H:i:s', current_time('timestamp')) . "\n";
 
-            if (!wp_mail($admin_email, $asunto, $cuerpo, array('Content-Type: text/plain; charset=UTF-8'))) {
-                tp_log('No se pudo enviar el email de fallo del backup.', array('admin_email' => $admin_email), 'error');
+            $mail_error = '';
+            $capturar_error = function ($wp_error) use (&$mail_error) {
+                if ($wp_error instanceof WP_Error) {
+                    $mail_error = $wp_error->get_error_message();
+                }
+            };
+
+            add_action('wp_mail_failed', $capturar_error);
+            $mail_sent = wp_mail($admin_email, $asunto, $cuerpo, array('Content-Type: text/plain; charset=UTF-8'));
+            remove_action('wp_mail_failed', $capturar_error);
+
+            if (!$mail_sent) {
+                TP_Helpers::registrar_fallo_email('backup_automatico', $admin_email, $mail_error);
             }
         }
 

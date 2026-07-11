@@ -28,6 +28,8 @@ function tp_log($message, $context = array(), $level = 'info') {
  */
 class TP_Helpers {
 
+    const OPTION_ADMIN_EVENTS = 'tp_admin_events';
+
     /**
      * Normalizes a date string to Y-m-d.
      *
@@ -92,6 +94,126 @@ class TP_Helpers {
         $inicio = self::normalizar_fecha($inicio, gmdate('Y-m-d', current_time('timestamp')));
 
         return gmdate('Y-m-d', strtotime($inicio . ' +' . ((int) $offset * 7) . ' days'));
+    }
+
+    /**
+     * Stores a short operational event for administrators.
+     *
+     * @param string              $tipo    Event type.
+     * @param string              $mensaje Human-readable event message.
+     * @param array<string,mixed> $context Safe context without secrets.
+     * @param string              $level   info|warning|error.
+     * @return void
+     */
+    public static function registrar_evento_admin($tipo, $mensaje, $context = array(), $level = 'info') {
+        $eventos = get_option(self::OPTION_ADMIN_EVENTS, array());
+
+        if (!is_array($eventos)) {
+            $eventos = array();
+        }
+
+        array_unshift(
+            $eventos,
+            array(
+                'tipo'       => sanitize_key($tipo),
+                'level'      => sanitize_key($level),
+                'mensaje'    => sanitize_text_field($mensaje),
+                'context'    => self::sanitizar_contexto_evento($context),
+                'created_at' => gmdate('c', current_time('timestamp')),
+            )
+        );
+
+        update_option(self::OPTION_ADMIN_EVENTS, array_slice($eventos, 0, 20), false);
+    }
+
+    /**
+     * Stores one email failure event and mirrors it to debug logs.
+     *
+     * @param string              $contexto Operation context.
+     * @param string              $destino  Destination email.
+     * @param string              $detalle  Failure detail.
+     * @param array<string,mixed> $extra    Extra safe context.
+     * @return void
+     */
+    public static function registrar_fallo_email($contexto, $destino, $detalle = '', $extra = array()) {
+        $context = array_merge(
+            array(
+                'contexto' => $contexto,
+                'destino'  => self::enmascarar_email($destino),
+            ),
+            $extra
+        );
+
+        self::registrar_evento_admin(
+            'email_fallido',
+            sprintf('Fallo el envio de email en %s.', $contexto),
+            array_merge($context, array('detalle' => $detalle)),
+            'error'
+        );
+
+        tp_log(
+            'Fallo el envio de email.',
+            array_merge($context, array('detalle' => $detalle)),
+            'error'
+        );
+    }
+
+    /**
+     * Returns recent admin-visible operational events.
+     *
+     * @param int $limit Max events.
+     * @return array<int,array<string,mixed>>
+     */
+    public static function eventos_admin($limit = 8) {
+        $eventos = get_option(self::OPTION_ADMIN_EVENTS, array());
+
+        if (!is_array($eventos)) {
+            return array();
+        }
+
+        return array_slice($eventos, 0, max(1, min(20, absint($limit))));
+    }
+
+    /**
+     * Sanitizes event context.
+     *
+     * @param array<string,mixed> $context Raw context.
+     * @return array<string,string>
+     */
+    private static function sanitizar_contexto_evento($context) {
+        $safe = array();
+
+        foreach ($context as $key => $value) {
+            $key = sanitize_key($key);
+
+            if ('' === $key) {
+                continue;
+            }
+
+            if (is_scalar($value) || null === $value) {
+                $safe[$key] = sanitize_text_field((string) $value);
+            }
+        }
+
+        return $safe;
+    }
+
+    /**
+     * Masks an email for persistent operational logs.
+     *
+     * @param string $email Email.
+     * @return string
+     */
+    private static function enmascarar_email($email) {
+        $email = sanitize_email($email);
+
+        if (!$email || false === strpos($email, '@')) {
+            return '';
+        }
+
+        list($local, $domain) = explode('@', $email, 2);
+
+        return substr($local, 0, 2) . '***@' . $domain;
     }
 
     /**

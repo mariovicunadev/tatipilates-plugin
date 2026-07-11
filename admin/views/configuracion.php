@@ -15,8 +15,11 @@ $notificaciones_config = class_exists('TP_Notificaciones') ? TP_Notificaciones::
 $updater_config = class_exists('TP_Updater') ? TP_Updater::configuracion() : array();
 $updater_diagnostico = class_exists('TP_Updater') ? TP_Updater::diagnostico() : array();
 $ultimo_backup = class_exists('TP_Backups') ? TP_Backups::ultimo_backup() : null;
+$backups_guardados = class_exists('TP_Backups') ? TP_Backups::backups_guardados(5) : array();
+$backup_tablas = class_exists('TP_Backups') ? TP_Backups::etiquetas_tablas() : array();
 $aviso_backup = class_exists('TP_Backups') ? TP_Backups::aviso_almacenamiento() : null;
 $borrar_datos_al_desinstalar = class_exists('TP_Backups') ? TP_Backups::borrar_datos_al_desinstalar() : false;
+$eventos_admin = class_exists('TP_Helpers') ? TP_Helpers::eventos_admin(6) : array();
 $demo_disponible = class_exists('TP_Test_Data') && TP_Test_Data::is_available();
 $credenciales_demo = $demo_disponible ? get_transient('tp_demo_credentials_' . get_current_user_id()) : null;
 $aviso_demo_produccion = class_exists('TP_Test_Data') ? TP_Test_Data::hardening_notice() : array();
@@ -232,20 +235,53 @@ $tp_formatear_fecha_estado = static function ($valor) {
                 <p><?php echo esc_html__('Exporta e importa solo la data propia de Tati Pilates: horarios, alumnas, reservas, recuperaciones, pagos, logros, notificaciones y configuracion de recordatorios.', 'tatipilates'); ?></p>
                 <p><?php echo esc_html__('La importacion es idempotente: actualiza lo que ya existe por ID e inserta lo que falte, sin duplicar filas.', 'tatipilates'); ?></p>
 
-                <?php if ($ultimo_backup) : ?>
+                <?php if ($backups_guardados) : ?>
                     <p>
-                        <strong><?php echo esc_html__('Ultimo backup automatico:', 'tatipilates'); ?></strong><br>
-                        <code><?php echo esc_html($ultimo_backup['name']); ?></code><br>
-                        <small><?php echo esc_html($ultimo_backup['date']); ?> · <?php echo esc_html(size_format((int) $ultimo_backup['size'])); ?></small>
+                        <strong><?php echo esc_html__('Historial privado:', 'tatipilates'); ?></strong><br>
+                        <small><?php echo esc_html__('Ultimos backups guardados fuera del webroot.', 'tatipilates'); ?></small>
                     </p>
-                    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-                        <?php wp_nonce_field('tp_backup_archivo_descargar'); ?>
-                        <input type="hidden" name="action" value="tp_backup_archivo_descargar">
-                        <input type="hidden" name="backup" value="<?php echo esc_attr($ultimo_backup['name']); ?>">
-                        <button type="submit" class="button">
-                            <?php echo esc_html__('Descargar ultimo guardado', 'tatipilates'); ?>
-                        </button>
-                    </form>
+                    <div class="tp-backup-history">
+                        <?php foreach ($backups_guardados as $backup_guardado) : ?>
+                            <details class="tp-backup-history-item" <?php echo $ultimo_backup && $backup_guardado['name'] === $ultimo_backup['name'] ? 'open' : ''; ?>>
+                                <summary>
+                                    <span>
+                                        <strong><?php echo esc_html($backup_guardado['name']); ?></strong>
+                                        <small><?php echo esc_html($backup_guardado['date']); ?> · <?php echo esc_html(size_format((int) $backup_guardado['size'])); ?> · <?php echo esc_html($backup_guardado['hash']); ?></small>
+                                    </span>
+                                </summary>
+
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                                    <?php wp_nonce_field('tp_backup_archivo_descargar'); ?>
+                                    <input type="hidden" name="action" value="tp_backup_archivo_descargar">
+                                    <input type="hidden" name="backup" value="<?php echo esc_attr($backup_guardado['name']); ?>">
+                                    <button type="submit" class="button">
+                                        <?php echo esc_html__('Descargar', 'tatipilates'); ?>
+                                    </button>
+                                </form>
+
+                                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" class="tp-backup-restore-form">
+                                    <?php wp_nonce_field('tp_backup_archivo_restaurar'); ?>
+                                    <input type="hidden" name="action" value="tp_backup_archivo_restaurar">
+                                    <input type="hidden" name="backup" value="<?php echo esc_attr($backup_guardado['name']); ?>">
+
+                                    <fieldset>
+                                        <legend><?php echo esc_html__('Restaurar tablas', 'tatipilates'); ?></legend>
+                                        <?php foreach ($backup_tablas as $tabla_key => $tabla_label) : ?>
+                                            <label>
+                                                <input type="checkbox" name="tablas[]" value="<?php echo esc_attr($tabla_key); ?>">
+                                                <span><?php echo esc_html($tabla_label); ?></span>
+                                            </label>
+                                        <?php endforeach; ?>
+                                        <small><?php echo esc_html__('Sin seleccion restaura todo. Seleccionar tablas restaura solo esas secciones despues de validar el backup completo.', 'tatipilates'); ?></small>
+                                    </fieldset>
+
+                                    <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('Vas a restaurar datos desde este backup privado. Continuar?', 'tatipilates')); ?>');">
+                                        <?php echo esc_html__('Restaurar', 'tatipilates'); ?>
+                                    </button>
+                                </form>
+                            </details>
+                        <?php endforeach; ?>
+                    </div>
                 <?php else : ?>
                     <p><?php echo esc_html__('Aun no hay backups automaticos guardados.', 'tatipilates'); ?></p>
                 <?php endif; ?>
@@ -284,12 +320,49 @@ $tp_formatear_fecha_estado = static function ($valor) {
                             ?>
                         </small>
                     </label>
+                    <?php if ($backup_tablas) : ?>
+                        <fieldset class="tp-backup-restore-form">
+                            <legend><?php echo esc_html__('Importacion selectiva', 'tatipilates'); ?></legend>
+                            <?php foreach ($backup_tablas as $tabla_key => $tabla_label) : ?>
+                                <label>
+                                    <input type="checkbox" name="tablas[]" value="<?php echo esc_attr($tabla_key); ?>">
+                                    <span><?php echo esc_html($tabla_label); ?></span>
+                                </label>
+                            <?php endforeach; ?>
+                            <small><?php echo esc_html__('Sin seleccion importa todo. Si eliges tablas, las demas se validan pero no se escriben.', 'tatipilates'); ?></small>
+                        </fieldset>
+                    <?php endif; ?>
                     <button type="submit" class="button" onclick="return confirm('<?php echo esc_js(__('La importacion sincronizara datos del backup con la base actual. Continuar?', 'tatipilates')); ?>');">
                         <?php echo esc_html__('Importar backup', 'tatipilates'); ?>
                     </button>
                 </form>
             </div>
         </div>
+
+        <?php if ($eventos_admin) : ?>
+        <div class="tp-window tp-admin-side">
+            <div class="tp-window-bar">
+                <span></span>
+                <span></span>
+                <strong><?php echo esc_html__('Eventos operativos', 'tatipilates'); ?></strong>
+            </div>
+
+            <div class="tp-window-body">
+                <p><?php echo esc_html__('Ultimos avisos tecnicos relevantes para administracion.', 'tatipilates'); ?></p>
+                <ul class="tp-admin-events">
+                    <?php foreach ($eventos_admin as $evento) : ?>
+                        <li class="tp-admin-event-<?php echo esc_attr($evento['level'] ?? 'info'); ?>">
+                            <strong><?php echo esc_html($evento['mensaje'] ?? 'Evento registrado.'); ?></strong>
+                            <small><?php echo esc_html($tp_formatear_fecha_estado($evento['created_at'] ?? '')); ?></small>
+                            <?php if (!empty($evento['context']) && is_array($evento['context'])) : ?>
+                                <code><?php echo esc_html(wp_json_encode($evento['context'])); ?></code>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        </div>
+        <?php endif; ?>
 
         <?php if ($demo_disponible) : ?>
         <div class="tp-window tp-admin-side">

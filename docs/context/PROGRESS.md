@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-07-10
-**Qué se hizo:** Se publico `1.2.6-rc.1` en staging y `1.2.6` en stable/live con cifrado Sodium para `historia_medica`, `alergias` y `motivo_pilates`, migracion idempotente de texto plano, diagnostico de clave en Configuracion y pruebas CLI de cifrado/importacion. Se verificaron workflows, releases, manifest, tag, hash del ZIP y version interna del plugin.
+**Qué se hizo:** Se implemento y valido una tanda de hardening operativo: lint JS/CSS/YAML en pre-release, smoke HTTP opcional para portal/PWA, eventos administrativos de fallos de email e historial/restauracion selectiva de backups. Pasaron pruebas CLI y pre-release con `TP_PORTAL_URL` local.
 
 ## Próximo paso inmediato
-- Instalar/verificar `1.2.6` desde el updater en staging/live, confirmar que Datos medicos muestre cifrado activo y revisar una ficha Tatiana con datos medicos.
+- Revisar el cambio local pendiente en `assets/css/tatipilates-portal.min.css` y preparar release si la tanda queda aprobada.
 
 ## Dudas / bloqueos abiertos
 - Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.

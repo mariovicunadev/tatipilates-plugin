@@ -23,7 +23,7 @@ No hacer commit ni push hasta que el usuario lo pida explícitamente.
 
 ## Comandos
 - Build: no hay compilación; el paquete se genera con `./pre-release-check.sh --yes`.
-- Test: `./pre-release-check.sh --yes`; para backups usar `TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php`; para el updater usar `php tests/updater-token-configuration.php`; para permisos medicos usar `php tests/medical-data-access.php` y `php tests/medical-data-encryption.php`; complementar con `docs/testing-checklist.md`.
+- Test: `./pre-release-check.sh --yes`; para backups usar `TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php` y `php tests/backup-selective-restore.php`; para el updater usar `php tests/updater-token-configuration.php`; para permisos medicos usar `php tests/medical-data-access.php` y `php tests/medical-data-encryption.php`; para assets usar `php tests/static-assets-lint.php`; para smoke PWA usar `TP_PORTAL_URL=https://sitio/mi-pilates php tests/portal-pwa-smoke.php`; complementar con `docs/testing-checklist.md`.
 - Run local: iniciar LocalWP y abrir `https://devtatipilates.local/`; el plugin está enlazado desde `/Users/vicunav/Documents/wps/app/public/wp-content/plugins/tatipilates`.
 
 ## Reglas para el agente

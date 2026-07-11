@@ -10,6 +10,13 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
+### Added
+
+- Agrega lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
+- Agrega smoke test HTTP opcional para portal mobile/PWA mediante `TP_PORTAL_URL`.
+- Registra fallos de envio de email en eventos operativos visibles para administracion, sin guardar secretos ni correos completos.
+- Amplia Backups con historial de archivos privados, descarga por archivo y restauracion/importacion selectiva por tabla tras validar el backup completo.
+
 ## [1.2.6] - 2026-07-10
 
 ### Added

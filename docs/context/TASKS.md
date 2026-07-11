@@ -1,15 +1,16 @@
 # TASKS.md
 
 ## En progreso
-- [~] Verificar `1.2.6` instalado desde el updater en staging/live.
+- [~] Revisar cambio local pendiente en `assets/css/tatipilates-portal.min.css` antes de preparar release.
 
 ## Pendientes
-- [ ] Agregar lint de JS/CSS/YAML en pre-release sin minificar assets mientras SiteGround Optimizer gestione frontend.
-- [ ] Añadir smoke tests de portal y PWA en mobile.
-- [ ] Mejorar emails y logs administrativos de fallos de envío.
-- [ ] Mejorar historial y restauración selectiva de backups.
+- [ ] Verificar `1.2.6` instalado desde el updater en staging/live.
 
 ## Hechas
+- [x] Agregar lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
+- [x] Añadir smoke test HTTP opcional de portal/PWA mobile mediante `TP_PORTAL_URL`.
+- [x] Registrar fallos de email como eventos operativos visibles para administracion.
+- [x] Mejorar backups con historial privado, descarga por archivo y restauracion/importacion selectiva por tabla.
 - [x] Publicar `1.2.6-rc.1` en staging y `1.2.6` en live con cifrado medico, release, manifest, tag, hash y version interna del ZIP verificados.
 - [x] Implementar localmente AUD-02 Entrega 2 con cifrado Sodium, migracion idempotente, diagnostico admin y pruebas CLI.
 - [x] Publicar `1.2.5-rc.1` en staging y `1.2.5` en live con release, manifest, tag, hash y version interna del ZIP verificados.
