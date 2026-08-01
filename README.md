@@ -1,27 +1,27 @@
 # Tati Pilates Plugin
 
-Plugin privado de WordPress para administrar clases, alumnas, reservas, pagos, recuperaciones, asistencia y portal de estudiantes de Tati Pilates.
+Private WordPress plugin to manage classes, students, bookings, payments, makeup sessions, attendance, and the student portal for Tati Pilates.
 
-Este repositorio contiene solo el codigo del plugin. No incluye credenciales, documentacion sensible, datos locales ni paquetes ZIP generados.
+This repository contains only the plugin code. It does not include credentials, sensitive documentation, local data, or generated ZIP packages.
 
-## Funcionalidades principales
+## Main features
 
-- Administracion de horarios, cupos y modalidades.
-- Registro de alumnas vinculadas a usuarios nativos de WordPress.
-- Planes semanales e individuales.
-- Reservas desde wp-admin y desde el portal `/mi-pilates`.
-- Cancelacion de reservas, reporte de ausencias y recuperaciones.
-- Agenda semanal privada y copia de agenda para WhatsApp.
-- Pagos mensuales simples, sin montos ni moneda.
-- Asistencia, faltas y generacion automatica de recuperaciones.
-- Logros personales, datos medicos, alergias, cumpleanos y fecha de inicio.
-- Notificaciones internas para admin y alumnas.
-- PWA ligera del portal de alumnas.
-- Datos de prueba para entornos locales.
-- Roles limitados `tp_admin_pilates` y `tp_tatiana`; Tatiana agrega acceso a
-  datos medicos sin recibir privilegios nativos de WordPress.
+- Management of schedules, spots, and class formats.
+- Student registration linked to native WordPress users.
+- Weekly and individual plans.
+- Bookings from wp-admin and from the `/mi-pilates` portal.
+- Booking cancellation, absence reporting, and makeup sessions.
+- Private weekly agenda and agenda copy for WhatsApp.
+- Simple monthly payments, without amounts or currency.
+- Attendance, absences, and automatic makeup-session generation.
+- Personal achievements, medical data, allergies, birthdays, and start date.
+- Internal notifications for admin and students.
+- Lightweight PWA for the student portal.
+- Test data for local environments.
+- Restricted roles `tp_admin_pilates` and `tp_tatiana`; Tatiana gets access to
+  medical data without receiving native WordPress privileges.
 
-## Estructura
+## Structure
 
 ```text
 tatipilates.php
@@ -31,12 +31,13 @@ admin/
 public/
 assets/
 docs/
+tests/
 .github/workflows/
 updates.json
 pre-release-check.sh
 ```
 
-Archivos locales excluidos del repo:
+Local files excluded from the repo:
 
 - `CONTEXTO.md`
 - `dev/`
@@ -44,19 +45,19 @@ Archivos locales excluidos del repo:
 - `guia-rapida-tatiana.*`
 - `checklist-pruebas-tati-pilates.*`
 - `mipilates.zip`
-- logs y archivos de Mac
+- logs and Mac files
 
-## Desarrollo local
+## Local development
 
-En LocalWP, el plugin puede montarse con un symlink hacia la carpeta del proyecto:
+In LocalWP, the plugin can be mounted with a symlink to the project folder:
 
 ```zsh
-ln -s "/Users/vicunav/Documents/Codex/Mi Pilates Admin" "/ruta/al/wordpress/wp-content/plugins/tatipilates"
+ln -s "/Users/vicunav/Documents/Codex/Mi Pilates Admin" "/path/to/wordpress/wp-content/plugins/tatipilates"
 ```
 
-Luego activar el plugin desde wp-admin.
+Then activate the plugin from wp-admin.
 
-El portal de alumnas vive en:
+The student portal lives at:
 
 ```text
 /mi-pilates
@@ -64,37 +65,37 @@ El portal de alumnas vive en:
 
 ## Pre-release
 
-Antes de generar un ZIP para staging o live, correr:
+Before generating a ZIP for staging or live, run:
 
 ```zsh
 ./pre-release-check.sh
 ```
 
-Para correrlo sin preguntas interactivas:
+To run it without interactive prompts:
 
 ```zsh
 ./pre-release-check.sh --yes
 ```
 
-El script verifica:
+The script checks:
 
-- Sintaxis PHP con el PHP de LocalWP.
-- Archivos PHP con BOM UTF-8.
-- Codigo de debug olvidado.
-- Que no exista `release/tatipilates/`.
-- Version del plugin en `tatipilates.php`.
-- Version de WordPress usada para la regresion local.
+- PHP syntax using LocalWP's PHP.
+- PHP files with a UTF-8 BOM.
+- Forgotten debug code.
+- That `release/tatipilates/` does not exist.
+- Plugin version in `tatipilates.php`.
+- WordPress version used for the local regression run.
 
-La compatibilidad confirmada se guarda en `release-metadata.json` y los
-workflows la copian automaticamente al manifiesto del canal publicado.
+Confirmed compatibility is saved to `release-metadata.json`, and the
+workflows copy it automatically into the published channel's manifest.
 
-Si todo pasa, genera un ZIP en:
+If everything passes, it generates a ZIP at:
 
 ```text
 release/tatipilates-VERSION-YYYYMMDD-HHMM.zip
 ```
 
-El ZIP incluye:
+The ZIP includes:
 
 - `tatipilates.php`
 - `uninstall.php`
@@ -103,36 +104,36 @@ El ZIP incluye:
 - `public/`
 - `assets/`
 
-El ZIP no incluye documentacion local, credenciales, `dev/`, `release/`, dotfiles ni archivos auxiliares.
+The ZIP does not include local documentation, credentials, `dev/`, `release/`, dotfiles, or auxiliary files.
 
-## Workflow recomendado
+## Recommended workflow
 
-1. Crear o cambiar una feature en local.
-2. Probar en LocalWP.
-3. Revisar cambios:
+1. Create or work on a feature locally.
+2. Test in LocalWP.
+3. Review changes:
 
 ```zsh
 git status
 git diff
 ```
 
-4. Registrar el cambio en `CHANGELOG.md`, normalmente en la version `Unreleased`.
-5. Si el cambio se va a mandar a staging, actualizar la version en `tatipilates.php`.
-6. Correr pre-release:
+4. Log the change in `CHANGELOG.md`, normally under the `Unreleased` version.
+5. If the change is going to staging, bump the version in `tatipilates.php`.
+6. Run the pre-release check:
 
 ```zsh
 ./pre-release-check.sh --yes
 ```
 
-7. Si los checks pasan, commitear:
+7. If the checks pass, commit:
 
 ```zsh
 git add .
-git commit -m "tipo: descripcion corta"
+git commit -m "type: short description"
 git push
 ```
 
-Ejemplos de mensajes:
+Message examples:
 
 ```text
 feat: add student notification preferences
@@ -140,164 +141,164 @@ fix: prevent duplicate recovery booking
 chore: update release checks
 ```
 
-8. Subir el ZIP generado a staging.
-9. Probar staging, especialmente:
+8. Upload the generated ZIP to staging.
+9. Test staging, especially:
 
-- Login y reset de contrasena en `/mi-pilates`.
-- Dashboard de alumna.
-- Reservas, cancelaciones y recuperaciones.
-- Agenda semanal.
-- Pagos, asistencia y notificaciones.
+- Login and password reset at `/mi-pilates`.
+- Student dashboard.
+- Bookings, cancellations, and makeup sessions.
+- Weekly agenda.
+- Payments, attendance, and notifications.
 - PWA/offline.
-- Admin Pilates con permisos operativos limitados.
-- Tatiana con los mismos permisos operativos y acceso medico.
+- Admin Pilates with limited operational permissions.
+- Tatiana with the same operational permissions plus medical access.
 
-10. Si staging esta correcto, subir el mismo ZIP a live.
-11. Despues del deploy live, crear un tag de version:
+10. If staging looks correct, upload the same ZIP to live.
+11. After the live deploy, create a version tag:
 
 ```zsh
 git tag v1.0.1
 git push origin v1.0.1
 ```
 
-12. Si aparece un bug en staging o live, corregirlo en local, generar un nuevo ZIP y volver a probar. No editar directo en staging/live sin replicar el cambio en Git.
+12. If a bug shows up in staging or live, fix it locally, generate a new ZIP, and test again. Do not edit the plugin directly on staging/live without replicating the change in Git.
 
-## Reglas importantes
+## Important rules
 
-- No subir credenciales ni `CONTEXTO.md` al repo.
-- No subir ZIPs generados.
-- No subir `dev/`.
-- No editar directamente el plugin en staging/live sin replicar el cambio en este repo.
-- Si se cambia estructura de base de datos, actualizar activacion/migracion y probar en staging antes de live.
-- Si se cambia seguridad o permisos, probar con administrator, Tatiana, Admin
-  Pilates y alumna.
-- Desactivar el plugin conserva datos. Eliminarlo tambien conserva datos por defecto; solo borra data si se activa explicitamente en Zona peligrosa.
-- Antes de depurar cambios riesgosos en staging/live, descargar un backup JSON desde `Tati Pilates > Configuracion`.
+- Do not upload credentials or `CONTEXTO.md` to the repo.
+- Do not upload generated ZIPs.
+- Do not upload `dev/`.
+- Do not edit the plugin directly on staging/live without replicating the change in this repo.
+- If the database structure changes, update activation/migration and test on staging before live.
+- If security or permissions change, test with administrator, Tatiana, Admin
+  Pilates, and student accounts.
+- Deactivating the plugin preserves data. Deleting it also preserves data by default; data is only deleted if explicitly enabled in the Danger Zone.
+- Before debugging risky changes on staging/live, download a JSON backup from `Tati Pilates > Settings`.
 
-## Deploy a staging y live
+## Deploy to staging and live
 
-El flujo manual tradicional es:
-
-```text
-LocalWP -> pre-release ZIP -> staging -> pruebas -> live
-```
-
-Para staging, subir el ZIP generado por `pre-release-check.sh` desde wp-admin o por el mecanismo de deploy disponible.
-
-Para live, usar el mismo ZIP que ya paso staging. Si se necesita corregir algo despues de staging, generar un nuevo ZIP, volver a probar y recien despues publicar.
-
-## Updater privado
-
-Desde `1.1.0`, el plugin incluye un updater privado por canales:
-
-- `staging`: para el sitio de pruebas.
-- `stable`: para el sitio live.
-
-La primera version que contiene el updater debe instalarse manualmente con ZIP normal. Despues de ese bootstrap, WordPress puede detectar actualizaciones privadas desde:
+The traditional manual flow is:
 
 ```text
-Plugins > Tati Pilates > Actualizar ahora
+LocalWP -> pre-release ZIP -> staging -> testing -> live
 ```
 
-Configuracion en cada sitio:
+For staging, upload the ZIP generated by `pre-release-check.sh` from wp-admin or through the available deploy mechanism.
+
+For live, use the same ZIP that already passed staging. If something needs to be fixed after staging, generate a new ZIP, test again, and only then publish.
+
+## Private updater
+
+Since `1.1.0`, the plugin includes a private channel-based updater:
+
+- `staging`: for the test site.
+- `stable`: for the live site.
+
+The first version that includes the updater must be installed manually with a regular ZIP. After that bootstrap, WordPress can detect private updates from:
 
 ```text
-Tati Pilates > Configuracion > Actualizaciones privadas
+Plugins > Tati Pilates > Update now
 ```
 
-En staging:
+Configuration on each site:
 
 ```text
-Canal: staging
+Tati Pilates > Settings > Private updates
 ```
 
-En live:
+On staging:
 
 ```text
-Canal: stable
+Channel: staging
 ```
 
-El token de GitHub se guarda solo en WordPress. No se sube al repo.
+On live:
 
-Flujo nuevo recomendado:
+```text
+Channel: stable
+```
+
+The GitHub token is stored only in WordPress. It is never uploaded to the repo.
+
+Recommended new flow:
 
 ```text
 Local changes
 -> commit/push main
 -> GitHub Action: Publish staging release 1.1.1-rc.1
--> staging actualiza desde WordPress
--> pruebas
+-> staging updates from WordPress
+-> testing
 -> GitHub Action: Promote stable release 1.1.1
--> live actualiza desde WordPress
+-> live updates from WordPress
 ```
 
-Documentacion completa:
+Full documentation:
 
 ```text
 docs/updater-workflow.md
 ```
 
-## Guias operativas
+## Operational guides
 
-- `docs/README.md`: indice de documentacion tecnica y operativa.
-- `docs/architecture.md`: mapa de clases, capas y responsabilidades.
-- `docs/codex-workflow-guide.md`: como abrir chats nuevos, pedir cambios, versionar y documentar.
-- `docs/codex-workflow-guide.pdf`: version imprimible/rapida de la guia de trabajo con Codex.
-- `docs/data-model.md`: tablas propias, relaciones, indices y reglas de datos.
-- `docs/local-development.md`: LocalWP, symlink, PHP local, datos demo y flujo local.
-- `docs/product-decisions.md`: decisiones funcionales que deben respetarse.
-- `docs/release-runbook.md`: pasos para publicar a staging y promover a live.
-- `docs/roadmap.md`: mejoras futuras y deuda tecnica.
-- `docs/security-checklist.md`: checklist de seguridad para cambios sensibles.
-- `docs/testing-checklist.md`: pruebas antes de publicar una version.
-- `docs/troubleshooting.md`: problemas frecuentes y diagnostico.
-- `docs/updater-workflow.md`: releases por canales `staging` y `stable`.
+- `docs/README.md`: index of technical and operational documentation.
+- `docs/architecture.md`: map of classes, layers, and responsibilities.
+- `docs/codex-workflow-guide.md`: how to open new chats, request changes, version, and document.
+- `docs/codex-workflow-guide.pdf`: printable/quick version of the Codex workflow guide.
+- `docs/data-model.md`: custom tables, relationships, indexes, and data rules.
+- `docs/local-development.md`: LocalWP, symlink, local PHP, demo data, and local workflow.
+- `docs/product-decisions.md`: functional decisions that must be respected.
+- `docs/release-runbook.md`: steps to publish to staging and promote to live.
+- `docs/roadmap.md`: future improvements and technical debt.
+- `docs/security-checklist.md`: security checklist for sensitive changes.
+- `docs/testing-checklist.md`: tests to run before publishing a version.
+- `docs/troubleshooting.md`: common issues and diagnostics.
+- `docs/updater-workflow.md`: releases across the `staging` and `stable` channels.
 
-## Seguridad
+## Security
 
-El plugin usa:
+The plugin uses:
 
-- Nonces en acciones sensibles.
-- Capability `tp_manage_pilates` para administracion.
-- Ownership checks para acciones de alumnas.
-- Sanitizacion al guardar y escaping al mostrar.
-- `$wpdb->prepare()` y metodos tipados de `$wpdb`.
-- Checks estrictos `false ===` en operaciones de base de datos.
-- Logging interno controlado por `WP_DEBUG`.
-- Rate limiting en login del portal.
-- Mensajes genericos en reset de contrasena para evitar user enumeration.
-- Updater privado sin tokens hardcodeados en el codigo.
+- Nonces on sensitive actions.
+- `tp_manage_pilates` capability for administration.
+- Ownership checks for student actions.
+- Sanitization on save and escaping on output.
+- `$wpdb->prepare()` and typed `$wpdb` methods.
+- Strict `false ===` checks on database operations.
+- Internal logging controlled by `WP_DEBUG`.
+- Rate limiting on portal login.
+- Generic messages on password reset to prevent user enumeration.
+- Private updater with no tokens hardcoded in the code.
 
-## Repositorio
+## Repository
 
-Repositorio privado:
+Private repository:
 
 ```text
 https://github.com/mariovicunadev/tatipilates-plugin
 ```
 
-## Prompt base para nuevos chats
+## Base prompt for new chats
 
-Usar este prompt al abrir una nueva conversacion de Codex para cambios futuros:
+Use this prompt when opening a new Codex conversation for future changes:
 
 ```text
-Estamos trabajando en el repo local:
+We're working in the local repo:
 /Users/vicunav/Documents/Codex/Mi Pilates Admin
 
-Plugin privado de WordPress: Tati Pilates.
-Repo GitHub privado: https://github.com/mariovicunadev/tatipilates-plugin
-Branch principal: main.
+Private WordPress plugin: Tati Pilates.
+Private GitHub repo: https://github.com/mariovicunadev/tatipilates-plugin
+Main branch: main.
 
-Lee README.md, CHANGELOG.md y docs/updater-workflow.md antes de tocar codigo.
-Si existe CONTEXTO.md en local, leelo tambien, pero no lo subas al repo.
+Read README.md, CHANGELOG.md, and docs/updater-workflow.md before touching code.
+If CONTEXTO.md exists locally, read it too, but do not upload it to the repo.
 
 Workflow:
-- No hagas commit ni push hasta que yo lo pida.
-- Registra cambios relevantes en CHANGELOG.md.
-- Mantene fuera del repo credenciales, release/, dev/, CONTEXTO.md y ZIPs.
-- Antes de cerrar una tanda para staging, correr ./pre-release-check.sh --yes.
-- Para publicar updates, usar los canales staging/stable documentados en docs/updater-workflow.md.
+- Do not commit or push until I ask for it.
+- Log relevant changes in CHANGELOG.md.
+- Keep credentials, release/, dev/, CONTEXTO.md, and ZIPs out of the repo.
+- Before closing a batch for staging, run ./pre-release-check.sh --yes.
+- To publish updates, use the staging/stable channels documented in docs/updater-workflow.md.
 
-Objetivo de este chat:
-[describir aqui el cambio o bug]
+Goal of this chat:
+[describe the change or bug here]
 ```
