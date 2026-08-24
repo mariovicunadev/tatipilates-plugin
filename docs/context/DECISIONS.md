@@ -128,3 +128,12 @@
 **Estado:** Vigente en local; pendiente de publicación
 
 ---
+
+## [2026-08-24] Exponer precios a Elementor mediante Dynamic Tags propios
+**Decisión:** Crear `TP_Precios` (opcion unica `tp_precios_config`, sin tabla nueva) como fuente canonica de los seis precios de referencia y sus seis precios de efectivo USD manuales, y exponerlos a Elementor mediante un Dynamic Tag propio (`tp-precio`, controles "Plan" y "Tipo") registrado directamente en `elementor/dynamic_tags/register`. Reutiliza `tp_manage_pilates` sin capability nueva. El guardado purga la cache de SG Optimizer cuando la funcion `sg_cachepress_purge_cache()` esta disponible.
+**Alternativas consideradas:** Shortcodes (no se pueden bindear al control Title de los Heading widgets ya existentes sin migrarlos a otro tipo de widget); opciones nativas re-tipeadas a mano en Elementor (mantiene una copia duplicada, viola el requisito de fuente unica); fetch REST/JS en el navegador (agrega latencia y riesgo de SEO para contenido estatico sin beneficio real); widget custom tipo "Price List" (sobre-ingenieria para seis valores).
+**Por qué se eligió esta:** Los seis widgets Heading existentes en `#precios` ya soportan dynamic tags en su control Title; esta es la integracion de menor superficie que mantiene renderizado server-side, sin JS adicional y sin tocar el layout/CSS actual.
+**Nota de implementacion:** El primer intento registro el hook dentro de un listener de `elementor/loaded`, agregado desde el `plugins_loaded` de este plugin. Elementor dispara `elementor/loaded` desde su propio `plugins_loaded`, que corre antes que el nuestro (orden alfabetico de carga), asi que el listener siempre llegaba tarde y el tag nunca se registraba. Se corrigio enganchando `elementor/dynamic_tags/register` directamente — es seguro igual, porque Elementor solo dispara ese hook desde su propio codigo ya cargado, y nunca se dispara en un sitio sin Elementor.
+**Estado:** Vigente en local; pendiente de publicación
+
+---

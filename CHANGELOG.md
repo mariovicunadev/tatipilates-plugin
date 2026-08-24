@@ -12,6 +12,7 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ### Added
 
+- Agrega gestion de precios (`TP_Precios`) con pantalla de administracion `Tati Pilates > Precios`, valor de referencia y precio de efectivo USD manual por cada uno de los seis planes/clases, y un Dynamic Tag de Elementor (`tp-precio`) para consumirlos server-side sin editar la pagina. Purga la cache de SG Optimizer al guardar.
 - Agrega lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
 - Agrega smoke test HTTP opcional para portal mobile/PWA mediante `TP_PORTAL_URL`.
 - Registra fallos de envio de email en eventos operativos visibles para administracion, sin guardar secretos ni correos completos.

@@ -42,6 +42,7 @@ class TP_Admin {
         add_action('admin_post_tp_admin_notificacion_vista', array($this, 'marcar_notificacion_vista'));
         add_action('admin_post_tp_admin_notificacion_eliminar', array($this, 'eliminar_notificacion'));
         add_action('admin_post_tp_guardar_notificaciones_config', array($this, 'guardar_notificaciones_config'));
+        add_action('admin_post_tp_guardar_precios', array($this, 'guardar_precios'));
         add_action('admin_post_tp_guardar_updater_config', array($this, 'guardar_updater_config'));
         add_action('admin_post_tp_updater_comprobar', array($this, 'comprobar_updater'));
         add_action('admin_post_tp_seed_test_data', array($this, 'generar_datos_prueba'));
@@ -183,13 +184,23 @@ class TP_Admin {
         );
 
         add_menu_page(
+            'Precios',
+            'Precios',
+            $capability,
+            'tatipilates-precios',
+            array($this, 'render_precios'),
+            'dashicons-tag',
+            34
+        );
+
+        add_menu_page(
             'Configuración',
             'Configuración',
             $capability,
             'tatipilates-configuracion',
             array($this, 'render_configuracion'),
             'dashicons-admin-generic',
-            34
+            35
         );
     }
 
@@ -368,6 +379,16 @@ class TP_Admin {
     public function render_configuracion() {
         $this->require_admin();
         include TP_PLUGIN_DIR . 'admin/views/configuracion.php';
+    }
+
+    /**
+     * Renders the pricing admin screen.
+     *
+     * @return void
+     */
+    public function render_precios() {
+        $this->require_admin();
+        include TP_PLUGIN_DIR . 'admin/views/precios.php';
     }
 
     /**
@@ -712,6 +733,46 @@ class TP_Admin {
         } else {
             TP_Notificaciones::guardar_configuracion($_POST);
             $args['tp_mensaje'] = rawurlencode('Configuracion de notificaciones guardada.');
+        }
+
+        wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));
+        exit;
+    }
+
+    /**
+     * Saves pricing submitted from the Precios screen.
+     *
+     * @return void
+     */
+    public function guardar_precios() {
+        $this->require_admin();
+        check_admin_referer('tp_guardar_precios');
+
+        $args = array('page' => 'tatipilates-precios');
+
+        if (!class_exists('TP_Precios')) {
+            $args['tp_error'] = rawurlencode('El modulo de precios no esta disponible.');
+        } else {
+            $resultado = TP_Precios::guardar_configuracion($_POST);
+
+            if (!empty($resultado['rechazados'])) {
+                $etiquetas  = TP_Precios::etiquetas();
+                $nombres    = array_map(
+                    static function ($clave) use ($etiquetas) {
+                        return isset($etiquetas[$clave]) ? $etiquetas[$clave] : $clave;
+                    },
+                    $resultado['rechazados']
+                );
+
+                $args['tp_error'] = rawurlencode(
+                    sprintf(
+                        'Precios guardados. Estos campos tenian un valor invalido y conservaron el valor anterior: %s.',
+                        implode(', ', $nombres)
+                    )
+                );
+            } else {
+                $args['tp_mensaje'] = rawurlencode('Precios actualizados.');
+            }
         }
 
         wp_safe_redirect(add_query_arg($args, admin_url('admin.php')));

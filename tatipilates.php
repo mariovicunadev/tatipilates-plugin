@@ -86,3 +86,19 @@ add_action(
         }
     }
 );
+
+/*
+ * Registers the pricing Dynamic Tag. Hooking this action directly (instead
+ * of gating it behind 'elementor/loaded') is deliberate: Elementor only
+ * ever fires 'elementor/dynamic_tags/register' itself, from inside its own
+ * already-loaded code, so this never runs (and TP_Elementor_Precios is
+ * never autoloaded) on a site without Elementor. An earlier version gated
+ * this behind 'elementor/loaded', but Elementor's own 'plugins_loaded'
+ * callback fires that hook before this plugin's 'plugins_loaded' callback
+ * runs (alphabetical load order), so a listener attached from inside our
+ * 'plugins_loaded' callback was always too late to catch it.
+ */
+add_action(
+    'elementor/dynamic_tags/register',
+    array('TP_Elementor_Precios', 'registrar')
+);

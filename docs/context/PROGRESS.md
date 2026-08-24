@@ -1,11 +1,11 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-07-10
-**Qué se hizo:** Se implemento y valido una tanda de hardening operativo: lint JS/CSS/YAML en pre-release, smoke HTTP opcional para portal/PWA, eventos administrativos de fallos de email e historial/restauracion selectiva de backups. Pasaron pruebas CLI y pre-release con `TP_PORTAL_URL` local.
+**Fecha:** 2026-08-24
+**Qué se hizo:** Se diseño y luego implemento localmente la gestion de precios: clase `TP_Precios` (opcion unica, sin tabla nueva), pantalla admin `Tati Pilates > Precios` con precio de referencia y precio de efectivo USD manual por cada uno de los seis planes/clases, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo, registrado en `elementor/dynamic_tags/register`) y purga de cache SG Optimizer al guardar. Se corrigio un bug real de orden de carga de hooks (ver DECISIONS.md, 2026-08-24) que impedia que el tag se registrara. 12 checks en `tests/pricing-config.php`, todos en verde; `devtatipilates.local` validado visualmente por el usuario. La migracion de los widgets de Elementor existentes queda a cargo del usuario (no del agente).
 
 ## Próximo paso inmediato
-- Revisar el cambio local pendiente en `assets/css/tatipilates-portal.min.css` y preparar release si la tanda queda aprobada.
+- Publicar `-rc.1` a staging, probar con `docs/testing-checklist.md`, y promover a stable solo despues de confirmacion explicita del usuario.
 
 ## Dudas / bloqueos abiertos
 - Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.
@@ -13,6 +13,7 @@
 ## Historial
 (Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)
 
+- [2026-08-24, Unreleased] - Se agrego gestion de precios (referencia + efectivo USD manual) con pantalla admin dedicada y Dynamic Tag propio de Elementor.
 - [2026-07-10, 1.2.6] - Se cifraron los campos medicos en reposo con clave de servidor, migracion idempotente y diagnostico administrativo.
 - [2026-07-09, 1.2.5] - Se agrego diagnostico visible del updater privado y comprobacion manual desde Configuracion.
 - [2026-07-09, 1.2.5] - Se agregaron pruebas CLI para helpers, reservas y rollbacks transaccionales.

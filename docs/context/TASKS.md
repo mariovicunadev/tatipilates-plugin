@@ -5,8 +5,11 @@
 
 ## Pendientes
 - [ ] Verificar `1.2.6` instalado desde el updater en staging/live.
+- [ ] Probar Precios en staging (guardar valores, verificar purga de cache, confirmar el Dynamic Tag `tp-precio` en el editor de Elementor) antes de promover a stable.
+- [ ] Bindear manualmente en Elementor los seis widgets Heading de `#precios` (ref. y USD) al nuevo Dynamic Tag `tp-precio` — a cargo del usuario, no del agente.
 
 ## Hechas
+- [x] Implementar y validar localmente `TP_Precios`: opcion `tp_precios_config`, pantalla admin `Precios` con precio de referencia y precio de efectivo USD manual por plan/clase, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo) y purga de cache SG Optimizer al guardar. Pruebas CLI en `tests/pricing-config.php` (12 checks).
 - [x] Agregar lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
 - [x] Añadir smoke test HTTP opcional de portal/PWA mobile mediante `TP_PORTAL_URL`.
 - [x] Registrar fallos de email como eventos operativos visibles para administracion.

@@ -16,6 +16,7 @@
 - [x] RF13: Distribuir versiones privadas por canales `staging` y `stable` mediante GitHub Releases.
 - [x] RF14: Separar el acceso a campos médicos mediante `tp_view_medical_data` sin exponerlos en listados operativos.
 - [x] RF15: Cifrar campos médicos en reposo con una clave de servidor externa a WordPress.
+- [x] RF16: Administrar el precio de referencia y el precio de efectivo USD de los seis planes/clases desde `Tati Pilates > Precios`, y exponerlos a Elementor mediante un Dynamic Tag propio (`tp-precio`) sin que el frontend guarde una copia independiente del valor.
 
 ## Requisitos no funcionales
 - Performance: evitar recargas completas innecesarias; usar índices documentados; mantener consultas acotadas y assets versionados.
@@ -36,9 +37,10 @@
 | Backups | Exporta datos propios sin contraseñas; la importación es idempotente y mantiene relaciones. |
 | Updater | Staging recibe solo RC, live recibe solo versiones finales y los ZIP privados se descargan con token autorizado. |
 | Release | `./pre-release-check.sh --yes` pasa antes de publicar y stable solo se promueve después de probar staging. |
+| Precios | Un campo invalido no bloquea el guardado de los demas y conserva su valor anterior; guardar purga la cache de SG Optimizer cuando esta disponible. |
 
 ## Fuera de alcance
-- Cobros, montos, moneda, facturación o pasarelas de pago.
+- Cobros, montos, moneda, facturación o pasarelas de pago (los precios de referencia/USD son datos informativos de presentacion, no procesan cobros ni se relacionan con `TP_Pagos`).
 - Marketplace público o distribución por WordPress.org.
 - Aplicación móvil nativa.
 - Waitlist, integración de calendario, reportes mensuales y perfil editable por alumnas hasta que entren al roadmap activo.

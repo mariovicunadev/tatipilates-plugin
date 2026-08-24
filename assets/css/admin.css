@@ -1121,6 +1121,59 @@ body.wp-admin {
     gap: 14px;
 }
 
+.tp-precios-form {
+    display: grid;
+    gap: 18px;
+}
+
+.tp-precios-form h2 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.tp-precio-input {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--tp-line);
+    border-radius: 10px;
+    background: #fbf8f4;
+    padding: 0 12px;
+}
+
+.tp-precio-prefijo {
+    color: var(--tp-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.tp-precio-input input[type="text"] {
+    border: none;
+    background: transparent;
+    padding-left: 0;
+    box-shadow: none !important;
+}
+
+.tp-precio-par-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.tp-precio-subcampo {
+    display: grid;
+    gap: 5px;
+    margin: 0;
+}
+
+.tp-precio-subcampo small {
+    color: var(--tp-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
 .tp-admin .button,
 .tp-admin .button-primary {
     border-color: var(--tp-sage);

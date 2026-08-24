@@ -195,6 +195,22 @@ cifrados con otra clave.
 El lint estatico valida sintaxis JS con Node, estructura CSS y YAML de workflows
 sin agregar minificacion propia.
 
+## Precios
+
+- Los seis valores de referencia y los seis de efectivo USD persisten correctamente al guardar.
+- Un usuario sin `tp_manage_pilates` no puede leer ni modificar precios (probar con POST directo, no solo ocultando el menu).
+- Un campo invalido (vacio, no numerico) no bloquea el guardado de los otros y conserva su valor anterior; el aviso identifica el campo rechazado.
+- El home page muestra el valor guardado inmediatamente despues de guardar, no un valor cacheado (verificar header `sg-f-cache`/`x-proxy-cache` en un entorno con SG Optimizer).
+- El Dynamic Tag "Precio (Tati Pilates)" aparece en el grupo "Tati Pilates" al abrir el selector de dynamic tags en el control Title de un widget Heading.
+- Seleccionar cada plan y cada Tipo (Referencia / Efectivo USD) en el tag renderiza el valor formateado correcto (`ref. X.XXX` o `$X`) en el preview del editor.
+- Con Elementor desactivado, wp-admin y el sitio cargan sin errores/warnings PHP.
+
+Check automatizado:
+
+```zsh
+php tests/pricing-config.php
+```
+
 ## Pre-release local
 
 Antes de publicar:
