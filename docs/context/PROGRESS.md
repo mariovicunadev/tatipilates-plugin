@@ -2,10 +2,10 @@
 
 ## Última sesión
 **Fecha:** 2026-08-26
-**Qué se hizo:** Se audito `1.3.0` y se corrigieron dos bordes de la gestion de precios: las entradas malformadas ya no se convierten silenciosamente y un fallo real de `update_option()` se informa como error sin purgar cache. Los avisos identifican plan y tipo, se corrigio el comentario obsoleto del hook de Elementor y se sincronizo el contexto operativo con la release estable. Se agrego una fuente estructurada y un generador verificable para `CHANGELOG.md`. Pasaron 61 checks funcionales, lint estatico, el smoke portal/PWA, la importacion/rollback contra WordPress real y el pre-release completo en WordPress 7.1.
+**Qué se hizo:** Se audito `1.3.0` y se corrigieron dos bordes de la gestion de precios: las entradas malformadas ya no se convierten silenciosamente y un fallo real de `update_option()` se informa como error sin purgar cache. Los avisos identifican plan y tipo, se corrigio el comentario obsoleto del hook de Elementor y se agrego una fuente estructurada con generador verificable para `CHANGELOG.md`. Pasaron 61 checks funcionales, lint estatico, el smoke portal/PWA, la importacion/rollback contra WordPress real y el pre-release completo en WordPress 7.1. Se publico `1.3.1-rc.1` en staging y `1.3.1` en stable; ambos tags, manifiestos, hashes y ZIP quedaron verificados contra `main`.
 
 ## Próximo paso inmediato
-- Preparar una nueva RC/patch de estas correcciones cuando el usuario autorice commit y release.
+- Confirmar `1.3.1` instalado mediante el updater en live y completar el binding manual de los widgets Heading de Elementor.
 
 ## Dudas / bloqueos abiertos
 - Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.

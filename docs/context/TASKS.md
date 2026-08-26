@@ -4,11 +4,11 @@
 - Ninguna tarea activa.
 
 ## Pendientes
-- [ ] Publicar las correcciones de auditoria de precios en una nueva RC/patch cuando el usuario autorice commit y release.
-- [ ] Confirmar `1.3.0` instalado desde el updater en live.
+- [ ] Confirmar `1.3.1` instalado desde el updater en live.
 - [ ] Bindear manualmente en Elementor los seis widgets Heading de `#precios` (ref. y USD) al nuevo Dynamic Tag `tp-precio` — a cargo del usuario, no del agente.
 
 ## Hechas
+- [x] Publicar y verificar `1.3.1-rc.1` en staging y promover `1.3.1` a stable con tags, manifiestos, hashes y contenido interno de los ZIP correctos.
 - [x] Corregir la validacion estricta de precios, el reporte de fallos de persistencia y la purga de cache; ampliar la regresion a 13 checks de precios y validar la suite completa en LocalWP.
 - [x] Publicar `1.3.0-rc.1` en staging y promover `1.3.0` a stable con la gestion de precios probada.
 - [x] Implementar y validar localmente `TP_Precios`: opcion `tp_precios_config`, pantalla admin `Precios` con precio de referencia y precio de efectivo USD manual por plan/clase, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo) y purga de cache SG Optimizer al guardar. Pruebas CLI en `tests/pricing-config.php` (13 checks).
