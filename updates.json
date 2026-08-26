@@ -3,13 +3,13 @@
   "repository": "mariovicunadev/tatipilates-plugin",
   "channels": {
     "staging": {
-      "version": "1.3.0-rc.1",
-      "tag": "v1.3.0-rc.1",
-      "asset": "tatipilates-1.3.0-rc.1.zip",
+      "version": "1.3.1-rc.1",
+      "tag": "v1.3.1-rc.1",
+      "asset": "tatipilates-1.3.1-rc.1.zip",
       "requires": "6.0",
       "tested": "7.1",
       "requires_php": "8.0",
-      "notes": "Gestion de precios: pantalla admin Precios (referencia + efectivo USD) y Dynamic Tag de Elementor tp-precio."
+      "notes": "Corrige la validacion y persistencia de precios, evita purgas de cache tras fallos y mejora los avisos administrativos."
     },
     "stable": {
       "version": "1.3.0",
