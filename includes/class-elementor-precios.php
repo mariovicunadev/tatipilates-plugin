@@ -1,10 +1,10 @@
 <?php
 /**
- * Exposes plugin-owned pricing to Elementor via a custom Dynamic Tag.
+ * Expone los precios del plugin a Elementor mediante un Dynamic Tag propio.
  *
- * Loaded only when Elementor is active (see the 'elementor/loaded' hook in
- * tatipilates.php) so this file is never parsed, and TP_Elementor_Precios
- * is never autoloaded, on a site without Elementor.
+ * La clase solo se carga cuando Elementor dispara
+ * 'elementor/dynamic_tags/register', por lo que un sitio sin Elementor no
+ * intenta resolver esta dependencia.
  *
  * @package TatiPilates
  */

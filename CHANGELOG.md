@@ -8,11 +8,30 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 - `MINOR`: funcionalidades nuevas.
 - `PATCH`: fixes y mejoras pequenas.
 
+<!-- Generado desde docs/releases/changelog.json mediante scripts/generate-changelog.php. -->
+
 ## [Unreleased]
+
+Sin cambios pendientes.
+
+## [1.3.1] - 2026-08-26
+
+### Fixed
+
+- Rechaza precios negativos, notacion cientifica y texto con digitos intercalados en vez de convertirlos silenciosamente.
+- Informa los fallos reales de persistencia de precios y evita purgar la cache cuando WordPress no pudo guardar la opcion.
+- Identifica el plan y el tipo de precio en los avisos de campos rechazados.
+
+## [1.3.0] - 2026-08-24
 
 ### Added
 
-- Agrega gestion de precios (`TP_Precios`) con pantalla de administracion `Tati Pilates > Precios`, valor de referencia y precio de efectivo USD manual por cada uno de los seis planes/clases, y un Dynamic Tag de Elementor (`tp-precio`) para consumirlos server-side sin editar la pagina. Purga la cache de SG Optimizer al guardar.
+- Agrega gestion de precios (`TP_Precios`) con pantalla de administracion `Tati Pilates > Precios`, valor de referencia y precio de efectivo USD manual por cada uno de los seis planes/clases, y un Dynamic Tag de Elementor (`tp-precio`) para consumirlos del lado del servidor sin editar la pagina. Purga la cache de SG Optimizer al guardar.
+
+## [1.2.7] - 2026-08-24
+
+### Added
+
 - Agrega lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
 - Agrega smoke test HTTP opcional para portal mobile/PWA mediante `TP_PORTAL_URL`.
 - Registra fallos de envio de email en eventos operativos visibles para administracion, sin guardar secretos ni correos completos.

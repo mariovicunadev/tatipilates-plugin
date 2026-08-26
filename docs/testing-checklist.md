@@ -199,7 +199,8 @@ sin agregar minificacion propia.
 
 - Los seis valores de referencia y los seis de efectivo USD persisten correctamente al guardar.
 - Un usuario sin `tp_manage_pilates` no puede leer ni modificar precios (probar con POST directo, no solo ocultando el menu).
-- Un campo invalido (vacio, no numerico) no bloquea el guardado de los otros y conserva su valor anterior; el aviso identifica el campo rechazado.
+- Un campo invalido (vacio, negativo, con letras o notacion cientifica) no bloquea el guardado de los otros y conserva su valor anterior; el aviso identifica el plan y el tipo rechazados.
+- Si WordPress no puede persistir la opcion, la pantalla informa el fallo, conserva los valores anteriores y no purga la cache.
 - El home page muestra el valor guardado inmediatamente despues de guardar, no un valor cacheado (verificar header `sg-f-cache`/`x-proxy-cache` en un entorno con SG Optimizer).
 - El Dynamic Tag "Precio (Tati Pilates)" aparece en el grupo "Tati Pilates" al abrir el selector de dynamic tags en el control Title de un widget Heading.
 - Seleccionar cada plan y cada Tipo (Referencia / Efectivo USD) en el tag renderiza el valor formateado correcto (`ref. X.XXX` o `$X`) en el preview del editor.

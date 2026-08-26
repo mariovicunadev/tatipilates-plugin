@@ -1,18 +1,20 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-08-24
-**Qué se hizo:** Se diseño y luego implemento localmente la gestion de precios: clase `TP_Precios` (opcion unica, sin tabla nueva), pantalla admin `Tati Pilates > Precios` con precio de referencia y precio de efectivo USD manual por cada uno de los seis planes/clases, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo, registrado en `elementor/dynamic_tags/register`) y purga de cache SG Optimizer al guardar. Se corrigio un bug real de orden de carga de hooks (ver DECISIONS.md, 2026-08-24) que impedia que el tag se registrara. 12 checks en `tests/pricing-config.php`, todos en verde; `devtatipilates.local` validado visualmente por el usuario. La migracion de los widgets de Elementor existentes queda a cargo del usuario (no del agente).
+**Fecha:** 2026-08-26
+**Qué se hizo:** Se audito `1.3.0` y se corrigieron dos bordes de la gestion de precios: las entradas malformadas ya no se convierten silenciosamente y un fallo real de `update_option()` se informa como error sin purgar cache. Los avisos identifican plan y tipo, se corrigio el comentario obsoleto del hook de Elementor y se sincronizo el contexto operativo con la release estable. Se agrego una fuente estructurada y un generador verificable para `CHANGELOG.md`. Pasaron 61 checks funcionales, lint estatico, el smoke portal/PWA, la importacion/rollback contra WordPress real y el pre-release completo en WordPress 7.1.
 
 ## Próximo paso inmediato
-- Publicar `-rc.1` a staging, probar con `docs/testing-checklist.md`, y promover a stable solo despues de confirmacion explicita del usuario.
+- Preparar una nueva RC/patch de estas correcciones cuando el usuario autorice commit y release.
 
 ## Dudas / bloqueos abiertos
 - Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.
+- La pantalla admin de Precios no se automatizo en navegador porque no habia una sesion autenticada disponible; la validacion HTTP y CLI de LocalWP si se completo.
 
 ## Historial
-(Resumen cronológico extraído del CHANGELOG.md — ver ese archivo para detalle completo)
+(Resumen cronologico operativo; ver `CHANGELOG.md` para el historial detallado publicado)
 
+- [2026-08-26, 1.3.1] - Se endurecio la validacion de precios y el manejo de fallos de persistencia/cache; el changelog paso a generarse desde una fuente estructurada.
 - [2026-08-24, Unreleased] - Se agrego gestion de precios (referencia + efectivo USD manual) con pantalla admin dedicada y Dynamic Tag propio de Elementor.
 - [2026-07-10, 1.2.6] - Se cifraron los campos medicos en reposo con clave de servidor, migracion idempotente y diagnostico administrativo.
 - [2026-07-09, 1.2.5] - Se agrego diagnostico visible del updater privado y comprobacion manual desde Configuracion.

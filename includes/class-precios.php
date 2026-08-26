@@ -154,25 +154,30 @@ class TP_Precios {
     }
 
     /**
-     * Normalizes raw form input for a single price field.
+     * Normaliza la entrada de un campo de precio.
      *
-     * Strips everything but digits (so both "40000" and "40.000" parse
-     * identically), then casts to a non-negative integer.
+     * Acepta enteros sin formato o grupos de miles consistentes con punto,
+     * coma o espacio. Cualquier signo, letra, decimal o agrupacion incompleta
+     * invalida el campo para evitar conversiones silenciosas.
      *
-     * @param mixed $valor Raw input.
-     * @return int|null Normalized value, or null when the input is empty/invalid.
+     * @param mixed $valor Entrada recibida del formulario.
+     * @return int|null Valor normalizado o null cuando la entrada es invalida.
      */
     private static function normalizar_valor($valor) {
         if (!is_scalar($valor)) {
             return null;
         }
 
-        $solo_digitos = preg_replace('/[^0-9]/', '', (string) $valor);
+        $entrada = trim((string) $valor);
 
-        if ('' === $solo_digitos) {
+        if (
+            '' === $entrada
+            || !preg_match('/^(?:[0-9]+|[0-9]{1,3}([., ])[0-9]{3}(?:\\1[0-9]{3})*)$/', $entrada)
+        ) {
             return null;
         }
 
+        $solo_digitos = str_replace(array('.', ',', ' '), '', $entrada);
         $entero = absint($solo_digitos);
 
         if ($entero > 999999999) {
@@ -212,13 +217,14 @@ class TP_Precios {
         }
 
         $guardado = update_option(self::OPCION_CONFIG, $config);
+        $ok       = (bool) $guardado || $config === $actual;
 
-        if (function_exists('sg_cachepress_purge_cache')) {
+        if ($ok && function_exists('sg_cachepress_purge_cache')) {
             sg_cachepress_purge_cache(home_url('/'));
         }
 
         return array(
-            'ok'         => (bool) $guardado || $config === $actual,
+            'ok'         => $ok,
             'rechazados' => $rechazados,
         );
     }

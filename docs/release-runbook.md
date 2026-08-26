@@ -19,7 +19,14 @@ git status
 git diff
 ```
 
-2. Confirmar que `CHANGELOG.md` describe la tanda.
+2. Actualizar `docs/releases/changelog.json`, regenerar y verificar el changelog:
+
+```zsh
+php scripts/generate-changelog.php
+php scripts/generate-changelog.php --check
+```
+
+No editar `CHANGELOG.md` manualmente.
 3. Confirmar que la regresion se ejecuto en el WordPress local.
 4. Correr pre-release local:
 
@@ -147,7 +154,7 @@ Confirmar version instalada.
 Para un fix pequeno:
 
 1. Corregir en local.
-2. Registrar en `CHANGELOG.md`.
+2. Registrar la correccion en `docs/releases/changelog.json` y regenerar `CHANGELOG.md`.
 3. Pre-release local.
 4. Commit/push.
 5. Publicar `x.y.z-rc.1` a staging.

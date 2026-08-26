@@ -117,7 +117,12 @@ git status
 git diff
 ```
 
-4. Log the change in `CHANGELOG.md`, normally under the `Unreleased` version.
+4. Registrar el cambio en `docs/releases/changelog.json`; luego regenerar y verificar `CHANGELOG.md`:
+
+```zsh
+php scripts/generate-changelog.php
+php scripts/generate-changelog.php --check
+```
 5. If the change is going to staging, bump the version in `tatipilates.php`.
 6. Run the pre-release check:
 

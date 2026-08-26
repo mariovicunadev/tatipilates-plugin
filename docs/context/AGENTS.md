@@ -32,7 +32,7 @@ No hacer commit ni push hasta que el usuario lo pida explícitamente.
 - Consultar SPEC.md antes de agregar features nuevas.
 - Al iniciar una tarea, leer `PROJECT.md`, `SPEC.md`, `ARCHITECTURE.md`, `DECISIONS.md`, `TASKS.md`, `PROGRESS.md` y `../../CHANGELOG.md`.
 - Tratar `CHANGELOG.md` como historial detallado y `PROGRESS.md` como resumen operativo.
-- Registrar cambios relevantes en `CHANGELOG.md` sin reescribir versiones publicadas.
+- Registrar cambios relevantes en `docs/releases/changelog.json` y regenerar `CHANGELOG.md` mediante `php scripts/generate-changelog.php`; no editar el archivo generado manualmente.
 - Preservar cambios locales existentes que no pertenezcan a la tarea.
 - No commitear `CONTEXTO.md`, `dev/`, `release/`, ZIPs, tokens ni credenciales.
 - No pegar ni solicitar tokens en chats; indicar cómo crear o rotar credenciales.

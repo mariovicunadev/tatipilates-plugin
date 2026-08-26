@@ -77,7 +77,7 @@
 **Decisión:** Guardar los backups automáticos en una ruta privada fuera de `ABSPATH`, configurable mediante `TP_BACKUP_DIR`, y servir archivos guardados solo mediante un handler administrativo autenticado.
 **Alternativas consideradas:** Mantenerlos cifrados dentro de uploads; depender de `.htaccess` o reglas específicas de Nginx.
 **Por qué se eligió esta:** Evita exposición estática sin cambiar el formato JSON ni depender del servidor web, y mantiene portabilidad y restauración de backups existentes.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -85,7 +85,7 @@
 **Decisión:** Permitir el seeder solo en `local` o `development` con `TP_ALLOW_DEMO_DATA=true`, generar credenciales aleatorias en cada ejecución y rotar cuentas demo detectadas durante upgrades de producción.
 **Alternativas consideradas:** Conservar contraseñas fijas; ocultar únicamente el botón; eliminar automáticamente todos los datos demo en producción.
 **Por qué se eligió esta:** Bloquea la ejecución en el dominio y el handler, elimina credenciales conocidas y neutraliza accesos existentes sin borrar información que requiera revisión humana.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -93,7 +93,7 @@
 **Decisión:** Definir `format_version: 2`, normalizar legacy v1 y ejecutar un contrato estricto completo antes de abrir la transacción de importación.
 **Alternativas consideradas:** Confiar en restricciones SQL; validar cada fila mientras se inserta; aceptar campos desconocidos para máxima flexibilidad.
 **Por qué se eligió esta:** Evita importaciones parciales, coerciones silenciosas y payloads futuros incompatibles, manteniendo soporte explícito para los backups existentes.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -101,7 +101,7 @@
 **Decisión:** Resolver el PAT mediante `TP_GITHUB_TOKEN`, con precedencia de constante sobre entorno, y conservar el valor de `wp_options` solo como fallback durante una version de transicion.
 **Alternativas consideradas:** Mantener el PAT en `wp_options`; cifrarlo con una clave gestionada por el mismo WordPress; exigir un corte inmediato sin fallback.
 **Por qué se eligió esta:** Reduce la exposicion ante volcados de base de datos, permite custodia operativa en el servidor y evita interrumpir actualizaciones existentes durante la migracion.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -117,7 +117,7 @@
 **Decisión:** Crear `tp_tatiana` como copia operativa de Admin Pilates y agregarle `tp_view_medical_data`, manteniendo a las asistentes en `tp_admin_pilates` sin acceso medico.
 **Alternativas consideradas:** Dar acceso medico a todo Admin Pilates; asignar una capability individual sin rol visible; usar administrator para Tatiana.
 **Por qué se eligió esta:** Hace explicita la diferencia entre propietaria y asistentes, conserva menor privilegio y evita otorgar a Tatiana capacidades nativas innecesarias de WordPress.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -125,7 +125,7 @@
 **Decisión:** Guardar `historia_medica`, `alergias` y `motivo_pilates` con Sodium usando `TP_DATA_ENCRYPTION_KEY` definida en `wp-config.php` o variable de entorno. La clave no se guarda en `wp_options` ni en el repositorio.
 **Alternativas consideradas:** Mantener texto plano con capability separada; guardar la clave en la configuracion de WordPress; cifrar backups solamente.
 **Por qué se eligió esta:** Protege ante volcados de base de datos y backups, mantiene menor privilegio y separa la custodia del secreto del almacenamiento de datos.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado
 
 ---
 
@@ -134,6 +134,6 @@
 **Alternativas consideradas:** Shortcodes (no se pueden bindear al control Title de los Heading widgets ya existentes sin migrarlos a otro tipo de widget); opciones nativas re-tipeadas a mano en Elementor (mantiene una copia duplicada, viola el requisito de fuente unica); fetch REST/JS en el navegador (agrega latencia y riesgo de SEO para contenido estatico sin beneficio real); widget custom tipo "Price List" (sobre-ingenieria para seis valores).
 **Por qué se eligió esta:** Los seis widgets Heading existentes en `#precios` ya soportan dynamic tags en su control Title; esta es la integracion de menor superficie que mantiene renderizado server-side, sin JS adicional y sin tocar el layout/CSS actual.
 **Nota de implementacion:** El primer intento registro el hook dentro de un listener de `elementor/loaded`, agregado desde el `plugins_loaded` de este plugin. Elementor dispara `elementor/loaded` desde su propio `plugins_loaded`, que corre antes que el nuestro (orden alfabetico de carga), asi que el listener siempre llegaba tarde y el tag nunca se registraba. Se corrigio enganchando `elementor/dynamic_tags/register` directamente — es seguro igual, porque Elementor solo dispara ese hook desde su propio codigo ya cargado, y nunca se dispara en un sitio sin Elementor.
-**Estado:** Vigente en local; pendiente de publicación
+**Estado:** Vigente y publicado en `1.3.0`
 
 ---

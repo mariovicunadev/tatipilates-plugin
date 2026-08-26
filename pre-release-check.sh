@@ -194,7 +194,16 @@ if [[ -d "release/tatipilates" ]]; then
   mark_warn 4 "Existe release/tatipilates/"
   exit_with_summary
 fi
-mark_pass 4 "No existe release/tatipilates/"
+
+changelog_output="$("$PHP_BIN" scripts/generate-changelog.php --check 2>&1)"
+if [[ $? -ne 0 ]]; then
+  echo "$changelog_output"
+  mark_fail 4 "CHANGELOG.md desactualizado"
+  exit_with_summary
+fi
+
+echo "$changelog_output"
+mark_pass 4 "Release temporal ausente y changelog vigente"
 
 echo "${BLUE}CHECK 5 — Version del plugin${RESET}"
 version="$(sed -nE 's/^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*([^[:space:]]+).*/\1/p' tatipilates.php | head -n 1)"

@@ -1,15 +1,17 @@
 # TASKS.md
 
 ## En progreso
-- [~] Revisar cambio local pendiente en `assets/css/tatipilates-portal.min.css` antes de preparar release.
+- Ninguna tarea activa.
 
 ## Pendientes
-- [ ] Verificar `1.2.6` instalado desde el updater en staging/live.
-- [ ] Probar Precios en staging (guardar valores, verificar purga de cache, confirmar el Dynamic Tag `tp-precio` en el editor de Elementor) antes de promover a stable.
+- [ ] Publicar las correcciones de auditoria de precios en una nueva RC/patch cuando el usuario autorice commit y release.
+- [ ] Confirmar `1.3.0` instalado desde el updater en live.
 - [ ] Bindear manualmente en Elementor los seis widgets Heading de `#precios` (ref. y USD) al nuevo Dynamic Tag `tp-precio` — a cargo del usuario, no del agente.
 
 ## Hechas
-- [x] Implementar y validar localmente `TP_Precios`: opcion `tp_precios_config`, pantalla admin `Precios` con precio de referencia y precio de efectivo USD manual por plan/clase, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo) y purga de cache SG Optimizer al guardar. Pruebas CLI en `tests/pricing-config.php` (12 checks).
+- [x] Corregir la validacion estricta de precios, el reporte de fallos de persistencia y la purga de cache; ampliar la regresion a 13 checks de precios y validar la suite completa en LocalWP.
+- [x] Publicar `1.3.0-rc.1` en staging y promover `1.3.0` a stable con la gestion de precios probada.
+- [x] Implementar y validar localmente `TP_Precios`: opcion `tp_precios_config`, pantalla admin `Precios` con precio de referencia y precio de efectivo USD manual por plan/clase, Dynamic Tag de Elementor `tp-precio` (controles Plan/Tipo) y purga de cache SG Optimizer al guardar. Pruebas CLI en `tests/pricing-config.php` (13 checks).
 - [x] Agregar lint JS/CSS/YAML al pre-release sin minificar assets del plugin.
 - [x] Añadir smoke test HTTP opcional de portal/PWA mobile mediante `TP_PORTAL_URL`.
 - [x] Registrar fallos de email como eventos operativos visibles para administracion.

@@ -12,6 +12,7 @@ define('ABSPATH', __DIR__ . '/');
 
 $tp_precios_test_options = array();
 $tp_precios_test_purge_calls = array();
+$tp_precios_test_update_failure = false;
 
 /**
  * Reads a test option.
@@ -35,7 +36,11 @@ function get_option($name, $default = false) {
  * @return bool
  */
 function update_option($name, $value) {
-    global $tp_precios_test_options;
+    global $tp_precios_test_options, $tp_precios_test_update_failure;
+
+    if ($tp_precios_test_update_failure) {
+        return false;
+    }
 
     $changed = !array_key_exists($name, $tp_precios_test_options) || $tp_precios_test_options[$name] !== $value;
     $tp_precios_test_options[$name] = $value;
@@ -158,11 +163,17 @@ try {
         TP_Precios::guardar_configuracion(
             array_merge(
                 TP_Precios::configuracion_default(),
-                array('clase_mat' => '3.200')
+                array(
+                    'clase_mat'        => '3.200',
+                    'plan_2x'          => '40,000',
+                    'plan_3x'          => '48 000',
+                )
             )
         );
 
         tp_precios_test_assert(3200 === TP_Precios::obtener('clase_mat'), 'El separador de miles tipeado a mano no se normalizo.');
+        tp_precios_test_assert(40000 === TP_Precios::obtener('plan_2x'), 'El separador de miles con coma no se normalizo.');
+        tp_precios_test_assert(48000 === TP_Precios::obtener('plan_3x'), 'El separador de miles con espacio no se normalizo.');
     };
 
     $checks['invalid_field_falls_back_without_blocking_others'] = function () use (&$tp_precios_test_options) {
@@ -185,7 +196,7 @@ try {
         tp_precios_test_assert(55000 === TP_Precios::obtener('plan_3x'), 'plan_3x valido no se guardo pese al rechazo de otro campo.');
     };
 
-    $checks['negative_and_non_numeric_input_falls_back'] = function () use (&$tp_precios_test_options) {
+    $checks['malformed_input_falls_back'] = function () use (&$tp_precios_test_options) {
         $tp_precios_test_options = array(
             TP_Precios::OPCION_CONFIG => TP_Precios::configuracion_default(),
         );
@@ -196,13 +207,40 @@ try {
                 array(
                     'clase_individual' => '-500',
                     'clase_mat'        => 'no-es-numero',
+                    'plan_2x'          => 'abc123',
+                    'plan_3x'          => '1e3',
                 )
             )
         );
 
+        tp_precios_test_assert(in_array('clase_individual', $resultado['rechazados'], true), 'Un valor negativo debio quedar rechazado.');
         tp_precios_test_assert(in_array('clase_mat', $resultado['rechazados'], true), 'Texto no numerico debio quedar rechazado.');
+        tp_precios_test_assert(in_array('plan_2x', $resultado['rechazados'], true), 'Texto con digitos intercalados debio quedar rechazado.');
+        tp_precios_test_assert(in_array('plan_3x', $resultado['rechazados'], true), 'La notacion cientifica debio quedar rechazada.');
+        tp_precios_test_assert(8000 === TP_Precios::obtener('clase_individual'), 'El valor negativo no conservo el precio anterior.');
         tp_precios_test_assert(3200 === TP_Precios::obtener('clase_mat'), 'clase_mat invalida no conservo el valor anterior.');
-        tp_precios_test_assert(500 === TP_Precios::obtener('clase_individual'), 'Un signo negativo debe normalizarse a su valor absoluto, no rechazarse.');
+        tp_precios_test_assert(40000 === TP_Precios::obtener('plan_2x'), 'El texto con digitos no conservo el precio anterior.');
+        tp_precios_test_assert(48000 === TP_Precios::obtener('plan_3x'), 'La notacion cientifica no conservo el precio anterior.');
+    };
+
+    $checks['storage_failure_is_reported_without_purging_cache'] = function () use (&$tp_precios_test_options, &$tp_precios_test_update_failure) {
+        global $tp_precios_test_purge_calls;
+
+        $tp_precios_test_options = array(
+            TP_Precios::OPCION_CONFIG => TP_Precios::configuracion_default(),
+        );
+        $tp_precios_test_purge_calls = array();
+        $tp_precios_test_update_failure = true;
+
+        $config = TP_Precios::configuracion_default();
+        $config['plan_2x'] = '45000';
+        $resultado = TP_Precios::guardar_configuracion($config);
+
+        $tp_precios_test_update_failure = false;
+
+        tp_precios_test_assert(false === $resultado['ok'], 'El fallo de persistencia debio reportarse.');
+        tp_precios_test_assert(40000 === TP_Precios::obtener('plan_2x'), 'El fallo de persistencia altero el valor guardado.');
+        tp_precios_test_assert(array() === $tp_precios_test_purge_calls, 'No se debe purgar cache cuando falla la persistencia.');
     };
 
     $checks['save_purges_sg_optimizer_cache'] = function () use (&$tp_precios_test_options) {

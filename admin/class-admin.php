@@ -755,11 +755,18 @@ class TP_Admin {
         } else {
             $resultado = TP_Precios::guardar_configuracion($_POST);
 
-            if (!empty($resultado['rechazados'])) {
+            if (empty($resultado['ok'])) {
+                $args['tp_error'] = rawurlencode('No se pudieron guardar los precios. Intenta nuevamente.');
+            } elseif (!empty($resultado['rechazados'])) {
                 $etiquetas  = TP_Precios::etiquetas();
                 $nombres    = array_map(
                     static function ($clave) use ($etiquetas) {
-                        return isset($etiquetas[$clave]) ? $etiquetas[$clave] : $clave;
+                        $es_usd    = '_usd' === substr($clave, -4);
+                        $plan      = $es_usd ? substr($clave, 0, -4) : $clave;
+                        $etiqueta  = isset($etiquetas[$plan]) ? $etiquetas[$plan] : $plan;
+                        $tipo      = $es_usd ? 'Efectivo USD' : 'Referencia';
+
+                        return sprintf('%1$s (%2$s)', $etiqueta, $tipo);
                     },
                     $resultado['rechazados']
                 );
