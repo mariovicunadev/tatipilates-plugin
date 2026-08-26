@@ -4,10 +4,11 @@
 - Ninguna tarea activa.
 
 ## Pendientes
-- [ ] Confirmar `1.3.1` instalado desde el updater en live.
-- [ ] Bindear manualmente en Elementor los seis widgets Heading de `#precios` (ref. y USD) al nuevo Dynamic Tag `tp-precio` — a cargo del usuario, no del agente.
+- Ninguna tarea pendiente.
 
 ## Hechas
+- [x] Confirmar `1.3.1` instalado desde el updater en live.
+- [x] Bindear en Elementor los seis widgets Heading de `#precios` (ref. y USD) al Dynamic Tag `tp-precio`.
 - [x] Publicar y verificar `1.3.1-rc.1` en staging y promover `1.3.1` a stable con tags, manifiestos, hashes y contenido interno de los ZIP correctos.
 - [x] Corregir la validacion estricta de precios, el reporte de fallos de persistencia y la purga de cache; ampliar la regresion a 13 checks de precios y validar la suite completa en LocalWP.
 - [x] Publicar `1.3.0-rc.1` en staging y promover `1.3.0` a stable con la gestion de precios probada.
