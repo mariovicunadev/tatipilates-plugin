@@ -1319,6 +1319,18 @@ body.wp-admin {
     min-height: 82px;
 }
 
+.tp-alumnas-page .tp-birthdate-selects {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.3fr;
+    gap: 6px;
+}
+
+.tp-alumnas-page .tp-birthdate-selects select {
+    min-height: 40px;
+    min-width: 0;
+    max-width: 100%;
+}
+
 .tp-alumnas-page .tp-field-checkbox {
     display: inline-grid;
     grid-template-columns: auto 1fr;

@@ -12,7 +12,9 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 
 ## [Unreleased]
 
-Sin cambios pendientes.
+### Changed
+
+- Reemplaza el calendario de fecha de nacimiento e inicio en Pilates en el formulario de alumnas por selectores de dia, mes y ano para registrar sin navegar mes por mes.
 
 ## [1.3.1] - 2026-08-26
 

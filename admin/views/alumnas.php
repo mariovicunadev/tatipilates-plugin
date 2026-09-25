@@ -572,15 +572,25 @@ if ($ficha) {
                     <strong><?php echo esc_html__('Activo', 'tatipilates'); ?></strong>
                 </label>
 
-                <label class="tp-field tp-field-date">
-                    <span><?php echo esc_html__('Fecha de nacimiento', 'tatipilates'); ?></span>
-                    <input type="date" name="fecha_nacimiento" value="<?php echo esc_attr($editando ? $editando->fecha_nacimiento : ''); ?>">
-                </label>
+                <?php
+                $tp_date_field = array(
+                    'name'      => 'fecha_nacimiento',
+                    'label'     => __('Fecha de nacimiento', 'tatipilates'),
+                    'value'     => $editando && !empty($editando->fecha_nacimiento) ? (string) $editando->fecha_nacimiento : '',
+                    'max_years' => 100,
+                );
+                include TP_PLUGIN_DIR . 'admin/views/partials/date-selects.php';
+                ?>
 
-                <label class="tp-field tp-field-date">
-                    <span><?php echo esc_html__('Inicio en Pilates', 'tatipilates'); ?></span>
-                    <input type="date" name="fecha_inicio_pilates" value="<?php echo esc_attr($editando ? $editando->fecha_inicio_pilates : gmdate('Y-m-d', current_time('timestamp'))); ?>">
-                </label>
+                <?php
+                $tp_date_field = array(
+                    'name'      => 'fecha_inicio_pilates',
+                    'label'     => __('Inicio en Pilates', 'tatipilates'),
+                    'value'     => $editando ? (string) $editando->fecha_inicio_pilates : gmdate('Y-m-d', current_time('timestamp')),
+                    'max_years' => 40,
+                );
+                include TP_PLUGIN_DIR . 'admin/views/partials/date-selects.php';
+                ?>
 
                 <?php if ($puede_ver_datos_medicos) : ?>
                     <label class="tp-field tp-field-medical">

@@ -244,6 +244,16 @@ class TP_Admin {
             array(),
             file_exists($admin_css) ? filemtime($admin_css) : TP_VERSION
         );
+
+        $birthdate_js = TP_PLUGIN_DIR . 'assets/js/admin-birthdate.js';
+
+        wp_enqueue_script(
+            'tatipilates-admin-birthdate',
+            TP_PLUGIN_URL . 'assets/js/admin-birthdate.js',
+            array(),
+            file_exists($birthdate_js) ? filemtime($birthdate_js) : TP_VERSION,
+            true
+        );
     }
 
     /**
