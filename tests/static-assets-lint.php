@@ -71,13 +71,35 @@ function tp_static_lint_common($path, $contents) {
 }
 
 /**
+ * Comando portable para localizar un ejecutable (Windows o POSIX).
+ *
+ * @param string $bin Nombre del ejecutable.
+ * @return string
+ */
+function tp_static_lint_which($bin) {
+    return ('Windows' === PHP_OS_FAMILY) ? 'where ' . $bin . ' 2>NUL' : 'command -v ' . $bin . ' 2>/dev/null';
+}
+
+/**
+ * Primera ruta devuelta por tp_static_lint_which().
+ *
+ * @param string $bin Nombre del ejecutable.
+ * @return string
+ */
+function tp_static_lint_find($bin) {
+    $lines = preg_split('/\R/', trim((string) shell_exec(tp_static_lint_which($bin))));
+
+    return trim((string) $lines[0]);
+}
+
+/**
  * Validates JavaScript syntax with Node when available.
  *
  * @param array<int,string> $files JS files.
  * @return void
  */
 function tp_static_lint_js($files) {
-    $node = trim((string) shell_exec('command -v node 2>/dev/null'));
+    $node = tp_static_lint_find('node');
 
     if ('' === $node) {
         tp_static_lint_fail('Node.js no esta disponible para validar JavaScript.');
@@ -87,7 +109,7 @@ function tp_static_lint_js($files) {
         $contents = file_get_contents($file);
         tp_static_lint_common($file, false === $contents ? '' : $contents);
 
-        $command = escapeshellcmd($node) . ' --check ' . escapeshellarg($file) . ' 2>&1';
+        $command = escapeshellarg($node) . ' --check ' . escapeshellarg($file) . ' 2>&1';
         exec($command, $output, $status);
 
         if (0 !== $status) {
@@ -145,7 +167,7 @@ function tp_static_lint_css($files) {
  * @return void
  */
 function tp_static_lint_yaml($files) {
-    $ruby = trim((string) shell_exec('command -v ruby 2>/dev/null'));
+    $ruby = tp_static_lint_find('ruby');
 
     if ('' === $ruby) {
         tp_static_lint_fail('Ruby no esta disponible para validar YAML.');
@@ -155,7 +177,7 @@ function tp_static_lint_yaml($files) {
         $contents = file_get_contents($file);
         tp_static_lint_common($file, false === $contents ? '' : $contents);
 
-        $command = escapeshellcmd($ruby) . ' -e ' . escapeshellarg('require "yaml"; YAML.load_file(ARGV[0])') . ' ' . escapeshellarg($file) . ' 2>&1';
+        $command = escapeshellarg($ruby) . ' -e ' . escapeshellarg("require 'yaml'; YAML.load_file(ARGV[0])") . ' ' . escapeshellarg($file) . ' 2>&1';
         exec($command, $output, $status);
 
         if (0 !== $status) {
