@@ -12,7 +12,7 @@ Las reglas completas del proyecto están en `docs/context/AGENTS.md`: leerlo al 
 ## Flujo de trabajo: local -> live (no hay staging)
 
 1. Hacer el cambio en el repo y probarlo en `devtatipilates.local` (desktop y mobile si toca UI).
-2. Registrar el cambio en `docs/releases/changelog.json` y regenerar con `php scripts/generate-changelog.php`; nunca editar `CHANGELOG.md` a mano.
+2. Registrar el cambio en `docs/releases/changelog.json` (en `unreleased`) y regenerar con `php scripts/generate-changelog.php`; nunca editar `CHANGELOG.md` a mano. Antes de publicar, mover esas entradas a una release nueva con la versión y fecha a publicar y dejar `unreleased` vacío: `release.ps1` lo exige.
 3. `.\pre-release-check.ps1 -Yes` (con `$env:TP_PORTAL_URL='http://devtatipilates.local/mi-pilates'`).
 4. Commit (Conventional Commits en inglés) y `git push origin main`, **solo cuando el usuario lo pida**.
 5. `.\release.ps1 -Channel stable -Version X.Y.Z` publica en live; el sitio live lo ve como actualización en wp-admin.

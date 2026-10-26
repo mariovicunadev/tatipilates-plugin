@@ -32,7 +32,10 @@ php scripts/generate-changelog.php
 php scripts/generate-changelog.php --check
 ```
 
-No editar `CHANGELOG.md` manualmente.
+No editar `CHANGELOG.md` manualmente. Mientras se trabaja, las entradas van en
+`unreleased`; antes de promover, moverlas a una release nueva al inicio de
+`releases` (`version` y `date` de la version a publicar) y dejar `unreleased`
+vacio (`{}`). `release.ps1 -Channel stable` se niega a publicar si no esta asi.
 3. Confirmar que la regresion se ejecuto en el WordPress local.
 4. Correr pre-release local:
 

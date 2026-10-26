@@ -26,6 +26,15 @@ $behind = git rev-list --count HEAD..origin/main
 if ([int]$ahead -gt 0) { throw "Tienes $ahead commit(s) sin pushear. Ejecuta: git push origin main" }
 if ([int]$behind -gt 0) { throw "origin/main tiene $behind commit(s) que no tienes. Ejecuta: git pull" }
 
+# Stable exige el changelog cerrado: la version ya registrada y nada en "unreleased".
+if ($Channel -eq "stable") {
+  $changelog = Get-Content docs\releases\changelog.json -Raw -Encoding UTF8 | ConvertFrom-Json
+  $pendientes = @($changelog.unreleased.PSObject.Properties).Count
+  if ($pendientes -gt 0 -or $changelog.releases[0].version -ne $Version) {
+    throw "docs/releases/changelog.json debe tener v$Version como primera release y 'unreleased' vacio. Mueve las entradas, regenera con php scripts/generate-changelog.php, commitea y pushea."
+  }
+}
+
 $workflow = if ($Channel -eq "staging") { "publish-staging-release.yml" } else { "promote-stable-release.yml" }
 if (-not $Notes) { $Notes = if ($Channel -eq "staging") { "Release candidate para pruebas en staging." } else { "Version aprobada para live." } }
 
@@ -38,6 +47,9 @@ $run = gh run list --workflow $workflow --limit 1 --json databaseId --jq '.[0].d
 Write-Host "Workflow en ejecucion (run $run). Esperando resultado..."
 gh run watch $run --exit-status
 if ($LASTEXITCODE -eq 0) {
-  git pull --ff-only
+  # git escribe el progreso en stderr; con "Stop" PowerShell lo trataria como error.
+  $ErrorActionPreference = "Continue"
+  git pull --ff-only 2>&1 | Out-Host
+  if ($LASTEXITCODE -ne 0) { Write-Host "El workflow paso pero git pull --ff-only fallo. Ejecutalo a mano." -ForegroundColor Yellow; exit 1 }
   Write-Host "Listo: v$Version publicada en $Channel. Los sitios la veran al consultar updates.json." -ForegroundColor Green
 } else { Write-Host "El workflow fallo. Revisa: gh run view $run --log-failed" -ForegroundColor Red; exit 1 }

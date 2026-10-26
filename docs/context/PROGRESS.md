@@ -2,19 +2,20 @@
 
 ## Última sesión
 **Fecha:** 2026-10-26
-**Qué se hizo:** La pantalla de Precios acepta decimales libres (coma o punto decimal) y los conserva tal cual se tipean (`8,5`, `8,50`, `1,2345`); un unico separador seguido de exactamente tres digitos sigue siendo miles (`3.200` = 3200, `8,555` = 8555), salvo con parte entera 0 (`0,555`). `TP_Precios` guarda cadenas numericas canonicas (`"1234.50"`) y lee sin cambios las opciones enteras/float previas. `tests/pricing-config.php` pasa 18 checks; se verifico guardado en wp-admin y render en la seccion publica de LocalWP. Sin publicar ni commitear.
+**Qué se hizo:** La pantalla de Precios acepta decimales libres (coma o punto decimal) y los conserva tal cual se tipean (`8,5`, `8,50`, `1,2345`); un unico separador seguido de exactamente tres digitos sigue siendo miles (`3.200` = 3200, `8,555` = 8555), salvo con parte entera 0 (`0,555`). `TP_Precios` guarda cadenas numericas canonicas (`"1234.50"`) y lee sin cambios las opciones enteras/float previas. `tests/pricing-config.php` pasa 18 checks; se verifico guardado en wp-admin y render en la seccion publica de LocalWP. Publicado como `1.3.3` en stable (tag, ZIP y `updates.json` verificados). Ademas se ordeno el changelog (`1.3.2` y `1.3.3` salen de `unreleased`), `release.ps1` exige el changelog cerrado antes de publicar en stable y ya no reporta un falso error cuando `git pull` escribe en stderr.
 
 ## Próximo paso inmediato
-- Confirmar `1.3.1` instalado mediante el updater en live y completar el binding manual de los widgets Heading de Elementor.
+- Confirmar `1.3.3` instalado mediante el updater en live y que `#precios` muestre los valores del Dynamic Tag (si en live aun falta el binding manual de los widgets Heading de Elementor, completarlo).
+- Nada pendiente en el repo: `main` limpio y sincronizado con `origin`.
 
 ## Dudas / bloqueos abiertos
 - Mantener respaldadas las claves `TP_DATA_ENCRYPTION_KEY` por ambiente; sin la clave correcta, los campos medicos cifrados no son recuperables.
-- La pantalla admin de Precios no se automatizo en navegador porque no habia una sesion autenticada disponible; la validacion HTTP y CLI de LocalWP si se completo.
 
 ## Historial
 (Resumen cronologico operativo; ver `CHANGELOG.md` para el historial detallado publicado)
 
-- [2026-10-26, Unreleased] - Los precios de referencia y USD aceptan decimales libres, conservados tal cual se escriben.
+- [2026-10-26, 1.3.3] - Los precios de referencia y USD aceptan decimales libres, conservados tal cual se escriben.
+- [2026-09-25, 1.3.2] - Selectores de dia, mes y ano para fecha de nacimiento e inicio en Pilates.
 - [2026-08-26, 1.3.1] - Se endurecio la validacion de precios y el manejo de fallos de persistencia/cache; el changelog paso a generarse desde una fuente estructurada.
 - [2026-08-24, Unreleased] - Se agrego gestion de precios (referencia + efectivo USD manual) con pantalla admin dedicada y Dynamic Tag propio de Elementor.
 - [2026-07-10, 1.2.6] - Se cifraron los campos medicos en reposo con clave de servidor, migracion idempotente y diagnostico administrativo.
