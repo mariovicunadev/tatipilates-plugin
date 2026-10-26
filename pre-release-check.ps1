@@ -14,6 +14,16 @@ if (-not $php) {
 }
 if (-not $php) { $php = (Get-Command php -ErrorAction SilentlyContinue).Source }
 
+# Sin el php.ini del sitio, el PHP de Local no carga curl y el smoke HTTP falla con "HTTP 0".
+if (-not $env:PHPRC) {
+  $sitesFile = "$env:APPDATA\Local\sites.json"
+  if (Test-Path $sitesFile) {
+    $site = (Get-Content $sitesFile -Raw | ConvertFrom-Json).PSObject.Properties.Value | Where-Object { $_.domain -eq "devtatipilates.local" } | Select-Object -First 1
+    $conf = if ($site) { "$env:APPDATA\Local\run\$($site.id)\conf\php" }
+    if ($conf -and (Test-Path "$conf\php.ini")) { $env:PHPRC = $conf }
+  }
+}
+
 $names = "Sintaxis PHP", "BOM UTF-8", "Debug code", "Release desactualizado", "Version del plugin", "Compatibilidad WordPress", "Lint JS/CSS/YAML", "Smoke portal/PWA"
 $results = @{}
 
