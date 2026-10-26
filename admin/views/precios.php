@@ -64,9 +64,9 @@ $grupo_individual = array('clase_individual', 'clase_mat');
                                             <span class="tp-precio-prefijo">ref.</span>
                                             <input
                                                 type="text"
-                                                inputmode="numeric"
+                                                inputmode="decimal"
                                                 name="<?php echo esc_attr($clave); ?>"
-                                                value="<?php echo esc_attr(number_format((int) $precios[$clave], 0, ',', '.')); ?>"
+                                                value="<?php echo esc_attr(TP_Precios::formatear_numero($precios[$clave])); ?>"
                                             >
                                         </span>
                                     </label>
@@ -76,9 +76,9 @@ $grupo_individual = array('clase_individual', 'clase_mat');
                                             <span class="tp-precio-prefijo">$</span>
                                             <input
                                                 type="text"
-                                                inputmode="numeric"
+                                                inputmode="decimal"
                                                 name="<?php echo esc_attr($clave_usd); ?>"
-                                                value="<?php echo esc_attr(number_format((int) $precios[$clave_usd], 0, ',', '.')); ?>"
+                                                value="<?php echo esc_attr(TP_Precios::formatear_numero($precios[$clave_usd])); ?>"
                                             >
                                         </span>
                                     </label>
@@ -99,9 +99,9 @@ $grupo_individual = array('clase_individual', 'clase_mat');
                                             <span class="tp-precio-prefijo">ref.</span>
                                             <input
                                                 type="text"
-                                                inputmode="numeric"
+                                                inputmode="decimal"
                                                 name="<?php echo esc_attr($clave); ?>"
-                                                value="<?php echo esc_attr(number_format((int) $precios[$clave], 0, ',', '.')); ?>"
+                                                value="<?php echo esc_attr(TP_Precios::formatear_numero($precios[$clave])); ?>"
                                             >
                                         </span>
                                     </label>
@@ -111,9 +111,9 @@ $grupo_individual = array('clase_individual', 'clase_mat');
                                             <span class="tp-precio-prefijo">$</span>
                                             <input
                                                 type="text"
-                                                inputmode="numeric"
+                                                inputmode="decimal"
                                                 name="<?php echo esc_attr($clave_usd); ?>"
-                                                value="<?php echo esc_attr(number_format((int) $precios[$clave_usd], 0, ',', '.')); ?>"
+                                                value="<?php echo esc_attr(TP_Precios::formatear_numero($precios[$clave_usd])); ?>"
                                             >
                                         </span>
                                     </label>

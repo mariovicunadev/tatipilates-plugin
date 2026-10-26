@@ -1,8 +1,8 @@
 # PROGRESS.md
 
 ## Última sesión
-**Fecha:** 2026-08-26
-**Qué se hizo:** Se audito `1.3.0` y se corrigieron dos bordes de la gestion de precios: las entradas malformadas ya no se convierten silenciosamente y un fallo real de `update_option()` se informa como error sin purgar cache. Los avisos identifican plan y tipo, se corrigio el comentario obsoleto del hook de Elementor y se agrego una fuente estructurada con generador verificable para `CHANGELOG.md`. Pasaron 61 checks funcionales, lint estatico, el smoke portal/PWA, la importacion/rollback contra WordPress real y el pre-release completo en WordPress 7.1. Se publico `1.3.1-rc.1` en staging y `1.3.1` en stable; ambos tags, manifiestos, hashes y ZIP quedaron verificados contra `main`.
+**Fecha:** 2026-10-26
+**Qué se hizo:** La pantalla de Precios acepta decimales libres (coma o punto decimal) y los conserva tal cual se tipean (`8,5`, `8,50`, `1,2345`); un unico separador seguido de exactamente tres digitos sigue siendo miles (`3.200` = 3200, `8,555` = 8555), salvo con parte entera 0 (`0,555`). `TP_Precios` guarda cadenas numericas canonicas (`"1234.50"`) y lee sin cambios las opciones enteras/float previas. `tests/pricing-config.php` pasa 18 checks; se verifico guardado en wp-admin y render en la seccion publica de LocalWP. Sin publicar ni commitear.
 
 ## Próximo paso inmediato
 - Confirmar `1.3.1` instalado mediante el updater en live y completar el binding manual de los widgets Heading de Elementor.
@@ -14,6 +14,7 @@
 ## Historial
 (Resumen cronologico operativo; ver `CHANGELOG.md` para el historial detallado publicado)
 
+- [2026-10-26, Unreleased] - Los precios de referencia y USD aceptan decimales libres, conservados tal cual se escriben.
 - [2026-08-26, 1.3.1] - Se endurecio la validacion de precios y el manejo de fallos de persistencia/cache; el changelog paso a generarse desde una fuente estructurada.
 - [2026-08-24, Unreleased] - Se agrego gestion de precios (referencia + efectivo USD manual) con pantalla admin dedicada y Dynamic Tag propio de Elementor.
 - [2026-07-10, 1.2.6] - Se cifraron los campos medicos en reposo con clave de servidor, migracion idempotente y diagnostico administrativo.

@@ -15,6 +15,7 @@ El formato sigue la idea de Keep a Changelog y las versiones usan semver:
 ### Changed
 
 - Reemplaza el calendario de fecha de nacimiento e inicio en Pilates en el formulario de alumnas por selectores de dia, mes y ano para registrar sin navegar mes por mes.
+- Acepta precios con decimales en `Tati Pilates > Precios` (coma o punto decimal) y los conserva exactamente como se escriben: `8,5`, `8,50` y `1,2345` se guardan y se muestran tal cual. Los miles ya aceptados se interpretan igual que antes (`3.200` sigue siendo 3200).
 
 ## [1.3.1] - 2026-08-26
 
