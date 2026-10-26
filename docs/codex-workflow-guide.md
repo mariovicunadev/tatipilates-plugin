@@ -35,10 +35,8 @@ Checklist de pruebas antes de publicar una version. Deberia cubrir:
 Guia paso a paso para publicar:
 
 - Como cerrar una tanda local.
-- Como crear release candidate.
-- Como actualizar staging.
+- Como probar en devtatipilates.local.
 - Como promover a stable.
-- Que hacer si staging falla.
 - Que hacer si live no detecta update.
 
 3. `docs/security-checklist.md`
@@ -141,8 +139,8 @@ Workflow:
 - No hagas commit ni push hasta que yo lo pida.
 - Registra cambios relevantes en CHANGELOG.md.
 - Mantene fuera del repo credenciales, release/, dev/, CONTEXTO.md y ZIPs.
-- Antes de cerrar una tanda para staging, correr ./pre-release-check.sh --yes.
-- Para publicar updates, usar los canales staging/stable documentados en docs/updater-workflow.md.
+- Antes de cerrar una tanda, correr ./pre-release-check.sh --yes y probar en devtatipilates.local.
+- Para publicar updates, promover directo al canal stable (ver docs/release-runbook.md); no hay staging en el flujo normal.
 
 Objetivo de este chat:
 [describir aqui el cambio o bug]
@@ -174,11 +172,11 @@ Restricciones:
 2. Pegar el prompt base.
 3. Describir el cambio o bug.
 4. Pedir que no se haga commit hasta revisar.
-5. Probar en local o staging.
+5. Probar en local (`devtatipilates.local`, enlazado al repo por junction).
 6. Cuando este listo, pedir:
 
 ```text
-Listo para staging. Corre pre-release, commit, push y publica release candidate.
+Listo para publicar. Corre pre-release, commit, push y promueve a stable.
 ```
 
 7. Codex deberia:
@@ -187,16 +185,9 @@ Listo para staging. Corre pre-release, commit, push y publica release candidate.
 - actualizar `CHANGELOG.md`;
 - generar ZIP si corresponde;
 - hacer commit y push;
-- publicar `1.x.x-rc.1` al canal `staging`.
+- promover `1.x.x` al canal `stable`.
 
-8. Probar staging.
-9. Si todo esta bien, pedir:
-
-```text
-Promover 1.x.x a stable.
-```
-
-10. Live detectara la version final desde WordPress.
+8. Live detectara la version final desde WordPress.
 
 ## Versionado recomendado
 
@@ -204,14 +195,7 @@ Promover 1.x.x a stable.
 - Feature nueva: subir minor. Ejemplo: `1.1.1` a `1.2.0`.
 - Cambio incompatible o migracion grande: subir major. Ejemplo: `1.1.1` a `2.0.0`.
 
-Para staging usar siempre:
-
-```text
-1.2.0-rc.1
-1.2.0-rc.2
-```
-
-Para live usar:
+Para live usar version final:
 
 ```text
 1.2.0
@@ -222,8 +206,8 @@ Para live usar:
 - No pegar tokens en chats.
 - No subir `CONTEXTO.md`.
 - No subir ZIPs de `release/`.
-- No tocar staging/live manualmente sin replicarlo en Git.
-- No promover a `stable` sin probar staging.
+- No tocar live manualmente sin replicarlo en Git.
+- No promover a `stable` sin probar en `devtatipilates.local`.
 - No hacer commit hasta que la tanda este revisada.
 - Mantener `CHANGELOG.md` al dia.
 - Usar GitHub Actions para publicar y promover releases.
@@ -246,10 +230,9 @@ Nuevo chat
 -> prompt base
 -> cambios locales
 -> revisar
+-> probar en devtatipilates.local
 -> pre-release
 -> commit/push
--> Publish staging release: 1.x.x-rc.1
--> probar staging
 -> Promote stable release: 1.x.x
 -> actualizar live desde WordPress
 ```

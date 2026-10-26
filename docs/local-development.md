@@ -153,6 +153,9 @@ Si un cambio visual no aparece:
 
 ## Flujo local recomendado
 
+Desde 2026-10-23 no hay staging: se prueba en LocalWP y se promueve directo a
+stable (ver `docs/release-runbook.md`).
+
 ```text
 Editar
 -> probar LocalWP
@@ -160,5 +163,5 @@ Editar
 -> actualizar CHANGELOG.md
 -> pre-release
 -> commit/push
--> publish staging release
+-> promote stable release
 ```

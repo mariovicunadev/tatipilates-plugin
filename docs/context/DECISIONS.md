@@ -21,7 +21,7 @@
 **Decisión:** `staging` consume versiones `-rc.N` y `stable` consume versiones finales mediante `updates.json` y GitHub Releases.
 **Alternativas consideradas:** Subir ZIP manualmente siempre; desplegar cada push a `main`; usar un único canal.
 **Por qué se eligió esta:** Separa validación y producción, conserva rollback por release y evita publicar cambios sin probar.
-**Estado:** Vigente
+**Estado:** Superseded por la decisión de 2026-10-23 (ya no es obligatorio pasar por staging); el canal sigue existiendo como opción.
 
 ---
 
@@ -137,3 +137,9 @@
 **Estado:** Vigente y publicado en `1.3.0`
 
 ---
+
+## [2026-10-23] Eliminar staging como paso obligatorio del flujo de release
+**Decisión:** El repo (`D:\Proyectos\Mi Pilates Admin`) se enlaza directo al sitio LocalWP (`devtatipilates.local`) mediante un directory junction, de forma que probar en local reemplaza la prueba en staging. `Promote stable release` ya no requiere haber publicado antes una release candidate en el canal `staging`.
+**Alternativas consideradas:** Mantener staging como paso obligatorio; mantener staging solo como entorno opcional para casos puntuales (elegida como complemento, no como reemplazo total: el workflow `Publish staging release` y el canal `staging` siguen existiendo por si se necesitan).
+**Por qué se eligió esta:** El entorno local ya refleja el codigo del repo en tiempo real (junction), por lo que exigir un despliegue adicional a un sitio de staging separado añadia un paso redundante sin mejorar la validación.
+**Estado:** Vigente

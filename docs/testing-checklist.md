@@ -1,12 +1,13 @@
 # Testing checklist
 
-Checklist para probar una version antes de publicarla a `stable`.
+Checklist para probar una version en `devtatipilates.local` antes de
+publicarla a `stable`. No hay staging en el flujo normal (ver
+`docs/release-runbook.md`).
 
 ## Preparacion
 
-- Confirmar que el sitio correcto esta en el canal esperado:
-  - staging: `Tati Pilates > Configuracion > Actualizaciones privadas > staging`
-  - live: `Tati Pilates > Configuracion > Actualizaciones privadas > stable`
+- Confirmar que el sitio local esta en el canal esperado: `Tati Pilates > Configuracion > Actualizaciones privadas > stable`.
+- Si se usa staging puntualmente: `Tati Pilates > Configuracion > Actualizaciones privadas > staging`.
 - Confirmar version instalada en `Plugins > Tati Pilates`.
 - Confirmar que el pre-release detecta la version de WordPress usada para la
   regresion y que coincide con `release-metadata.json`.

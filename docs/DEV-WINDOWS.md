@@ -20,7 +20,8 @@ La carpeta antigua `D:\Proyectos\wps` es el sitio de la Mac, ya no se usa.
 Node 24, pnpm 11.9, git, GitHub CLI (`gh`), PHP 8.3 + Composer (para repos con `composer.json`),
 Ruby 3.3 (lint YAML), ExifTool e ImageMagick, LocalWP.
 
-Los tests usan el **PHP 8.2 de Local** con la configuración del sitio, no el PHP 8.3 del sistema.
+Los tests usan el **PHP de Local del sitio (8.3.36)** con su `php.ini`, no el PHP del sistema.
+`pre-release-check.ps1` define `PHPRC` solo; sin ese `php.ini` no carga `curl` y el smoke del portal falla con "HTTP 0".
 
 ## Tokens y claves
 
@@ -36,7 +37,7 @@ Los tests usan el **PHP 8.2 de Local** con la configuración del sitio, no el PH
 $env:PHPRC="$env:APPDATA\Local\run\PikzcSaOn\conf\php"
 $env:TP_WP_LOAD='D:\wps\devtatipilates\app\public\wp-load.php'
 $env:TP_PORTAL_URL='http://devtatipilates.local/mi-pilates'   # http: el cert de Local es autofirmado
-$php="$env:APPDATA\Local\lightning-services\php-8.2.29+0\bin\win64\php.exe"
+$php="$env:APPDATA\Local\lightning-services\php-8.3.36+0\bin\win64\php.exe"
 Get-ChildItem tests\*.php | % { "$($_.Name): " + (& $php $_.FullName 2>&1 | Select -Last 1) }
 ```
 
@@ -45,15 +46,20 @@ El sitio debe estar **iniciado** en Local. El id `PikzcSaOn` es el del sitio en 
 
 ## Flujo de release
 
+Desde 2026-10-23 no hay staging: el plugin dentro de `devtatipilates.local` es
+un directory junction al repo (`D:\wps\devtatipilates\app\public\wp-content\plugins\tatipilates`
+-> `D:\Proyectos\Mi Pilates Admin`), así que probar en LocalWP reemplaza la
+prueba en staging.
+
 1. `.\pre-release-check.ps1` (8 chequeos; `-NoZip` para no generar el ZIP).
-2. `git add -A; git commit -m "..."; git push origin main`.
-3. `.\release.ps1 -Channel staging -Version X.Y.Z-rc.N` publica la release candidate.
-4. Probar en `https://staging2.tatipilates.com`.
-5. `.\release.ps1 -Channel stable -Version X.Y.Z` promueve a live.
+2. Probar el cambio en `https://devtatipilates.local/`.
+3. `git add -A; git commit -m "..."; git push origin main`.
+4. `.\release.ps1 -Channel stable -Version X.Y.Z` promueve directo a live.
 
 `release.ps1` exige árbol limpio y `main` sincronizado con `origin`, pide confirmación y espera el workflow.
 Los workflows son manuales (`workflow_dispatch`): hacer push no publica nada por sí solo.
-Staging y live leen `updates.json` (canales `staging` y `stable`) con su propio token.
+Live lee `updates.json` (canal `stable`) con su propio token. El canal `staging` y
+`release.ps1 -Channel staging` siguen disponibles pero ya no son un paso obligatorio.
 
 ## Particularidades de Windows
 

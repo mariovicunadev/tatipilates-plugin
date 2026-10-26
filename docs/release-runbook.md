@@ -1,14 +1,20 @@
 # Release runbook
 
-Guia operativa para cerrar una tanda, publicarla en staging y promoverla a live.
+Guia operativa para cerrar una tanda local y promoverla directo a live.
+
+Desde 2026-10-23 no hay staging: el repo esta enlazado a `devtatipilates.local`
+mediante un directory junction (ver `docs/DEV-WINDOWS.md`), asi que la prueba
+en local reemplaza la prueba en staging antes de promover a stable.
 
 ## Principios
 
 - `main` guarda codigo.
-- `Publish staging release` publica una version candidata para staging.
 - `Promote stable release` publica una version final para live.
-- No editar staging/live manualmente sin replicar el cambio en Git.
-- No promover a `stable` sin probar staging.
+- No editar live manualmente sin replicar el cambio en Git.
+- No promover a `stable` sin probar en LocalWP (`devtatipilates.local`).
+- El workflow `Publish staging release` y el canal `staging` de `updates.json`
+  siguen existiendo por si hace falta una release candidate puntual, pero ya
+  no son un paso obligatorio del flujo normal.
 
 ## Cerrar una tanda local
 
@@ -45,74 +51,19 @@ git commit -m "tipo: descripcion corta"
 git push
 ```
 
-## Publicar release candidate a staging
+## Probar en local
 
-En GitHub:
-
-```text
-Actions > Publish staging release > Run workflow
-```
-
-Usar version con sufijo `rc`:
-
-```text
-1.2.0-rc.1
-```
-
-El workflow:
-
-- actualiza `tatipilates.php`;
-- actualiza `updates.json` en `channels.staging`;
-- crea tag `v1.2.0-rc.1`;
-- genera ZIP;
-- crea prerelease en GitHub.
-
-Despues traer cambios a local:
-
-```zsh
-git pull --ff-only
-```
-
-## Actualizar staging
-
-En WordPress staging:
-
-```text
-Escritorio > Actualizaciones > Comprobar de nuevo
-Plugins > Tati Pilates > Actualizar ahora
-```
-
-Si no aparece:
-
-- guardar de nuevo `Tati Pilates > Configuracion > Actualizaciones privadas`;
-- confirmar canal `staging`;
-- confirmar que el estado del token sea `Configurado por servidor`;
-- confirmar `TP_GITHUB_TOKEN` y permiso `Contents: Read-only`;
-- confirmar que GitHub release tiene asset ZIP.
-
-## Probar staging
-
-Usar:
+Antes de promover, probar la tanda en `https://devtatipilates.local/` (enlazado
+al repo via directory junction) usando:
 
 ```text
 docs/testing-checklist.md
 ```
 
-Si aparece bug:
-
-1. Corregir en local.
-2. Commit/push.
-3. Publicar nuevo RC:
-
-```text
-1.2.0-rc.2
-```
-
-4. Repetir pruebas.
+Si aparece un bug: corregir en local, commitear/pushear y volver a probar antes
+de promover.
 
 ## Promover a stable
-
-Cuando staging pasa:
 
 ```text
 Actions > Promote stable release > Run workflow
@@ -157,9 +108,8 @@ Para un fix pequeno:
 2. Registrar la correccion en `docs/releases/changelog.json` y regenerar `CHANGELOG.md`.
 3. Pre-release local.
 4. Commit/push.
-5. Publicar `x.y.z-rc.1` a staging.
-6. Probar solo el flujo afectado + smoke test basico.
-7. Promover `x.y.z` a stable.
+5. Probar el flujo afectado + smoke test basico en `devtatipilates.local`.
+6. Promover `x.y.z` a stable.
 
 ## Rollback
 
@@ -171,6 +121,19 @@ Si live falla despues de update:
 4. Publicar nuevo patch.
 
 El updater no hace rollback automatico.
+
+## Staging (opcional, ya no forma parte del flujo normal)
+
+Si alguna vez se necesita una release candidate externa (ej. para que otra
+persona pruebe sin usar LocalWP):
+
+```text
+Actions > Publish staging release > Run workflow
+```
+
+Version con sufijo `rc` (ej. `1.2.0-rc.1`). Actualiza `updates.json` en
+`channels.staging`, crea tag y prerelease en GitHub. No es un requisito previo
+a `Promote stable release`.
 
 ## Comandos utiles
 

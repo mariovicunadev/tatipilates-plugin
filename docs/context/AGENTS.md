@@ -24,7 +24,7 @@ No hacer commit ni push hasta que el usuario lo pida explícitamente.
 ## Comandos
 - Build: no hay compilación; el paquete se genera con `./pre-release-check.sh --yes`.
 - Test: `./pre-release-check.sh --yes`; para backups usar `TP_WP_LOAD=/ruta/a/wp-load.php php tests/backup-import-validation.php` y `php tests/backup-selective-restore.php`; para el updater usar `php tests/updater-token-configuration.php`; para permisos medicos usar `php tests/medical-data-access.php` y `php tests/medical-data-encryption.php`; para assets usar `php tests/static-assets-lint.php`; para smoke PWA usar `TP_PORTAL_URL=https://sitio/mi-pilates php tests/portal-pwa-smoke.php`; para precios usar `php tests/pricing-config.php`; complementar con `docs/testing-checklist.md`.
-- Run local: iniciar LocalWP y abrir `https://devtatipilates.local/`; el plugin está enlazado desde `/Users/vicunav/Documents/wps/app/public/wp-content/plugins/tatipilates`.
+- Run local: iniciar LocalWP y abrir `https://devtatipilates.local/`; el plugin está enlazado mediante directory junction desde `D:\wps\devtatipilates\app\public\wp-content\plugins\tatipilates` hacia `D:\Proyectos\Mi Pilates Admin`.
 
 ## Reglas para el agente
 - Siempre actualizar PROGRESS.md al final de cada sesión.
@@ -36,7 +36,6 @@ No hacer commit ni push hasta que el usuario lo pida explícitamente.
 - Preservar cambios locales existentes que no pertenezcan a la tarea.
 - No commitear `CONTEXTO.md`, `dev/`, `release/`, ZIPs, tokens ni credenciales.
 - No pegar ni solicitar tokens en chats; indicar cómo crear o rotar credenciales.
-- Antes de staging, correr pre-release, revisar diff y publicar una versión `-rc.N`.
-- No promover a stable sin prueba explícita en staging.
+- Desde 2026-10-23 no hay canal de staging: probar en LocalWP (`devtatipilates.local`), correr pre-release y publicar directo a `stable` con `./release.ps1 -Channel stable -Version X.Y.Z`.
 - Después de workflows de release, ejecutar `git pull --ff-only` y verificar versión, manifest, tag y asset.
 - Para detalles ampliados consultar `docs/architecture.md`, `docs/data-model.md`, `docs/product-decisions.md`, `docs/security-checklist.md`, `docs/testing-checklist.md` y `docs/release-runbook.md`.

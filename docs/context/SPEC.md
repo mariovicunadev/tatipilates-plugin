@@ -36,7 +36,7 @@
 | PWA/mobile | No hay overflow horizontal y los assets actualizados no quedan retenidos indefinidamente. |
 | Backups | Exporta datos propios sin contraseñas; la importación es idempotente y mantiene relaciones. |
 | Updater | Staging recibe solo RC, live recibe solo versiones finales y los ZIP privados se descargan con token autorizado. |
-| Release | `./pre-release-check.sh --yes` pasa antes de publicar y stable solo se promueve después de probar staging. |
+| Release | `./pre-release-check.ps1` pasa antes de publicar y stable solo se promueve después de probar en LocalWP (no hay staging obligatorio). |
 | Precios | Un campo invalido no bloquea el guardado de los demas y conserva su valor anterior; guardar purga la cache de SG Optimizer cuando esta disponible. |
 
 ## Fuera de alcance

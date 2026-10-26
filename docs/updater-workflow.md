@@ -2,7 +2,10 @@
 
 El plugin soporta actualizaciones privadas desde GitHub Releases usando dos canales:
 
-- `staging`: sitio de pruebas.
+- `staging`: canal opcional para una release candidate puntual. Desde
+  2026-10-23 no hay un sitio de staging activo ni es un paso obligatorio del
+  flujo de release (ver `docs/release-runbook.md`); la prueba se hace en
+  LocalWP, que esta enlazado al repo.
 - `stable`: sitio live.
 
 Cada instalacion de WordPress elige su canal desde:
